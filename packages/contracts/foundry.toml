@@ -1,0 +1,6 @@
+[profile.default]
+src = 'src'
+out = 'foundry-out'
+libs = ['lib']
+cache_path = 'foundry-cache'
+solc_version = '0.8.16'
