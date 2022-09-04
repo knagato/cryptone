@@ -11,13 +11,20 @@ The contracts is the suite of Solidity contracts.
 The api is an HTTP webserver.
 
 ## Quickstart
+### [Only the first time] Place dotenv file in each package
+Create .env from .env.sample.
+
+### Run database
 ```
-# Install dependencies
-yarn
-
-# Run database
 docker-compose up -d
+```
 
-# Run all packages
+### Install dependencies
+```
+yarn
+```
+
+### Run all packages
+```
 yarn dev
 ```
