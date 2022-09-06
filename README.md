@@ -7,9 +7,6 @@ The web is the frontend for interacting with CrypTone features.
 ### contracts
 The contracts is the suite of Solidity contracts.
 
-### api
-The api is an HTTP webserver.
-
 ## Quickstart
 ### [Only the first time] Place dotenv file in each package
 Create .env from .env.sample.
