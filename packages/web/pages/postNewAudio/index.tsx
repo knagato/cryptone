@@ -1,7 +1,8 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useRef, useState } from "react";
 import FormCard from "src/components/formCard";
+import Lit from "src/lib/Lit";
 
 const PostNewAudio: NextPage = () => {
   const newAudio = useRef<HTMLInputElement>(null);
@@ -10,9 +11,49 @@ const PostNewAudio: NextPage = () => {
   const audioDescription = useRef<HTMLInputElement>(null);
   // const preview = useRef(null);
 
-  const handleSubmit = (e: FormEvent) => {
-    console.log("post new audio!!");
-    console.log(audioName.current?.value);
+  // const [zipBlob, setZipBlob] = useState<Blob | File>();
+
+  // const [encryptedFile, setEncryptedFile] = useState<Blob>();
+  // const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
+
+  const [encryptedString, setEncryptedString] = useState("");
+  const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
+
+  const handleSubmit = async (e: FormEvent) => {
+    const file = newAudio.current?.files?.item(0);
+    if (!file) {
+      console.log("a file is not found");
+      return;
+    }
+    const { encryptedString, encryptedSymmetricKey } = await Lit.encryptString(
+      "Hello Lit-Protocol!!"
+    );
+    // setZipBlob(zipBlob);
+
+    // setEncryptedFile(encryptedFile);
+    setEncryptedString(encryptedString);
+    setEncryptedSymmetricKey(encryptedSymmetricKey);
+  };
+
+  const handleDecrypt = async () => {
+    // if (!encryptedFile) {
+    //   return;
+    // }
+    // const decryptedFile = await Lit.decryptFile(
+    //   encryptedFile,
+    //   encryptedSymmetricKey
+    // );
+
+    const decryptedString = await Lit.decryptString(
+      encryptedString,
+      encryptedSymmetricKey
+    );
+    console.log();
+    // console.log("decryptedFile");
+    // console.log(decryptedFile);
+    console.log(decryptedString);
+    // console.log("metaData");
+    // console.log(metadata);
   };
 
   return (
@@ -63,6 +104,9 @@ const PostNewAudio: NextPage = () => {
             type="text"
             className="border rounded"
           />
+        </>
+        <>
+          <button onClick={handleDecrypt}>decrypt</button>
         </>
         <>
           <label htmlFor="message">preview (15s):</label>
