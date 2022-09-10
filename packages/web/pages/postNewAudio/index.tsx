@@ -16,41 +16,62 @@ const PostNewAudio: NextPage = () => {
 
   // const [zipBlob, setZipBlob] = useState<Blob | File>();
 
+  const isEmpty = (str: string | undefined) => str === undefined || str === "";
+
   const handleSubmit = async (e: FormEvent) => {
-    const file = newAudio.current?.files?.item(0);
-    if (!file) {
+    const audioFile = newAudio.current?.files?.item(0);
+    const jacketFile = jacket.current?.files?.item(0);
+    const name = audioName.current?.value;
+    const description = audioDescription.current?.value;
+    const preview = null; // TODO: implement preview
+    // if (!audioFile || !jacketFile || isEmpty(name) || isEmpty(description) || !preview) {
+    if (!audioFile) {
       console.log("a file is not found");
       return;
     }
 
+    // TODO: mint original audio token to smart contract
+    const conditionTokenId = 0;
+
     const { encryptedFile, encryptedSymmetricKey } = await Lit.encryptFile(
-      file
+      audioFile,
+      conditionTokenId
     );
     setEncryptedFile(encryptedFile);
     setEncryptedSymmetricKey(encryptedSymmetricKey);
 
-    // const zipBlob = await Lit.encryptFileAndZip(file);
-    // setZipBlob(zipBlob);
+    /*
+    const zipBlob = await Lit.encryptFileAndZip(file);
+    setZipBlob(zipBlob);
+      */
   };
 
+  // TODO: this implement will be moved to component to play original audio.
   const handleDecrypt = async () => {
     if (!encryptedFile) {
       return;
     }
+
+    // TODO: load original audio tokenId from smart contract
+    const conditionTokenId = 0;
+
     const decryptedFile = await Lit.decryptFile(
       encryptedFile,
-      encryptedSymmetricKey
+      encryptedSymmetricKey,
+      conditionTokenId
     );
     console.log(decryptedFile);
 
-    // if (!zipBlob) {
-    //   return;
-    // }
-    // const { decryptedFile, metadata } = await Lit.decryptZipFile(zipBlob);
-    // console.log("decryptedFile");
-    // console.log(decryptedFile);
-    // console.log("metaData");
-    // console.log(metadata);
+    /*
+    if (!zipBlob) {
+      return;
+    }
+    const { decryptedFile, metadata } = await Lit.decryptZipFile(zipBlob);
+    console.log("decryptedFile");
+    console.log(decryptedFile);
+    console.log("metaData");
+    console.log(metadata);
+    */
   };
 
   return (
@@ -103,13 +124,13 @@ const PostNewAudio: NextPage = () => {
           />
         </>
         <>
+          <label htmlFor="message">preview (15s):</label>
+          {/* TODO:Edit Preview */}
+        </>
+        <>
           <button onClick={handleDecrypt} className="border rounded">
             decrypt
           </button>
-        </>
-        <>
-          <label htmlFor="message">preview (15s):</label>
-          {/* TODO:Edit Preview */}
         </>
       </FormCard>
       {/* TODO:Footer */}

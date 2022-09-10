@@ -1,38 +1,10 @@
 // this is any type.
 import lit from "@lit-protocol/sdk-browser";
+import { access } from "fs";
 import { SAMPLE_CONTRACT_ADDRESS } from "src/utils/constants";
 
 const client = new lit.LitNodeClient();
 const chain = "mumbai";
-
-// Must hold at least one Monster Suit NFT (https://opensea.io/collection/monster-suit)
-const accessControlConditions =
-  // [
-  //   {
-  //     contractAddress: CRYPTONE_CONTRACT_ADDRESS, // Please check that correct address is set for this constant.
-  //     standardContractType: "ERC1155",
-  //     chain,
-  //     method: "balanceOf",
-  //     parameters: [":userAddress", "0"],
-  //     returnValueTest: {
-  //       comparator: ">",
-  //       value: "0",
-  //     },
-  //   },
-  // ];
-  [
-    {
-      contractAddress: SAMPLE_CONTRACT_ADDRESS,
-      standardContractType: "ERC1155",
-      chain,
-      method: "balanceOf",
-      parameters: [":userAddress", "0"],
-      returnValueTest: {
-        comparator: ">",
-        value: "0",
-      },
-    },
-  ];
 
 type EncryptStringResult = {
   encryptedString: string;
@@ -50,7 +22,40 @@ type DecryptWithUnzipResult = {
 };
 
 class Lit {
-  litNodeClient: any;
+  private litNodeClient: any;
+
+  private accessControlConditions =
+    // [
+    //   {
+    //     contractAddress: CRYPTONE_CONTRACT_ADDRESS, // Please check that correct address is set for this constant.
+    //     standardContractType: "ERC1155",
+    //     chain,
+    //     method: "balanceOf",
+    //     parameters: [":userAddress", "0"],
+    //     returnValueTest: {
+    //       comparator: ">",
+    //       value: "0",
+    //     },
+    //   },
+    // ];
+    [
+      {
+        contractAddress: SAMPLE_CONTRACT_ADDRESS,
+        standardContractType: "ERC1155",
+        chain,
+        method: "balanceOf",
+        parameters: [":userAddress", "0"],
+        returnValueTest: {
+          comparator: ">",
+          value: "0",
+        },
+      },
+    ];
+
+  private setConditionTokenId(tokenId: Number) {
+    // TODO: modify this function to match conditions structure
+    this.accessControlConditions[0].parameters[1] = tokenId.toString();
+  }
 
   async connect() {
     await client.connect();
@@ -58,19 +63,23 @@ class Lit {
   }
 
   // using encryptFile
-  async encryptFile(file: Blob | File): Promise<EncryptFileResult> {
+  async encryptFile(
+    file: Blob | File,
+    conditionTokenId: Number
+  ): Promise<EncryptFileResult> {
     if (!this.litNodeClient) {
       await this.connect();
     }
 
+    this.setConditionTokenId(conditionTokenId);
     const authSig = await lit.checkAndSignAuthMessage({ chain });
 
     const { encryptedFile, symmetricKey } = await lit.encryptFile({ file });
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
-      accessControlConditions,
-      symmetricKey,
-      authSig,
-      chain,
+      accessControlConditions: this.accessControlConditions,
+      symmetricKey: symmetricKey,
+      authSig: authSig,
+      chain: chain,
     });
     return {
       encryptedFile,
@@ -83,16 +92,18 @@ class Lit {
 
   async decryptFile(
     encryptedFile: Blob,
-    encryptedSymmetricKey: string
+    encryptedSymmetricKey: string,
+    conditionTokenId: Number
   ): Promise<Blob> {
     if (!this.litNodeClient) {
       await this.connect();
     }
 
+    this.setConditionTokenId(conditionTokenId);
     const authSig = await lit.checkAndSignAuthMessage({ chain });
 
     const symmetricKey = await this.litNodeClient.getEncryptionKey({
-      accessControlConditions: accessControlConditions,
+      accessControlConditions: this.accessControlConditions,
       toDecrypt: encryptedSymmetricKey,
       chain: chain,
       authSig: authSig,
@@ -104,6 +115,7 @@ class Lit {
     return decryptedFile;
   }
 
+  /*
   // using encryptFileAndZipWithMetadata
   async encryptFileAndZip(file: Blob | File): Promise<Blob> {
     if (!this.litNodeClient) {
@@ -135,7 +147,9 @@ class Lit {
       metadata,
     };
   }
+  */
 
+  /*
   async encryptString(message: string): Promise<EncryptStringResult> {
     if (!this.litNodeClient) {
       await this.connect();
@@ -183,6 +197,7 @@ class Lit {
 
     return decryptedString;
   }
+  */
 }
 
 export default new Lit();
