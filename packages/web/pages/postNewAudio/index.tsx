@@ -11,10 +11,10 @@ const PostNewAudio: NextPage = () => {
   const audioDescription = useRef<HTMLInputElement>(null);
   // const preview = useRef(null);
 
-  // const [encryptedFile, setEncryptedFile] = useState<Blob>();
-  // const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
+  const [encryptedFile, setEncryptedFile] = useState<Blob>();
+  const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
 
-  const [zipBlob, setZipBlob] = useState<Blob | File>();
+  // const [zipBlob, setZipBlob] = useState<Blob | File>();
 
   const handleSubmit = async (e: FormEvent) => {
     const file = newAudio.current?.files?.item(0);
@@ -22,30 +22,35 @@ const PostNewAudio: NextPage = () => {
       console.log("a file is not found");
       return;
     }
-    // setEncryptedFile(encryptedFile);
-    // setEncryptedSymmetricKey(encryptedSymmetricKey);
 
-    const zipBlob = await Lit.encryptFileAndZip(file);
-    setZipBlob(zipBlob);
+    const { encryptedFile, encryptedSymmetricKey } = await Lit.encryptFile(
+      file
+    );
+    setEncryptedFile(encryptedFile);
+    setEncryptedSymmetricKey(encryptedSymmetricKey);
+
+    // const zipBlob = await Lit.encryptFileAndZip(file);
+    // setZipBlob(zipBlob);
   };
 
   const handleDecrypt = async () => {
-    // if (!encryptedFile) {
-    //   return;
-    // }
-    // const decryptedFile = await Lit.decryptFile(
-    //   encryptedFile,
-    //   encryptedSymmetricKey
-    // );
-
-    if (!zipBlob) {
+    if (!encryptedFile) {
       return;
     }
-    const { decryptedFile, metadata } = await Lit.decryptZipFile(zipBlob);
-    console.log("decryptedFile");
+    const decryptedFile = await Lit.decryptFile(
+      encryptedFile,
+      encryptedSymmetricKey
+    );
     console.log(decryptedFile);
-    console.log("metaData");
-    console.log(metadata);
+
+    // if (!zipBlob) {
+    //   return;
+    // }
+    // const { decryptedFile, metadata } = await Lit.decryptZipFile(zipBlob);
+    // console.log("decryptedFile");
+    // console.log(decryptedFile);
+    // console.log("metaData");
+    // console.log(metadata);
   };
 
   return (
@@ -98,7 +103,9 @@ const PostNewAudio: NextPage = () => {
           />
         </>
         <>
-          <button onClick={handleDecrypt}>decrypt</button>
+          <button onClick={handleDecrypt} className="border rounded">
+            decrypt
+          </button>
         </>
         <>
           <label htmlFor="message">preview (15s):</label>
