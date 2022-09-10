@@ -34,6 +34,21 @@ const accessControlConditions =
     },
   ];
 
+type EncryptStringResult = {
+  encryptedString: string;
+  encryptedSymmetricKey: string;
+};
+
+type EncryptFileResult = {
+  encryptedFile: Blob;
+  encryptedSymmetricKey: string;
+};
+
+type DecryptWithUnzipResult = {
+  decryptedFile: Blob;
+  metadata: Object;
+};
+
 class Lit {
   litNodeClient: any;
 
@@ -42,7 +57,7 @@ class Lit {
     this.litNodeClient = client;
   }
 
-  async encryptString(message: String) {
+  async encryptString(message: string): Promise<EncryptStringResult> {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -66,7 +81,10 @@ class Lit {
     };
   }
 
-  async decryptString(encryptedString: String, encryptedSymmetricKey: String) {
+  async decryptString(
+    encryptedString: string,
+    encryptedSymmetricKey: string
+  ): Promise<string> {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -88,7 +106,7 @@ class Lit {
   }
 
   // using encryptFile
-  async encryptFile(file: Blob | File) {
+  async encryptFile(file: Blob | File): Promise<EncryptFileResult> {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -111,7 +129,10 @@ class Lit {
     };
   }
 
-  async decryptFile(encryptedFile: Blob, encryptedSymmetricKey: String) {
+  async decryptFile(
+    encryptedFile: Blob,
+    encryptedSymmetricKey: string
+  ): Promise<Blob> {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -129,7 +150,7 @@ class Lit {
   }
 
   // using encryptFileAndZipWithMetadata
-  async encryptFileAndZip(file: Blob | File) {
+  async encryptFileAndZip(file: Blob | File): Promise<Blob> {
     if (!this.litNodeClient) {
       await this.connect();
     }
@@ -144,7 +165,7 @@ class Lit {
     return zipBlob;
   }
 
-  async decryptFileAndZip(file: Blob | File) {
+  async decryptZipFile(file: Blob): Promise<DecryptWithUnzipResult> {
     if (!this.litNodeClient) {
       await this.connect();
     }

@@ -11,13 +11,10 @@ const PostNewAudio: NextPage = () => {
   const audioDescription = useRef<HTMLInputElement>(null);
   // const preview = useRef(null);
 
-  // const [zipBlob, setZipBlob] = useState<Blob | File>();
-
   // const [encryptedFile, setEncryptedFile] = useState<Blob>();
   // const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
 
-  const [encryptedString, setEncryptedString] = useState("");
-  const [encryptedSymmetricKey, setEncryptedSymmetricKey] = useState("");
+  const [zipBlob, setZipBlob] = useState<Blob | File>();
 
   const handleSubmit = async (e: FormEvent) => {
     const file = newAudio.current?.files?.item(0);
@@ -25,14 +22,11 @@ const PostNewAudio: NextPage = () => {
       console.log("a file is not found");
       return;
     }
-    const { encryptedString, encryptedSymmetricKey } = await Lit.encryptString(
-      "Hello Lit-Protocol!!"
-    );
-    // setZipBlob(zipBlob);
-
     // setEncryptedFile(encryptedFile);
-    setEncryptedString(encryptedString);
-    setEncryptedSymmetricKey(encryptedSymmetricKey);
+    // setEncryptedSymmetricKey(encryptedSymmetricKey);
+
+    const zipBlob = await Lit.encryptFileAndZip(file);
+    setZipBlob(zipBlob);
   };
 
   const handleDecrypt = async () => {
@@ -44,16 +38,14 @@ const PostNewAudio: NextPage = () => {
     //   encryptedSymmetricKey
     // );
 
-    const decryptedString = await Lit.decryptString(
-      encryptedString,
-      encryptedSymmetricKey
-    );
-    console.log();
-    // console.log("decryptedFile");
-    // console.log(decryptedFile);
-    console.log(decryptedString);
-    // console.log("metaData");
-    // console.log(metadata);
+    if (!zipBlob) {
+      return;
+    }
+    const { decryptedFile, metadata } = await Lit.decryptZipFile(zipBlob);
+    console.log("decryptedFile");
+    console.log(decryptedFile);
+    console.log("metaData");
+    console.log(metadata);
   };
 
   return (
