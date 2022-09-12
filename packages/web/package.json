@@ -24,7 +24,7 @@
     "next": "12.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "replicate-js": "github:nicholascelestin/replicate-js#v0.0.6",
+    "replicate-js": "github:nicholascelestin/replicate-js",
     "three": "^0.144.0",
     "wagmi": "^0.6.4"
   },
