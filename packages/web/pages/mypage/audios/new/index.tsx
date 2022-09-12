@@ -16,17 +16,7 @@ const PostNewAudio: NextPage = () => {
   };
 
   return (
-    <div>
-      <div className="font-semibold flex justify-center">
-        {/* TODO:Header */}
-        <Link href="/">
-          <a className="text-blue-500">Home</a>
-        </Link>
-        /
-        <Link href="/putOnSale">
-          <a className="text-blue-500">Put On Sale</a>
-        </Link>
-      </div>
+    <div className="py-10">
       <FormCard
         title="Post New Audio"
         buttonName="submit"
