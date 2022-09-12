@@ -13,9 +13,13 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@graywolfai/react-heroicons": "^2.0.1",
+    "@headlessui/react": "^1.7.0",
+    "@heroicons/react": "^2.0.10",
     "@prisma/client": "^4.3.1",
     "@react-three/drei": "^9.29.1",
     "@react-three/fiber": "^8.7.2",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "ethers": "^5.7.0",
     "next": "12.2.5",
     "react": "18.2.0",
