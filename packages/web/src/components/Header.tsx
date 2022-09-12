@@ -43,36 +43,36 @@ const navigation = {
       ],
     },
     {
-      id: 'alter',
-      name: 'Alter',
+      id: 'altar',
+      name: 'Altar',
       featured: [
         {
-          name: 'New Alter',
-          href: '/alters/1',
-          imageSrc: '/alter1.png',
+          name: 'New Altar',
+          href: '/altars/1',
+          imageSrc: '/altar1.png',
           imageAlt: 'sample',
         },
         {
-          name: 'Popular Alter',
-          href: '/alters/1',
+          name: 'Popular Altar',
+          href: '/altars/1',
           imageSrc: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/d3db96b0-4314-491c-bcdb-1528bea0ba30/out-0.png',
           imageAlt: 'electric sheep, neon, synthwave',
         },
       ],
       sections: [
         {
-          id: 'your-alters',
-          name: 'Your Alters',
+          id: 'your-altars',
+          name: 'Your Altars',
           items: [
-            { name: 'All Alters', href: '/mypage/alters' },
-            { name: 'Create New Alter', href: '/mypage/alters/new' },
+            { name: 'All Altars', href: '/mypage/altars' },
+            { name: 'Create New Altar', href: '/mypage/altars/new' },
           ],
         },
         {
-          id: 'public-alters',
-          name: 'Public Alters',
+          id: 'public-altars',
+          name: 'Public Altars',
           items: [
-            { name: 'All Alters', href: '/alters' },
+            { name: 'All Altars', href: '/altars' },
           ],
         },
       ],
@@ -84,7 +84,7 @@ const navigation = {
         {
           name: 'New Creator',
           href: '/users/1',
-          imageSrc: '/alter1.png',
+          imageSrc: '/altar1.png',
           imageAlt: 'sample',
         },
         {
