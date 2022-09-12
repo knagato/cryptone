@@ -1,4 +1,4 @@
-import { Object3D, PerspectiveCamera, Box3, Vector3 } from "three";
+import { Object3D, PerspectiveCamera, Box3, Vector3, Mesh } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 /*
@@ -71,3 +71,7 @@ export function fitCameraToCenteredObject(
   // prevent camera from zooming out far enough to create far plane cutoff
   orbitControls.maxDistance = cameraToFarEdge * 2;
 }
+
+export const isMesh = (x: Object3D): x is Mesh => {
+  return (x as Mesh).isMesh;
+};
