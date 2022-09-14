@@ -1,8 +1,8 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { NextPage } from "next";
-import React from "react";
-import { DiscJacket } from "src/components/Altar/DiscJacket";
+import React, { Suspense } from "react";
+import { Loader } from "src/components/Altar/Loader";
 import { Room } from "src/components/Altar/Room";
 
 const Altar: NextPage = () => {
@@ -27,8 +27,9 @@ const Altar: NextPage = () => {
           enableZoom
           enablePan
         />
-        <Room />
-        <DiscJacket position={[1, 0, 0]} />
+        <Suspense fallback={<Loader />}>
+          <Room />
+        </Suspense>
       </Canvas>
     </div>
   );

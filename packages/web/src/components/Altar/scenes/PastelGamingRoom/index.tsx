@@ -1,0 +1,1 @@
+export { PastelGamingRoom } from "./model";
