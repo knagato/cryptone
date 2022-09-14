@@ -5,14 +5,12 @@ import { useRouter } from "next/router";
 const altars = [
   {
     id: "altar1",
-    thumbnail:
-      "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-01.jpg",
+    thumbnail: "/altar-pastel.png",
     title: "Modern",
   },
   {
     id: "altar2",
-    thumbnail:
-      "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-02.jpg",
+    thumbnail: "/altar-pastel.png",
     title: "Fancy",
   },
 ];
