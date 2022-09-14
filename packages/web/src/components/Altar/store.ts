@@ -1,15 +1,15 @@
 import produce from "immer";
 import create from "zustand";
 
-type JacketKey = "1" | "2" | "3" | "4";
+export type JacketKey = "1" | "2" | "3" | "4";
 
 type AltarState = {
-  openJacketModal: boolean;
+  selectedJacket?: JacketKey;
   displayedJacket: Record<JacketKey, string | undefined>;
   actions: {
     init: () => void;
-    setOpenJacketModal: (open: boolean) => void;
-    setJacket: (pos: JacketKey, src: string) => void;
+    setOpenJacketModal: (key?: JacketKey) => void;
+    setJacket: (src: string) => void;
   };
 };
 
@@ -26,15 +26,17 @@ const useStore = create<AltarState>()((set, get) => {
       init: () => {
         //
       },
-      setOpenJacketModal: (open) => {
-        set({ openJacketModal: open });
+      setOpenJacketModal: (key) => {
+        set({ selectedJacket: key });
       },
-      setJacket: (key, src) => {
-        const { displayedJacket } = get();
+      setJacket: (src) => {
+        const { displayedJacket, selectedJacket } = get();
+        if (selectedJacket === undefined) return;
+
         const newJacket = produce(displayedJacket, (draft) => {
-          draft[key] = src;
+          draft[selectedJacket] = src;
         });
-        set({ displayedJacket: newJacket, openJacketModal: false });
+        set({ displayedJacket: newJacket, selectedJacket: undefined });
       },
     },
   };

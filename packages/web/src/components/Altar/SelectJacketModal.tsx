@@ -77,7 +77,7 @@ export const SelectJacketModal: FC<Props> = ({ onClose, open }) => {
                         <div key={jacket.id}>
                           <button
                             onClick={() => {
-                              actions.setJacket("1", jacket.thumbnail);
+                              actions.setJacket(jacket.thumbnail);
                             }}
                             className="group"
                           >

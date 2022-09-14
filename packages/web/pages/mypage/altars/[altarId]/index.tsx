@@ -7,7 +7,7 @@ import { Room, useStore } from "src/components/Altar";
 import { SelectJacketModal } from "src/components/Altar/SelectJacketModal";
 
 const Home: NextPage = () => {
-  const openJacketModal = useStore((state) => state.openJacketModal);
+  const selectedJacket = useStore((state) => state.selectedJacket);
   const actions = useStore((state) => state.actions);
 
   return (
@@ -43,8 +43,8 @@ const Home: NextPage = () => {
       </div>
 
       <SelectJacketModal
-        open={!!openJacketModal}
-        onClose={() => actions?.setOpenJacketModal(false)}
+        open={!!selectedJacket}
+        onClose={() => actions?.setOpenJacketModal(undefined)}
       />
     </div>
   );
