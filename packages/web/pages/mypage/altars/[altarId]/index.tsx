@@ -3,9 +3,13 @@ import { Canvas } from "@react-three/fiber";
 import { NextPage } from "next";
 import React, { Suspense } from "react";
 import { Loader } from "src/components/Altar/Loader";
-import { Room } from "src/components/Altar/Room";
+import { Room, useStore } from "src/components/Altar";
+import { SelectJacketModal } from "src/components/Altar/SelectJacketModal";
 
 const Home: NextPage = () => {
+  const openJacketModal = useStore((state) => state.openJacketModal);
+  const actions = useStore((state) => state.actions);
+
   return (
     <div className="container mx-auto py-16">
       <div className="md:flex md:items-center md:justify-between">
@@ -37,6 +41,11 @@ const Home: NextPage = () => {
           </Suspense>
         </Canvas>
       </div>
+
+      <SelectJacketModal
+        open={!!openJacketModal}
+        onClose={() => actions?.setOpenJacketModal(false)}
+      />
     </div>
   );
 };

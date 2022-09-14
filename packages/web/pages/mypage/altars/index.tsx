@@ -1,25 +1,23 @@
 import type { NextPage } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 const user = {
   id: "user1",
   altars: [
     {
-      id: "altar1",
-      thumbnail:
-        "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-01.jpg",
-      title: "My awesome altar1",
+      id: "altar-pastel",
+      thumbnail: "/altar-pastel.png",
+      title: "Pastel",
     },
     {
       id: "altar2",
-      thumbnail:
-        "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-02.jpg",
+      thumbnail: "/altar-pastel.png",
       title: "My awesome altar2",
     },
     {
       id: "altar3",
-      thumbnail:
-        "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-03.jpg",
+      thumbnail: "/altar-pastel.png",
       title: "My awesome altar3",
     },
   ],
@@ -48,11 +46,12 @@ const Home: NextPage = () => {
           {user.altars.map((altar) => (
             <Link key={altar.id} href={`/mypage/altars/${altar.id}`}>
               <a className="group">
-                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg sm:aspect-w-2 sm:aspect-h-3">
-                  <img
+                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg sm:aspect-w-2 sm:aspect-h-3 relative">
+                  <Image
+                    alt={altar.title}
                     src={altar.thumbnail}
-                    alt="Person using a pen to cross a task off a productivity paper card."
-                    className="h-full w-full object-cover object-center group-hover:opacity-75"
+                    layout="fill"
+                    objectFit='cover'
                   />
                 </div>
                 <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
