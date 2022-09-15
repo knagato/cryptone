@@ -10,9 +10,31 @@ const PostNewAudio: NextPage = () => {
   const audioDescription = useRef<HTMLInputElement>(null);
   // const preview = useRef(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     console.log("post new audio!!");
-    console.log(audioName.current?.value);
+
+    // post data to IPFS
+    // this implement is test 
+    const audioFile = newAudio.current?.files?.item(0);
+    const jacketFile = jacket.current?.files?.item(0);
+    if (!audioFile || !jacketFile) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append(
+      "audio",
+      new Blob([audioFile], { type: "application/octet-stream" })
+    );
+    formData.append(
+      "jacket",
+      new Blob([jacketFile], { type: "application/octet-stream" })
+    );
+    const response = await fetch("/api/ipfs", {
+      method: "POST",
+      headers: {},
+      body: formData,
+    });
+    console.log(response.body);
   };
 
   return (
