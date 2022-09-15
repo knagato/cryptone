@@ -25,6 +25,7 @@
     "formidable": "^2.0.1",
     "immer": "^9.0.15",
     "next": "12.2.5",
+    "nft.storage": "^7.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "replicate-js": "github:nicholascelestin/replicate-js",
