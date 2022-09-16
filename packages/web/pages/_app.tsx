@@ -13,7 +13,7 @@ const { chains, provider } = configureChains(
   [chain.polygonMumbai, chain.optimismGoerli],
   [
     alchemyProvider({
-      apiKey: "yourAlchemyApiKey",
+      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
     }),
     publicProvider(),
   ]
