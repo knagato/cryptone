@@ -22,12 +22,19 @@ contract CrypTone is
 {
     uint256 internal constant REVISION = 1;
 
+    address internal immutable COLLECT_NFT_IMPL;
+
     /**
      * @dev This modifier reverts if the caller is not the configured governance address.
      */
     modifier onlyGov() {
         _validateCallerIsGovernance();
         _;
+    }
+
+    constructor(address collectNFTImpl) {
+        if (collectNFTImpl == address(0)) revert Errors.InitParamsInvalid();
+        COLLECT_NFT_IMPL = collectNFTImpl;
     }
 
     /// @inheritdoc ILensHub

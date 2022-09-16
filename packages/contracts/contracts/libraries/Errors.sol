@@ -17,6 +17,9 @@ library Errors {
     error HandleContainsInvalidCharacters();
     error ProfileImageURILengthInvalid();
 
+    // Module Errors
+    error InitParamsInvalid();
+
     // MultiState Errors
     error Paused();
     error PublishingPaused();
