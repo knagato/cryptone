@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import {ILensHub} from "../interfaces/ILensHub.sol";
-import {Events} from "../libraries/Events.sol";
-import {Constants} from "../libraries/Constants.sol";
-import {DataTypes} from "../libraries/DataTypes.sol";
-import {Errors} from "../libraries/Errors.sol";
-import {PublishingLogic} from "../libraries/PublishingLogic.sol";
-import {ProfileTokenURILogic} from "../libraries/ProfileTokenURILogic.sol";
-import {LensNFTBase} from "./base/LensNFTBase.sol";
-import {LensMultiState} from "./base/LensMultiState.sol";
-import {LensHubStorage} from "./storage/LensHubStorage.sol";
-import {VersionedInitializable} from "../upgradeability/VersionedInitializable.sol";
+import {ILensHub} from "./interfaces/ILensHub.sol";
+import {Events} from "./libraries/Events.sol";
+import {Constants} from "./libraries/Constants.sol";
+import {DataTypes} from "./libraries/DataTypes.sol";
+import {Errors} from "./libraries/Errors.sol";
+import {PublishingLogic} from "./libraries/PublishingLogic.sol";
+import {ProfileTokenURILogic} from "./libraries/ProfileTokenURILogic.sol";
+import {LensNFTBase} from "./core/base/LensNFTBase.sol";
+import {LensMultiState} from "./core/base/LensMultiState.sol";
+import {LensHubStorage} from "./core/storage/LensHubStorage.sol";
+import {VersionedInitializable} from "./upgradeability/VersionedInitializable.sol";
 
 contract CrypTone is
     LensNFTBase,

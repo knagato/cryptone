@@ -6,7 +6,7 @@ import {DataTypes} from "./DataTypes.sol";
 import {Errors} from "./Errors.sol";
 import {Events} from "./Events.sol";
 import {Constants} from "./Constants.sol";
-import {AudioNFT} from "../core/AudioNFT.sol";
+import {AudioNFT} from "../AudioNFT.sol";
 
 library PublishingLogic {
     function createProfile(
@@ -55,7 +55,12 @@ library PublishingLogic {
         _audioByIdByProfile[profileId][audioId].audioIdPointed = audioId;
         _audioByIdByProfile[profileId][audioId].contentURI = contentURI;
 
-        emit Events.PostCreated(profileId, audioId, contentURI, block.timestamp);
+        emit Events.PostCreated(
+            profileId,
+            audioId,
+            contentURI,
+            block.timestamp
+        );
     }
 
     function putOnSale(

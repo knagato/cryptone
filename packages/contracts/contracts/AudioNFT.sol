@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import "../../../../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
-import "../../../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../../../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
+import "../../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
 contract AudioNFT is ERC1155URIStorage, Ownable {
     constructor() ERC1155("") {}
