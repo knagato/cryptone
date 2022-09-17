@@ -1,31 +1,40 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { FC, Fragment } from "react";
 import { useStore } from "./store";
+import { Jacket } from "./types";
 
-const jackets = [
+const audios: Jacket[] = [
   {
     id: "m1",
     title: "Music 1",
-    thumbnail:
+    thumbnailSrc:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster1_baseColor.jpeg",
+    audioSrc:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
   },
   {
     id: "m2",
     title: "Music 2",
-    thumbnail:
+    thumbnailSrc:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster2_baseColor.jpeg",
+    audioSrc:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
   },
   {
     id: "m3",
     title: "Music 3",
-    thumbnail:
+    thumbnailSrc:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster3_baseColor.jpeg",
+    audioSrc:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
   },
   {
     id: "m4",
     title: "Music 4",
-    thumbnail:
+    thumbnailSrc:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster4_baseColor.jpeg",
+    audioSrc:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
   },
 ];
 
@@ -73,19 +82,19 @@ export const SelectJacketModal: FC<Props> = ({ onClose, open }) => {
                       Select music jacket images
                     </Dialog.Title>
                     <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                      {jackets.map((jacket) => (
-                        <div key={jacket.id}>
+                      {audios.map((audio) => (
+                        <div key={audio.id}>
                           <button
                             onClick={() => {
-                              actions.setJacket(jacket.thumbnail);
+                              actions.setJacket(audio);
                             }}
                             className="group"
                           >
                             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
-                              <img alt={jacket.title} src={jacket.thumbnail} />
+                              <img alt={audio.title} src={audio.thumbnailSrc} />
                             </div>
                             <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                              <h3>{jacket.title}</h3>
+                              <h3>{audio.title}</h3>
                             </div>
                           </button>
                         </div>

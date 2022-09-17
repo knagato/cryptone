@@ -1,15 +1,16 @@
 import produce from "immer";
 import create from "zustand";
+import { Jacket } from "./types";
 
 export type JacketKey = "1" | "2" | "3" | "4";
 
 type AltarState = {
   selectedJacket?: JacketKey;
-  displayedJacket: Record<JacketKey, string | undefined>;
+  displayedJacket: Record<JacketKey, Jacket | undefined>;
   actions: {
     init: () => void;
     setOpenJacketModal: (key?: JacketKey) => void;
-    setJacket: (src: string) => void;
+    setJacket: (src: Jacket) => void;
   };
 };
 
