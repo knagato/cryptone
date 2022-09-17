@@ -9,15 +9,6 @@ import {Events} from "../../libraries/Events.sol";
 import {ERC721Time} from "./ERC721Time.sol";
 import {ERC721Enumerable} from "./ERC721Enumerable.sol";
 
-/**
- * @title LensNFTBase
- * @author Lens Protocol
- *
- * @notice This is an abstract base contract to be inherited by other Lens Protocol NFTs, it includes
- * the slightly modified ERC721Enumerable, which itself inherits from the ERC721Time-- which adds an
- * internal operator approval setter, stores the mint timestamp for each token, and replaces the
- * constructor with an initializer.
- */
 abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
     bytes32 internal constant EIP712_REVISION_HASH = keccak256("1");
 
@@ -32,15 +23,6 @@ abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
 
     mapping(address => uint256) public sigNonces;
 
-    /**
-     * @notice Initializer sets the name, symbol and the cached domain separator.
-     *
-     * NOTE: Inheritor contracts *must* call this function to initialize the name & symbol in the
-     * inherited ERC721 contract.
-     *
-     * @param name The name to set in the ERC721 contract.
-     * @param symbol The symbol to set in the ERC721 contract.
-     */
     function _initialize(string calldata name, string calldata symbol)
         internal
     {
@@ -81,9 +63,6 @@ abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
         _burn(tokenId);
     }
 
-    /**
-     * @dev Wrapper for ecrecover to reduce code size, used in meta-tx specific functions.
-     */
     function _validateRecoveredAddress(
         bytes32 digest,
         address expectedAddress,
@@ -97,9 +76,6 @@ abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
         ) revert Errors.SignatureInvalid();
     }
 
-    /**
-     * @dev Calculates EIP712 DOMAIN_SEPARATOR based on the current contract and chain ID.
-     */
     function _calculateDomainSeparator() internal view returns (bytes32) {
         return
             keccak256(
@@ -113,13 +89,6 @@ abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
             );
     }
 
-    /**
-     * @dev Calculates EIP712 digest based on the current DOMAIN_SEPARATOR.
-     *
-     * @param hashedMessage The message hash from which the digest should be calculated.
-     *
-     * @return bytes32 A 32-byte output representing the EIP712 digest.
-     */
     function _calculateDigest(bytes32 hashedMessage)
         internal
         view

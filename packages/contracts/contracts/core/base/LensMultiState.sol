@@ -6,14 +6,6 @@ import {Events} from "../../libraries/Events.sol";
 import {DataTypes} from "../../libraries/DataTypes.sol";
 import {Errors} from "../../libraries/Errors.sol";
 
-/**
- * @title LensMultiState
- *
- * @notice This is an abstract contract that implements internal LensHub state setting and validation.
- *
- * whenNotPaused: Either publishingPaused or Unpaused.
- * whenPublishingEnabled: When Unpaused only.
- */
 abstract contract LensMultiState {
     DataTypes.ProtocolState private _state;
 
@@ -27,14 +19,6 @@ abstract contract LensMultiState {
         _;
     }
 
-    /**
-     * @notice Returns the current protocol state.
-     *
-     * @return ProtocolState The Protocol state, an enum, where:
-     *      0: Unpaused
-     *      1: PublishingPaused
-     *      2: Paused
-     */
     function getState() external view returns (DataTypes.ProtocolState) {
         return _state;
     }

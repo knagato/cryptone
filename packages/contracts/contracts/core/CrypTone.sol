@@ -24,9 +24,6 @@ contract CrypTone is
 
     address internal immutable AUDIO_NFT_IMPL;
 
-    /**
-     * @dev This modifier reverts if the caller is not the configured governance address.
-     */
     modifier onlyGov() {
         _validateCallerIsGovernance();
         _;
@@ -208,25 +205,11 @@ contract CrypTone is
         return _putOnSale(vars.profileId, vars.audioId, vars.amount);
     }
 
-    /**
-     * @notice Burns a profile, this maintains the profile data struct, but deletes the
-     * handle hash to profile ID mapping value.
-     *
-     * NOTE: This overrides the LensNFTBase contract's `burn()` function and calls it to fully burn
-     * the NFT.
-     */
     function burn(uint256 tokenId) public override whenNotPaused {
         super.burn(tokenId);
         _clearHandleHash(tokenId);
     }
 
-    /**
-     * @notice Burns a profile with a signature, this maintains the profile data struct, but deletes the
-     * handle hash to profile ID mapping value.
-     *
-     * NOTE: This overrides the LensNFTBase contract's `burnWithSig()` function and calls it to fully burn
-     * the NFT.
-     */
     function burnWithSig(
         uint256 tokenId,
         DataTypes.EIP712Signature calldata sig
@@ -332,9 +315,6 @@ contract CrypTone is
         }
     }
 
-    /**
-     * @dev Overrides the ERC721 tokenURI function to return the associated URI with a given profile.
-     */
     function tokenURI(uint256 tokenId)
         public
         view
@@ -415,10 +395,6 @@ contract CrypTone is
         address to,
         uint256 tokenId
     ) internal override whenNotPaused {
-        // if (_dispatcherByProfile[tokenId] != address(0)) {
-        //     _setDispatcher(tokenId, address(0));
-        // }
-
         if (_defaultProfileByAddress[from] == tokenId) {
             _defaultProfileByAddress[from] = 0;
         }

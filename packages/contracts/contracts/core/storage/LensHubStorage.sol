@@ -4,14 +4,6 @@ pragma solidity 0.8.16;
 
 import {DataTypes} from "../../libraries/DataTypes.sol";
 
-/**
- * @title LensHubStorage
- * @author Lens Protocol
- *
- * @notice This is an abstract contract that *only* contains storage for the LensHub contract. This
- * *must* be inherited last (bar interfaces) in order to preserve the LensHub storage layout. Adding
- * storage variables should be done solely at the bottom of this contract.
- */
 abstract contract LensHubStorage {
     bytes32 internal constant SET_PROFILE_IMAGE_URI_WITH_SIG_TYPEHASH =
         keccak256(

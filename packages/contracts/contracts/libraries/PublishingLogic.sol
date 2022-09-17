@@ -8,27 +8,7 @@ import {Events} from "./Events.sol";
 import {Constants} from "./Constants.sol";
 import {AudioNFT} from "../core/AudioNFT.sol";
 
-/**
- * @title PublishingLogic
- * @author Lens Protocol
- *
- * @notice This is the library that contains the logic for profile creation & publication.
- *
- * @dev The functions are external, so they are called from the hub via `delegateCall` under the hood. Furthermore,
- * expected events are emitted from this library instead of from the hub to alleviate code size concerns.
- */
 library PublishingLogic {
-    /**
-     * @notice Executes the logic to create a profile with the given parameters to the given address.
-     *
-     * @param vars The CreateProfileData struct containing the following parameters:
-     *      to: The address receiving the profile.
-     *      handle: The handle to set for the profile, must be unique and non-empty.
-     *      imageURI: The URI to set for the profile image.
-     * @param profileId The profile ID to associate with this profile NFT (token ID).
-     * @param _profileIdByHandleHash The storage reference to the mapping of profile IDs by handle hash.
-     * @param _profileById The storage reference to the mapping of profile structs by IDs.
-     */
     function createProfile(
         DataTypes.CreateProfileData calldata vars,
         uint256 profileId,
@@ -53,16 +33,6 @@ library PublishingLogic {
         _emitProfileCreated(profileId, vars);
     }
 
-    // /**
-    //  * @notice Creates a post publication mapped to the given profile.
-    //  *
-    //  * @dev To avoid a stack too deep error, reference parameters are passed in memory rather than calldata.
-    //  *
-    //  * @param profileId The profile ID to associate this publication to.
-    //  * @param contentURI The URI to set for this publication.
-    //  * @param pubId The publication ID to associate with this publication.
-    //  * @param _pubByIdByProfile The storage reference to the mapping of publications by publication ID by profile ID.
-    //  */
     function postNewAudio(
         uint256 profileId,
         string memory contentURI,

@@ -9,19 +9,6 @@ library ProfileTokenURILogic {
     uint8 internal constant DEFAULT_FONT_SIZE = 24;
     uint8 internal constant MAX_HANDLE_LENGTH_WITH_DEFAULT_FONT_SIZE = 17;
 
-    /**
-     * @notice Generates the token URI for the profile NFT.
-     *
-     * @dev The decoded token URI JSON metadata contains the following fields: name, description, image and attributes.
-     * The image field contains a base64-encoded SVG. Both the JSON metadata and the image are generated fully on-chain.
-     *
-     * @param id The token ID of the profile.
-     * @param owner The address which owns the profile.
-     * @param handle The profile's handle.
-     * @param imageURI The profile's picture URI. An empty string if has not been set.
-     *
-     * @return string The profile's token URI as a base64-encoded JSON string.
-     */
     function getProfileTokenURI(
         uint256 id,
         address owner,
@@ -59,17 +46,6 @@ library ProfileTokenURILogic {
             );
     }
 
-    /**
-     * @notice Generates the token image.
-     *
-     * @dev If the image URI was set and meets URI format conditions, it will be embedded in the token image.
-     * Otherwise, a default picture will be used. Handle font size is a function of handle length.
-     *
-     * @param handleWithAtSymbol The profile's handle beginning with "@" symbol.
-     * @param imageURI The profile's picture URI. An empty string if has not been set.
-     *
-     * @return string The profile token image as a base64-encoded SVG.
-     */
     function _getSVGImageBase64Encoded(
         string memory handleWithAtSymbol,
         string memory imageURI
@@ -92,16 +68,6 @@ library ProfileTokenURILogic {
             );
     }
 
-    /**
-     * @notice Gets the fragment of the SVG correponding to the profile picture.
-     *
-     * @dev If the image URI was set and meets URI format conditions, this will return an image tag referencing it.
-     * Otherwise, a group tag that renders the default picture will be returned.
-     *
-     * @param imageURI The profile's picture URI. An empty string if has not been set.
-     *
-     * @return string The fragment of the SVG token's image correspondending to the profile picture.
-     */
     function _getSVGProfilePicture(string memory imageURI)
         internal
         pure
@@ -122,17 +88,6 @@ library ProfileTokenURILogic {
         }
     }
 
-    /**
-     * @notice Maps the handle length to a font size.
-     *
-     * @dev Gives the font size as a function of handle length using the following formula:
-     *
-     *      fontSize(handleLength) = 24                              when handleLength <= 17
-     *      fontSize(handleLength) = 24 - (handleLength - 12) / 2    when handleLength  > 17
-     *
-     * @param handleLength The profile's handle length.
-     * @return uint256 The font size.
-     */
     function _handleLengthToFontSize(uint256 handleLength)
         internal
         pure
@@ -144,16 +99,6 @@ library ProfileTokenURILogic {
                 : DEFAULT_FONT_SIZE - (handleLength - 12) / 2;
     }
 
-    /**
-     * @notice Decides if Profile NFT should use user provided custom profile picture or the default one.
-     *
-     * @dev It checks if there is a custom imageURI set and makes sure it does not contain double-quotes to prevent
-     * injection attacks through the generated SVG.
-     *
-     * @param imageURI The imageURI set by the profile owner.
-     *
-     * @return bool A boolean indicating whether custom profile picture should be used or not.
-     */
     function _shouldUseCustomPicture(string memory imageURI)
         internal
         pure
