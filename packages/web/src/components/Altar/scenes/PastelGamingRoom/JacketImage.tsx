@@ -2,7 +2,7 @@ import { useTexture } from "@react-three/drei";
 import { FC } from "react";
 import { RepeatWrapping, sRGBEncoding } from "three";
 import { JacketKey, useStore } from "../../store";
-import useSound from "../../useSound";
+import { useSound } from "../../useSound";
 import { JACKET_INFO } from "./constants";
 
 type Props = {
@@ -27,7 +27,7 @@ export const JacketImage: FC<Props> = ({ jacketKey }) => {
   });
   useTexture.preload(textureUrl);
 
-  const [play] = useSound(displayedJacket[jacketKey]?.audioSrc ?? []);
+  const [play] = useSound(displayedJacket[jacketKey]?.audioSrc);
 
   return (
     <group
