@@ -19,7 +19,11 @@ abstract contract LensHubStorage {
         );
     bytes32 internal constant POST_WITH_SIG_TYPEHASH =
         keccak256(
-            "PostWithSig(uint256 profileId,string contentURI,address collectModule,bytes collectModuleInitData,address referenceModule,bytes referenceModuleInitData,uint256 nonce,uint256 deadline)"
+            "PostNewWorkWithSig(uint256 profileId,string workURI,uint256 nonce,uint256 deadline)"
+        );
+    bytes32 internal constant ON_SALE_WITH_SIG_TYPEHASH =
+        keccak256(
+            "PutOnSaleWithSig(uint256 profileId,uint256 workId,uint256 amount,uint256 nonce,uint256 deadline)"
         );
 
     mapping(bytes32 => uint256) internal _profileIdByHandleHash;

@@ -86,25 +86,25 @@ interface ILensHub {
         DataTypes.SetProfileImageURIWithSigData calldata vars
     ) external;
 
-    /**
-     * @notice Publishes a post to a given profile, must be called by the profile owner.
-     *
-     * @param vars A PostData struct containing the needed parameters.
-     *
-     * @return uint256 An integer representing the post's publication ID.
-     */
-    function post(DataTypes.PostData calldata vars) external returns (uint256);
+    // /**
+    //  * @notice Publishes a post to a given profile, must be called by the profile owner.
+    //  *
+    //  * @param vars A PostData struct containing the needed parameters.
+    //  *
+    //  * @return uint256 An integer representing the post's publication ID.
+    //  */
+    // function post(DataTypes.PostData calldata vars) external returns (uint256);
 
-    /**
-     * @notice Publishes a post to a given profile via signature with the specified parameters.
-     *
-     * @param vars A PostWithSigData struct containing the regular parameters and an EIP712Signature struct.
-     *
-     * @return uint256 An integer representing the post's publication ID.
-     */
-    function postWithSig(DataTypes.PostWithSigData calldata vars)
-        external
-        returns (uint256);
+    // /**
+    //  * @notice Publishes a post to a given profile via signature with the specified parameters.
+    //  *
+    //  * @param vars A PostWithSigData struct containing the regular parameters and an EIP712Signature struct.
+    //  *
+    //  * @return uint256 An integer representing the post's publication ID.
+    //  */
+    // function postWithSig(DataTypes.PostWithSigData calldata vars)
+    //     external
+    //     returns (uint256);
 
     /**
      * @notice Returns default profile for a given wallet address

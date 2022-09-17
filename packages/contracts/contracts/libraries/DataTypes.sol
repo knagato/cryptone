@@ -60,6 +60,7 @@ library DataTypes {
         uint256 pubCount;
         string handle;
         string imageURI;
+        address audioNFT;
     }
 
     /**
@@ -116,28 +117,27 @@ library DataTypes {
         EIP712Signature sig;
     }
 
-    /**
-     * @notice A struct containing the parameters required for the `post()` function.
-     *
-     * @param profileId The token ID of the profile to publish to.
-     * @param contentURI The URI to set for this new publication.
-     */
     struct PostData {
         uint256 profileId;
-        string contentURI;
+        string workURI;
     }
 
-    /**
-     * @notice A struct containing the parameters required for the `postWithSig()` function. Parameters are the same as
-     * the regular `post()` function, with an added EIP712Signature.
-     *
-     * @param profileId The token ID of the profile to publish to.
-     * @param contentURI The URI to set for this new publication.
-     * @param sig The EIP712Signature struct containing the profile owner's signature.
-     */
     struct PostWithSigData {
         uint256 profileId;
-        string contentURI;
+        string workURI;
+        EIP712Signature sig;
+    }
+
+    struct OnSaleData {
+        uint256 profileId;
+        uint256 workId;
+        uint256 amount;
+    }
+
+    struct OnSaleWithSigData {
+        uint256 profileId;
+        uint256 workId;
+        uint256 amount;
         EIP712Signature sig;
     }
 

@@ -17,8 +17,9 @@ library Errors {
     error HandleContainsInvalidCharacters();
     error ProfileImageURILengthInvalid();
 
-    // Module Errors
     error InitParamsInvalid();
+    error WorkIdInvalid();
+    error AudioNFTInvalid();
 
     // MultiState Errors
     error Paused();

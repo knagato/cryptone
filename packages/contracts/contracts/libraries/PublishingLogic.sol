@@ -6,6 +6,7 @@ import {DataTypes} from "./DataTypes.sol";
 import {Errors} from "./Errors.sol";
 import {Events} from "./Events.sol";
 import {Constants} from "./Constants.sol";
+import {AudioNFT} from "../core/AudioNFT.sol";
 
 /**
  * @title PublishingLogic
@@ -52,26 +53,56 @@ library PublishingLogic {
         _emitProfileCreated(profileId, vars);
     }
 
-    /**
-     * @notice Creates a post publication mapped to the given profile.
-     *
-     * @dev To avoid a stack too deep error, reference parameters are passed in memory rather than calldata.
-     *
-     * @param profileId The profile ID to associate this publication to.
-     * @param contentURI The URI to set for this publication.
-     * @param pubId The publication ID to associate with this publication.
-     * @param _pubByIdByProfile The storage reference to the mapping of publications by publication ID by profile ID.
-     */
-    function createPost(
+    // /**
+    //  * @notice Creates a post publication mapped to the given profile.
+    //  *
+    //  * @dev To avoid a stack too deep error, reference parameters are passed in memory rather than calldata.
+    //  *
+    //  * @param profileId The profile ID to associate this publication to.
+    //  * @param contentURI The URI to set for this publication.
+    //  * @param pubId The publication ID to associate with this publication.
+    //  * @param _pubByIdByProfile The storage reference to the mapping of publications by publication ID by profile ID.
+    //  */
+    function postNewWork(
         uint256 profileId,
         string memory contentURI,
         uint256 pubId,
+        address audioNFTImpl,
         mapping(uint256 => mapping(uint256 => DataTypes.PublicationStruct))
-            storage _pubByIdByProfile
+            storage _pubByIdByProfile,
+        mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
     ) external {
+        // _pubByIdByProfile[profileId][pubId].contentURI = contentURI;
+        address audioNFT = _profileById[profileId].audioNFT;
+        if (audioNFT == address(0)) {
+            audioNFT = _deployAudioNFT(profileId, audioNFTImpl);
+            _profileById[profileId].audioNFT = audioNFT;
+        }
+        AudioNFT(audioNFT).addNewType(pubId, contentURI);
+
+        // kottigawa nimo hozon
+        _pubByIdByProfile[profileId][pubId].profileIdPointed = profileId;
+        _pubByIdByProfile[profileId][pubId].pubIdPointed = pubId;
         _pubByIdByProfile[profileId][pubId].contentURI = contentURI;
 
         emit Events.PostCreated(profileId, pubId, contentURI, block.timestamp);
+    }
+
+    function putOnSale(
+        uint256 profileId,
+        uint256 workId,
+        uint256 amount,
+        mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
+    ) external {
+        if (_profileById[profileId].pubCount < workId) {
+            revert Errors.WorkIdInvalid();
+        }
+        address audioNFT = _profileById[profileId].audioNFT;
+        if (audioNFT == address(0)) {
+            revert Errors.AudioNFTInvalid();
+        }
+
+        AudioNFT(audioNFT).mint(workId, amount);
     }
 
     function _emitProfileCreated(
@@ -110,4 +141,9 @@ library PublishingLogic {
             }
         }
     }
+
+    function _deployAudioNFT(uint256 profileId, address audioNFTImpl)
+        private
+        returns (address)
+    {}
 }

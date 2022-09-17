@@ -22,7 +22,7 @@ contract CrypTone is
 {
     uint256 internal constant REVISION = 1;
 
-    address internal immutable COLLECT_NFT_IMPL;
+    address internal immutable AUDIO_NFT_IMPL;
 
     /**
      * @dev This modifier reverts if the caller is not the configured governance address.
@@ -32,9 +32,9 @@ contract CrypTone is
         _;
     }
 
-    constructor(address collectNFTImpl) {
-        if (collectNFTImpl == address(0)) revert Errors.InitParamsInvalid();
-        COLLECT_NFT_IMPL = collectNFTImpl;
+    constructor(address audioNFTImpl) {
+        if (audioNFTImpl == address(0)) revert Errors.InitParamsInvalid();
+        AUDIO_NFT_IMPL = audioNFTImpl;
     }
 
     /// @inheritdoc ILensHub
@@ -91,7 +91,6 @@ contract CrypTone is
         whenNotPaused
         returns (uint256)
     {
-        // if (!_profileCreatorWhitelisted[msg.sender]) revert Errors.ProfileCreatorNotWhitelisted();
         unchecked {
             uint256 profileId = ++_profileCounter;
             _mint(vars.to, profileId);
@@ -140,21 +139,17 @@ contract CrypTone is
         _setProfileImageURI(vars.profileId, vars.imageURI);
     }
 
-    /// @inheritdoc ILensHub
-    function post(DataTypes.PostData calldata vars)
+    function postNewWork(DataTypes.PostData calldata vars)
         external
-        override
         whenPublishingEnabled
         returns (uint256)
     {
         _validateCallerIsProfileOwner(vars.profileId);
-        return _createPost(vars.profileId, vars.contentURI);
+        return _postNewWork(vars.profileId, vars.workURI);
     }
 
-    /// @inheritdoc ILensHub
-    function postWithSig(DataTypes.PostWithSigData calldata vars)
+    function postNewWorkWithSig(DataTypes.PostWithSigData calldata vars)
         external
-        override
         whenPublishingEnabled
         returns (uint256)
     {
@@ -166,7 +161,7 @@ contract CrypTone is
                         abi.encode(
                             POST_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            keccak256(bytes(vars.contentURI)),
+                            keccak256(bytes(vars.workURI)),
                             sigNonces[owner]++,
                             vars.sig.deadline
                         )
@@ -176,7 +171,41 @@ contract CrypTone is
                 vars.sig
             );
         }
-        return _createPost(vars.profileId, vars.contentURI);
+        return _postNewWork(vars.profileId, vars.workURI);
+    }
+
+    function putOnSale(DataTypes.OnSaleData calldata vars)
+        external
+        whenPublishingEnabled
+    {
+        _validateCallerIsProfileOwner(vars.profileId);
+        _putOnSale(vars.profileId, vars.workId, vars.amount);
+    }
+
+    function putOnSaleWithSig(DataTypes.OnSaleWithSigData calldata vars)
+        external
+        whenPublishingEnabled
+    {
+        address owner = ownerOf(vars.profileId);
+        unchecked {
+            _validateRecoveredAddress(
+                _calculateDigest(
+                    keccak256(
+                        abi.encode(
+                            ON_SALE_WITH_SIG_TYPEHASH,
+                            vars.profileId,
+                            vars.workId,
+                            vars.amount,
+                            sigNonces[owner]++,
+                            vars.sig.deadline
+                        )
+                    )
+                ),
+                owner,
+                vars.sig
+            );
+        }
+        return _putOnSale(vars.profileId, vars.workId, vars.amount);
     }
 
     /**
@@ -348,20 +377,34 @@ contract CrypTone is
         );
     }
 
-    function _createPost(uint256 profileId, string memory contentURI)
+    function _postNewWork(uint256 profileId, string memory contentURI)
         internal
         returns (uint256)
     {
         unchecked {
             uint256 pubId = ++_profileById[profileId].pubCount;
-            PublishingLogic.createPost(
+            PublishingLogic.postNewWork(
                 profileId,
                 contentURI,
                 pubId,
-                _pubByIdByProfile
+                AUDIO_NFT_IMPL,
+                _pubByIdByProfile,
+                _profileById
             );
             return pubId;
         }
+    }
+
+    function _putOnSale(
+        uint256 profileId,
+        uint256 workId,
+        uint256 amount
+    ) internal {
+        if (_profileById[profileId].pubCount < workId) {
+            revert Errors.WorkIdInvalid();
+        }
+
+        PublishingLogic.putOnSale(profileId, workId, amount, _profileById);
     }
 
     function _setProfileImageURI(uint256 profileId, string calldata imageURI)
