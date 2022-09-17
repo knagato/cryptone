@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {ILensNFTBase} from "../../interfaces/ILensNFTBase.sol";
 import {Errors} from "../../libraries/Errors.sol";

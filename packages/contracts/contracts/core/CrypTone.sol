@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {ILensHub} from "../interfaces/ILensHub.sol";
 import {Events} from "../libraries/Events.sol";
@@ -250,14 +250,8 @@ contract CrypTone is
         return _governance;
     }
 
-    /// @inheritdoc ILensHub
-    function getPubCount(uint256 profileId)
-        external
-        view
-        override
-        returns (uint256)
-    {
-        return _profileById[profileId].pubCount;
+    function getWorkCount(uint256 profileId) external view returns (uint256) {
+        return _profileById[profileId].workCount;
     }
 
     /// @inheritdoc ILensHub
@@ -270,34 +264,30 @@ contract CrypTone is
         return _profileById[profileId].handle;
     }
 
-    /// @inheritdoc ILensHub
-    function getPubPointer(uint256 profileId, uint256 pubId)
+    function getWorkPointer(uint256 profileId, uint256 workId)
         external
         view
-        override
         returns (uint256, uint256)
     {
-        uint256 profileIdPointed = _pubByIdByProfile[profileId][pubId]
+        uint256 profileIdPointed = _workByIdByProfile[profileId][workId]
             .profileIdPointed;
-        uint256 pubIdPointed = _pubByIdByProfile[profileId][pubId].pubIdPointed;
-        return (profileIdPointed, pubIdPointed);
+        uint256 workIdPointed = _workByIdByProfile[profileId][workId]
+            .workIdPointed;
+        return (profileIdPointed, workIdPointed);
     }
 
-    /// @inheritdoc ILensHub
-    function getContentURI(uint256 profileId, uint256 pubId)
+    function getContentURI(uint256 profileId, uint256 workId)
         external
         view
-        override
         returns (string memory)
     {
-        return _pubByIdByProfile[profileId][pubId].contentURI;
+        return _workByIdByProfile[profileId][workId].contentURI;
     }
 
     /// @inheritdoc ILensHub
     function getProfileIdByHandle(string calldata handle)
         external
         view
-        override
         returns (uint256)
     {
         bytes32 handleHash = keccak256(bytes(handle));
@@ -314,30 +304,28 @@ contract CrypTone is
         return _profileById[profileId];
     }
 
-    /// @inheritdoc ILensHub
-    function getPub(uint256 profileId, uint256 pubId)
+    function getWork(uint256 profileId, uint256 workId)
         external
         view
-        override
-        returns (DataTypes.PublicationStruct memory)
+        returns (DataTypes.WorkStruct memory)
     {
-        return _pubByIdByProfile[profileId][pubId];
+        return _workByIdByProfile[profileId][workId];
     }
 
-    /// @inheritdoc ILensHub
-    function getPubType(uint256 profileId, uint256 pubId)
+    function getWorkType(uint256 profileId, uint256 workId)
         external
         view
-        override
         returns (DataTypes.PubType)
     {
-        if (pubId == 0 || _profileById[profileId].pubCount < pubId) {
+        if (workId == 0 || _profileById[profileId].workCount < workId) {
             return DataTypes.PubType.Nonexistent;
             // } else if (
-            //     _pubByIdByProfile[profileId][pubId].collectModule == address(0)
+            //     _workByIdByProfile[profileId][workId].collectModule == address(0)
             // ) {
             //     return DataTypes.PubType.Mirror;
-        } else if (_pubByIdByProfile[profileId][pubId].profileIdPointed == 0) {
+        } else if (
+            _workByIdByProfile[profileId][workId].profileIdPointed == 0
+        ) {
             return DataTypes.PubType.Post;
         } else {
             return DataTypes.PubType.Unknown;
@@ -382,16 +370,16 @@ contract CrypTone is
         returns (uint256)
     {
         unchecked {
-            uint256 pubId = ++_profileById[profileId].pubCount;
+            uint256 workId = ++_profileById[profileId].workCount;
             PublishingLogic.postNewWork(
                 profileId,
                 contentURI,
-                pubId,
+                workId,
                 AUDIO_NFT_IMPL,
-                _pubByIdByProfile,
+                _workByIdByProfile,
                 _profileById
             );
-            return pubId;
+            return workId;
         }
     }
 
@@ -400,7 +388,7 @@ contract CrypTone is
         uint256 workId,
         uint256 amount
     ) internal {
-        if (_profileById[profileId].pubCount < workId) {
+        if (_profileById[profileId].workCount < workId) {
             revert Errors.WorkIdInvalid();
         }
 

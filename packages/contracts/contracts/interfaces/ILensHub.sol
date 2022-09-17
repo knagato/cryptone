@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {DataTypes} from "../libraries/DataTypes.sol";
 
@@ -122,14 +122,14 @@ interface ILensHub {
      */
     function getGovernance() external view returns (address);
 
-    /**
-     * @notice Returns the publication count for a given profile.
-     *
-     * @param profileId The token ID of the profile to query.
-     *
-     * @return uint256 The number of publications associated with the queried profile.
-     */
-    function getPubCount(uint256 profileId) external view returns (uint256);
+    // /**
+    //  * @notice Returns the publication count for a given profile.
+    //  *
+    //  * @param profileId The token ID of the profile to query.
+    //  *
+    //  * @return uint256 The number of publications associated with the queried profile.
+    //  */
+    // function getPubCount(uint256 profileId) external view returns (uint256);
 
     /**
      * @notice Returns the handle associated with a profile.
@@ -140,32 +140,32 @@ interface ILensHub {
      */
     function getHandle(uint256 profileId) external view returns (string memory);
 
-    /**
-     * @notice Returns the publication pointer (profileId & pubId) associated with a given publication.
-     *
-     * @param profileId The token ID of the profile that published the publication to query the pointer for.
-     * @param pubId The publication ID of the publication to query the pointer for.
-     *
-     * @return tuple First, the profile ID of the profile the current publication is pointing to, second, the
-     * publication ID of the publication the current publication is pointing to.
-     */
-    function getPubPointer(uint256 profileId, uint256 pubId)
-        external
-        view
-        returns (uint256, uint256);
+    // /**
+    //  * @notice Returns the publication pointer (profileId & pubId) associated with a given publication.
+    //  *
+    //  * @param profileId The token ID of the profile that published the publication to query the pointer for.
+    //  * @param pubId The publication ID of the publication to query the pointer for.
+    //  *
+    //  * @return tuple First, the profile ID of the profile the current publication is pointing to, second, the
+    //  * publication ID of the publication the current publication is pointing to.
+    //  */
+    // function getPubPointer(uint256 profileId, uint256 pubId)
+    //     external
+    //     view
+    //     returns (uint256, uint256);
 
-    /**
-     * @notice Returns the URI associated with a given publication.
-     *
-     * @param profileId The token ID of the profile that published the publication to query.
-     * @param pubId The publication ID of the publication to query.
-     *
-     * @return string The URI associated with a given publication.
-     */
-    function getContentURI(uint256 profileId, uint256 pubId)
-        external
-        view
-        returns (string memory);
+    // /**
+    //  * @notice Returns the URI associated with a given publication.
+    //  *
+    //  * @param profileId The token ID of the profile that published the publication to query.
+    //  * @param pubId The publication ID of the publication to query.
+    //  *
+    //  * @return string The URI associated with a given publication.
+    //  */
+    // function getContentURI(uint256 profileId, uint256 pubId)
+    //     external
+    //     view
+    //     returns (string memory);
 
     /**
      * @notice Returns the profile token ID according to a given handle.
@@ -191,29 +191,29 @@ interface ILensHub {
         view
         returns (DataTypes.ProfileStruct memory);
 
-    /**
-     * @notice Returns the full publication struct for a given publication.
-     *
-     * @param profileId The token ID of the profile that published the publication to query.
-     * @param pubId The publication ID of the publication to query.
-     *
-     * @return PublicationStruct The publication struct associated with the queried publication.
-     */
-    function getPub(uint256 profileId, uint256 pubId)
-        external
-        view
-        returns (DataTypes.PublicationStruct memory);
+    // /**
+    //  * @notice Returns the full publication struct for a given publication.
+    //  *
+    //  * @param profileId The token ID of the profile that published the publication to query.
+    //  * @param pubId The publication ID of the publication to query.
+    //  *
+    //  * @return PublicationStruct The publication struct associated with the queried publication.
+    //  */
+    // function getPub(uint256 profileId, uint256 pubId)
+    //     external
+    //     view
+    //     returns (DataTypes.PublicationStruct memory);
 
-    /**
-     * @notice Returns the publication type associated with a given publication.
-     *
-     * @param profileId The token ID of the profile that published the publication to query.
-     * @param pubId The publication ID of the publication to query.
-     *
-     * @return PubType The publication type, as a member of an enum (either "post," "comment" or "mirror").
-     */
-    function getPubType(uint256 profileId, uint256 pubId)
-        external
-        view
-        returns (DataTypes.PubType);
+    // /**
+    //  * @notice Returns the publication type associated with a given publication.
+    //  *
+    //  * @param profileId The token ID of the profile that published the publication to query.
+    //  * @param pubId The publication ID of the publication to query.
+    //  *
+    //  * @return PubType The publication type, as a member of an enum (either "post," "comment" or "mirror").
+    //  */
+    // function getPubType(uint256 profileId, uint256 pubId)
+    //     external
+    //     view
+    //     returns (DataTypes.PubType);
 }

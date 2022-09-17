@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {DataTypes} from "./DataTypes.sol";
 import {Errors} from "./Errors.sol";
@@ -66,26 +66,26 @@ library PublishingLogic {
     function postNewWork(
         uint256 profileId,
         string memory contentURI,
-        uint256 pubId,
+        uint256 workId,
         address audioNFTImpl,
-        mapping(uint256 => mapping(uint256 => DataTypes.PublicationStruct))
-            storage _pubByIdByProfile,
+        mapping(uint256 => mapping(uint256 => DataTypes.WorkStruct))
+            storage _workByIdByProfile,
         mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
     ) external {
-        // _pubByIdByProfile[profileId][pubId].contentURI = contentURI;
-        address audioNFT = _profileById[profileId].audioNFT;
+        // _workByIdByProfile[profileId][workId].contentURI = contentURI;
+        address audioNFT = _profileById[profileId].audioNFTContract;
         if (audioNFT == address(0)) {
             audioNFT = _deployAudioNFT(profileId, audioNFTImpl);
-            _profileById[profileId].audioNFT = audioNFT;
+            _profileById[profileId].audioNFTContract = audioNFT;
         }
-        AudioNFT(audioNFT).addNewType(pubId, contentURI);
+        AudioNFT(audioNFT).addNewType(workId, contentURI);
 
         // kottigawa nimo hozon
-        _pubByIdByProfile[profileId][pubId].profileIdPointed = profileId;
-        _pubByIdByProfile[profileId][pubId].pubIdPointed = pubId;
-        _pubByIdByProfile[profileId][pubId].contentURI = contentURI;
+        _workByIdByProfile[profileId][workId].profileIdPointed = profileId;
+        _workByIdByProfile[profileId][workId].workIdPointed = workId;
+        _workByIdByProfile[profileId][workId].contentURI = contentURI;
 
-        emit Events.PostCreated(profileId, pubId, contentURI, block.timestamp);
+        emit Events.PostCreated(profileId, workId, contentURI, block.timestamp);
     }
 
     function putOnSale(
@@ -94,10 +94,10 @@ library PublishingLogic {
         uint256 amount,
         mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
     ) external {
-        if (_profileById[profileId].pubCount < workId) {
+        if (_profileById[profileId].workCount < workId) {
             revert Errors.WorkIdInvalid();
         }
-        address audioNFT = _profileById[profileId].audioNFT;
+        address audioNFT = _profileById[profileId].audioNFTContract;
         if (audioNFT == address(0)) {
             revert Errors.AudioNFTInvalid();
         }

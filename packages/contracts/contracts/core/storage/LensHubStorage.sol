@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {DataTypes} from "../../libraries/DataTypes.sol";
 
@@ -29,8 +29,8 @@ abstract contract LensHubStorage {
     mapping(bytes32 => uint256) internal _profileIdByHandleHash;
     mapping(uint256 => DataTypes.ProfileStruct) internal _profileById;
 
-    mapping(uint256 => mapping(uint256 => DataTypes.PublicationStruct))
-        internal _pubByIdByProfile;
+    mapping(uint256 => mapping(uint256 => DataTypes.WorkStruct))
+        internal _workByIdByProfile;
 
     mapping(address => uint256) internal _defaultProfileByAddress;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 /**
  * @title DataTypes
@@ -49,30 +49,30 @@ library DataTypes {
         uint256 deadline;
     }
 
-    /**
-     * @notice A struct containing profile data.
-     *
-     * @param pubCount The number of publications made to this profile.
-     * @param handle The profile's associated handle.
-     * @param imageURI The URI to be used for the profile's image.
-     */
+    // /**
+    //  * @notice A struct containing profile data.
+    //  *
+    //  * @param pubCount The number of publications made to this profile.
+    //  * @param handle The profile's associated handle.
+    //  * @param imageURI The URI to be used for the profile's image.
+    //  */
     struct ProfileStruct {
-        uint256 pubCount;
+        uint256 workCount;
         string handle;
         string imageURI;
-        address audioNFT;
+        address audioNFTContract;
     }
 
-    /**
-     * @notice A struct containing data associated with each new publication.
-     *
-     * @param profileIdPointed The profile token ID this publication points to, for mirrors and comments.
-     * @param pubIdPointed The publication ID this publication points to, for mirrors and comments.
-     * @param contentURI The URI associated with this publication.
-     */
-    struct PublicationStruct {
+    // /**
+    //  * @notice A struct containing data associated with each new publication.
+    //  *
+    //  * @param profileIdPointed The profile token ID this publication points to, for mirrors and comments.
+    //  * @param pubIdPointed The publication ID this publication points to, for mirrors and comments.
+    //  * @param contentURI The URI associated with this publication.
+    //  */
+    struct WorkStruct {
         uint256 profileIdPointed;
-        uint256 pubIdPointed;
+        uint256 workIdPointed;
         string contentURI;
     }
 
@@ -89,14 +89,14 @@ library DataTypes {
         string imageURI;
     }
 
-    /**
-     * @notice A struct containing the parameters required for the `setDefaultProfileWithSig()` function. Parameters are
-     * the same as the regular `setDefaultProfile()` function, with an added EIP712Signature.
-     *
-     * @param wallet The address of the wallet setting the default profile.
-     * @param profileId The token ID of the profile which will be set as default, or zero.
-     * @param sig The EIP712Signature struct containing the profile owner's signature.
-     */
+    // /**
+    //  * @notice A struct containing the parameters required for the `setDefaultProfileWithSig()` function. Parameters are
+    //  * the same as the regular `setDefaultProfile()` function, with an added EIP712Signature.
+    //  *
+    //  * @param wallet The address of the wallet setting the default profile.
+    //  * @param profileId The token ID of the profile which will be set as default, or zero.
+    //  * @param sig The EIP712Signature struct containing the profile owner's signature.
+    //  */
     struct SetDefaultProfileWithSigData {
         address wallet;
         uint256 profileId;
