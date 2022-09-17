@@ -33,13 +33,13 @@ library Events {
         address indexed creator,
         address indexed to,
         string handle,
-        string imageURI,
+        string contentURI,
         uint256 timestamp
     );
 
-    event ProfileImageURISet(
+    event ProfileContentURISet(
         uint256 indexed profileId,
-        string imageURI,
+        string contentURI,
         uint256 timestamp
     );
 

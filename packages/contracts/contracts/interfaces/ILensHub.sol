@@ -21,13 +21,6 @@ interface ILensHub {
         external
         returns (uint256);
 
-    function setProfileImageURI(uint256 profileId, string calldata imageURI)
-        external;
-
-    function setProfileImageURIWithSig(
-        DataTypes.SetProfileImageURIWithSigData calldata vars
-    ) external;
-
     function defaultProfile(address wallet) external view returns (uint256);
 
     function getGovernance() external view returns (address);

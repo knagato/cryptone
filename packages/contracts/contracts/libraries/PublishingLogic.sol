@@ -18,8 +18,9 @@ library PublishingLogic {
         _validateHandle(vars.handle);
 
         if (
-            bytes(vars.imageURI).length > Constants.MAX_PROFILE_IMAGE_URI_LENGTH
-        ) revert Errors.ProfileImageURILengthInvalid();
+            bytes(vars.contentURI).length >
+            Constants.MAX_PROFILE_CONTENT_URI_LENGTH
+        ) revert Errors.ProfileContentURILengthInvalid();
 
         bytes32 handleHash = keccak256(bytes(vars.handle));
 
@@ -28,7 +29,7 @@ library PublishingLogic {
 
         _profileIdByHandleHash[handleHash] = profileId;
         _profileById[profileId].handle = vars.handle;
-        _profileById[profileId].imageURI = vars.imageURI;
+        _profileById[profileId].contentURI = vars.contentURI;
 
         _emitProfileCreated(profileId, vars);
     }
@@ -89,7 +90,7 @@ library PublishingLogic {
             msg.sender, // Creator is always the msg sender
             vars.to,
             vars.handle,
-            vars.imageURI,
+            vars.contentURI,
             block.timestamp
         );
     }

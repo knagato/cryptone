@@ -15,7 +15,7 @@ library Errors {
     error HandleTaken();
     error HandleLengthInvalid();
     error HandleContainsInvalidCharacters();
-    error ProfileImageURILengthInvalid();
+    error ProfileContentURILengthInvalid();
 
     error InitParamsInvalid();
     error AudioIdInvalid();

@@ -10,7 +10,7 @@ library DataTypes {
     }
 
     enum PubType {
-        Post,
+        PostAudio,
         Nonexistent,
         Unknown
     }
@@ -25,7 +25,7 @@ library DataTypes {
     struct ProfileStruct {
         uint256 audioCount;
         string handle;
-        string imageURI;
+        string contentURI;
         address audioNFTContract;
     }
 
@@ -38,7 +38,7 @@ library DataTypes {
     struct CreateProfileData {
         address to;
         string handle;
-        string imageURI;
+        string contentURI;
     }
 
     struct SetDefaultProfileWithSigData {
@@ -47,9 +47,9 @@ library DataTypes {
         EIP712Signature sig;
     }
 
-    struct SetProfileImageURIWithSigData {
+    struct SetProfileContentURIWithSigData {
         uint256 profileId;
-        string imageURI;
+        string contentURI;
         EIP712Signature sig;
     }
 

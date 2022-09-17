@@ -7,7 +7,6 @@ import {Constants} from "./libraries/Constants.sol";
 import {DataTypes} from "./libraries/DataTypes.sol";
 import {Errors} from "./libraries/Errors.sol";
 import {PublishingLogic} from "./libraries/PublishingLogic.sol";
-import {ProfileTokenURILogic} from "./libraries/ProfileTokenURILogic.sol";
 import {LensNFTBase} from "./core/base/LensNFTBase.sol";
 import {LensMultiState} from "./core/base/LensMultiState.sol";
 import {LensHubStorage} from "./core/storage/LensHubStorage.sol";
@@ -101,20 +100,17 @@ contract CrypTone is
         }
     }
 
-    /// @inheritdoc ILensHub
-    function setProfileImageURI(uint256 profileId, string calldata imageURI)
+    function setProfileContentURI(uint256 profileId, string calldata contentURI)
         external
-        override
         whenNotPaused
     {
         _validateCallerIsProfileOwner(profileId);
-        _setProfileImageURI(profileId, imageURI);
+        _setProfileContentURI(profileId, contentURI);
     }
 
-    /// @inheritdoc ILensHub
-    function setProfileImageURIWithSig(
-        DataTypes.SetProfileImageURIWithSigData calldata vars
-    ) external override whenNotPaused {
+    function setProfileContentURIWithSig(
+        DataTypes.SetProfileContentURIWithSigData calldata vars
+    ) external whenNotPaused {
         address owner = ownerOf(vars.profileId);
         unchecked {
             _validateRecoveredAddress(
@@ -123,7 +119,7 @@ contract CrypTone is
                         abi.encode(
                             SET_PROFILE_IMAGE_URI_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            keccak256(bytes(vars.imageURI)),
+                            keccak256(bytes(vars.contentURI)),
                             sigNonces[owner]++,
                             vars.sig.deadline
                         )
@@ -133,7 +129,7 @@ contract CrypTone is
                 vars.sig
             );
         }
-        _setProfileImageURI(vars.profileId, vars.imageURI);
+        _setProfileContentURI(vars.profileId, vars.contentURI);
     }
 
     function postNewAudio(DataTypes.PostData calldata vars)
@@ -309,25 +305,14 @@ contract CrypTone is
         } else if (
             _audioByIdByProfile[profileId][audioId].profileIdPointed == 0
         ) {
-            return DataTypes.PubType.Post;
+            return DataTypes.PubType.PostAudio;
         } else {
             return DataTypes.PubType.Unknown;
         }
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
-        return
-            ProfileTokenURILogic.getProfileTokenURI(
-                tokenId,
-                ownerOf(tokenId),
-                _profileById[tokenId].handle,
-                _profileById[tokenId].imageURI
-            );
+    function contentURI(uint256 tokenId) public view returns (string memory) {
+        return _profileById[tokenId].contentURI;
     }
 
     /// ****************************
@@ -345,7 +330,7 @@ contract CrypTone is
         );
     }
 
-    function _postNewAudio(uint256 profileId, string memory contentURI)
+    function _postNewAudio(uint256 profileId, string calldata contentURI)
         internal
         returns (uint256)
     {
@@ -375,13 +360,18 @@ contract CrypTone is
         PublishingLogic.putOnSale(profileId, audioId, amount, _profileById);
     }
 
-    function _setProfileImageURI(uint256 profileId, string calldata imageURI)
-        internal
-    {
-        if (bytes(imageURI).length > Constants.MAX_PROFILE_IMAGE_URI_LENGTH)
-            revert Errors.ProfileImageURILengthInvalid();
-        _profileById[profileId].imageURI = imageURI;
-        emit Events.ProfileImageURISet(profileId, imageURI, block.timestamp);
+    function _setProfileContentURI(
+        uint256 profileId,
+        string calldata contentURI
+    ) internal {
+        if (bytes(contentURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
+            revert Errors.ProfileContentURILengthInvalid();
+        _profileById[profileId].contentURI = contentURI;
+        emit Events.ProfileContentURISet(
+            profileId,
+            contentURI,
+            block.timestamp
+        );
     }
 
     function _clearHandleHash(uint256 profileId) internal {
