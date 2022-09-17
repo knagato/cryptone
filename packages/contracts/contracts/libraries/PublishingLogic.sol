@@ -63,46 +63,46 @@ library PublishingLogic {
     //  * @param pubId The publication ID to associate with this publication.
     //  * @param _pubByIdByProfile The storage reference to the mapping of publications by publication ID by profile ID.
     //  */
-    function postNewWork(
+    function postNewAudio(
         uint256 profileId,
         string memory contentURI,
-        uint256 workId,
+        uint256 audioId,
         address audioNFTImpl,
-        mapping(uint256 => mapping(uint256 => DataTypes.WorkStruct))
-            storage _workByIdByProfile,
+        mapping(uint256 => mapping(uint256 => DataTypes.AudioStruct))
+            storage _audioByIdByProfile,
         mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
     ) external {
-        // _workByIdByProfile[profileId][workId].contentURI = contentURI;
+        // _audioByIdByProfile[profileId][audioId].contentURI = contentURI;
         address audioNFT = _profileById[profileId].audioNFTContract;
         if (audioNFT == address(0)) {
             audioNFT = _deployAudioNFT(profileId, audioNFTImpl);
             _profileById[profileId].audioNFTContract = audioNFT;
         }
-        AudioNFT(audioNFT).addNewType(workId, contentURI);
+        AudioNFT(audioNFT).addNewType(audioId, contentURI);
 
         // kottigawa nimo hozon
-        _workByIdByProfile[profileId][workId].profileIdPointed = profileId;
-        _workByIdByProfile[profileId][workId].workIdPointed = workId;
-        _workByIdByProfile[profileId][workId].contentURI = contentURI;
+        _audioByIdByProfile[profileId][audioId].profileIdPointed = profileId;
+        _audioByIdByProfile[profileId][audioId].audioIdPointed = audioId;
+        _audioByIdByProfile[profileId][audioId].contentURI = contentURI;
 
-        emit Events.PostCreated(profileId, workId, contentURI, block.timestamp);
+        emit Events.PostCreated(profileId, audioId, contentURI, block.timestamp);
     }
 
     function putOnSale(
         uint256 profileId,
-        uint256 workId,
+        uint256 audioId,
         uint256 amount,
         mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
     ) external {
-        if (_profileById[profileId].workCount < workId) {
-            revert Errors.WorkIdInvalid();
+        if (_profileById[profileId].audioCount < audioId) {
+            revert Errors.AudioIdInvalid();
         }
         address audioNFT = _profileById[profileId].audioNFTContract;
         if (audioNFT == address(0)) {
             revert Errors.AudioNFTInvalid();
         }
 
-        AudioNFT(audioNFT).mint(workId, amount);
+        AudioNFT(audioNFT).mint(audioId, amount);
     }
 
     function _emitProfileCreated(

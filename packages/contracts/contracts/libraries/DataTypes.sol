@@ -57,7 +57,7 @@ library DataTypes {
     //  * @param imageURI The URI to be used for the profile's image.
     //  */
     struct ProfileStruct {
-        uint256 workCount;
+        uint256 audioCount;
         string handle;
         string imageURI;
         address audioNFTContract;
@@ -70,9 +70,9 @@ library DataTypes {
     //  * @param pubIdPointed The publication ID this publication points to, for mirrors and comments.
     //  * @param contentURI The URI associated with this publication.
     //  */
-    struct WorkStruct {
+    struct AudioStruct {
         uint256 profileIdPointed;
-        uint256 workIdPointed;
+        uint256 audioIdPointed;
         string contentURI;
     }
 
@@ -119,24 +119,24 @@ library DataTypes {
 
     struct PostData {
         uint256 profileId;
-        string workURI;
+        string audioURI;
     }
 
     struct PostWithSigData {
         uint256 profileId;
-        string workURI;
+        string audioURI;
         EIP712Signature sig;
     }
 
     struct OnSaleData {
         uint256 profileId;
-        uint256 workId;
+        uint256 audioId;
         uint256 amount;
     }
 
     struct OnSaleWithSigData {
         uint256 profileId;
-        uint256 workId;
+        uint256 audioId;
         uint256 amount;
         EIP712Signature sig;
     }

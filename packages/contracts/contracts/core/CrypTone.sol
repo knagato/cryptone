@@ -139,16 +139,16 @@ contract CrypTone is
         _setProfileImageURI(vars.profileId, vars.imageURI);
     }
 
-    function postNewWork(DataTypes.PostData calldata vars)
+    function postNewAudio(DataTypes.PostData calldata vars)
         external
         whenPublishingEnabled
         returns (uint256)
     {
         _validateCallerIsProfileOwner(vars.profileId);
-        return _postNewWork(vars.profileId, vars.workURI);
+        return _postNewAudio(vars.profileId, vars.audioURI);
     }
 
-    function postNewWorkWithSig(DataTypes.PostWithSigData calldata vars)
+    function postNewAudioWithSig(DataTypes.PostWithSigData calldata vars)
         external
         whenPublishingEnabled
         returns (uint256)
@@ -161,7 +161,7 @@ contract CrypTone is
                         abi.encode(
                             POST_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            keccak256(bytes(vars.workURI)),
+                            keccak256(bytes(vars.audioURI)),
                             sigNonces[owner]++,
                             vars.sig.deadline
                         )
@@ -171,7 +171,7 @@ contract CrypTone is
                 vars.sig
             );
         }
-        return _postNewWork(vars.profileId, vars.workURI);
+        return _postNewAudio(vars.profileId, vars.audioURI);
     }
 
     function putOnSale(DataTypes.OnSaleData calldata vars)
@@ -179,7 +179,7 @@ contract CrypTone is
         whenPublishingEnabled
     {
         _validateCallerIsProfileOwner(vars.profileId);
-        _putOnSale(vars.profileId, vars.workId, vars.amount);
+        _putOnSale(vars.profileId, vars.audioId, vars.amount);
     }
 
     function putOnSaleWithSig(DataTypes.OnSaleWithSigData calldata vars)
@@ -194,7 +194,7 @@ contract CrypTone is
                         abi.encode(
                             ON_SALE_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            vars.workId,
+                            vars.audioId,
                             vars.amount,
                             sigNonces[owner]++,
                             vars.sig.deadline
@@ -205,7 +205,7 @@ contract CrypTone is
                 vars.sig
             );
         }
-        return _putOnSale(vars.profileId, vars.workId, vars.amount);
+        return _putOnSale(vars.profileId, vars.audioId, vars.amount);
     }
 
     /**
@@ -250,8 +250,8 @@ contract CrypTone is
         return _governance;
     }
 
-    function getWorkCount(uint256 profileId) external view returns (uint256) {
-        return _profileById[profileId].workCount;
+    function getAudioCount(uint256 profileId) external view returns (uint256) {
+        return _profileById[profileId].audioCount;
     }
 
     /// @inheritdoc ILensHub
@@ -264,24 +264,24 @@ contract CrypTone is
         return _profileById[profileId].handle;
     }
 
-    function getWorkPointer(uint256 profileId, uint256 workId)
+    function getAudioPointer(uint256 profileId, uint256 audioId)
         external
         view
         returns (uint256, uint256)
     {
-        uint256 profileIdPointed = _workByIdByProfile[profileId][workId]
+        uint256 profileIdPointed = _audioByIdByProfile[profileId][audioId]
             .profileIdPointed;
-        uint256 workIdPointed = _workByIdByProfile[profileId][workId]
-            .workIdPointed;
-        return (profileIdPointed, workIdPointed);
+        uint256 audioIdPointed = _audioByIdByProfile[profileId][audioId]
+            .audioIdPointed;
+        return (profileIdPointed, audioIdPointed);
     }
 
-    function getContentURI(uint256 profileId, uint256 workId)
+    function getContentURI(uint256 profileId, uint256 audioId)
         external
         view
         returns (string memory)
     {
-        return _workByIdByProfile[profileId][workId].contentURI;
+        return _audioByIdByProfile[profileId][audioId].contentURI;
     }
 
     /// @inheritdoc ILensHub
@@ -304,27 +304,27 @@ contract CrypTone is
         return _profileById[profileId];
     }
 
-    function getWork(uint256 profileId, uint256 workId)
+    function getAudio(uint256 profileId, uint256 audioId)
         external
         view
-        returns (DataTypes.WorkStruct memory)
+        returns (DataTypes.AudioStruct memory)
     {
-        return _workByIdByProfile[profileId][workId];
+        return _audioByIdByProfile[profileId][audioId];
     }
 
-    function getWorkType(uint256 profileId, uint256 workId)
+    function getAudioType(uint256 profileId, uint256 audioId)
         external
         view
         returns (DataTypes.PubType)
     {
-        if (workId == 0 || _profileById[profileId].workCount < workId) {
+        if (audioId == 0 || _profileById[profileId].audioCount < audioId) {
             return DataTypes.PubType.Nonexistent;
             // } else if (
-            //     _workByIdByProfile[profileId][workId].collectModule == address(0)
+            //     _audioByIdByProfile[profileId][audioId].collectModule == address(0)
             // ) {
             //     return DataTypes.PubType.Mirror;
         } else if (
-            _workByIdByProfile[profileId][workId].profileIdPointed == 0
+            _audioByIdByProfile[profileId][audioId].profileIdPointed == 0
         ) {
             return DataTypes.PubType.Post;
         } else {
@@ -365,34 +365,34 @@ contract CrypTone is
         );
     }
 
-    function _postNewWork(uint256 profileId, string memory contentURI)
+    function _postNewAudio(uint256 profileId, string memory contentURI)
         internal
         returns (uint256)
     {
         unchecked {
-            uint256 workId = ++_profileById[profileId].workCount;
-            PublishingLogic.postNewWork(
+            uint256 audioId = ++_profileById[profileId].audioCount;
+            PublishingLogic.postNewAudio(
                 profileId,
                 contentURI,
-                workId,
+                audioId,
                 AUDIO_NFT_IMPL,
-                _workByIdByProfile,
+                _audioByIdByProfile,
                 _profileById
             );
-            return workId;
+            return audioId;
         }
     }
 
     function _putOnSale(
         uint256 profileId,
-        uint256 workId,
+        uint256 audioId,
         uint256 amount
     ) internal {
-        if (_profileById[profileId].workCount < workId) {
-            revert Errors.WorkIdInvalid();
+        if (_profileById[profileId].audioCount < audioId) {
+            revert Errors.AudioIdInvalid();
         }
 
-        PublishingLogic.putOnSale(profileId, workId, amount, _profileById);
+        PublishingLogic.putOnSale(profileId, audioId, amount, _profileById);
     }
 
     function _setProfileImageURI(uint256 profileId, string calldata imageURI)

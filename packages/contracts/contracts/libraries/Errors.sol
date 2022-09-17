@@ -18,7 +18,7 @@ library Errors {
     error ProfileImageURILengthInvalid();
 
     error InitParamsInvalid();
-    error WorkIdInvalid();
+    error AudioIdInvalid();
     error AudioNFTInvalid();
 
     // MultiState Errors
