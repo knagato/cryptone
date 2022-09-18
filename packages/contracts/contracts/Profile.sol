@@ -21,16 +21,16 @@ contract Profile is
 {
     uint256 internal constant REVISION = 1;
 
-    address internal immutable AUDIO_NFT_IMPL;
+    // address internal immutable AUDIO_NFT_IMPL;
 
     modifier onlyGov() {
         _validateCallerIsGovernance();
         _;
     }
 
-    constructor(address audioNFTImpl) {
-        if (audioNFTImpl == address(0)) revert Errors.InitParamsInvalid();
-        AUDIO_NFT_IMPL = audioNFTImpl;
+    constructor() {
+        // if (audioNFTImpl == address(0)) revert Errors.InitParamsInvalid();
+        // AUDIO_NFT_IMPL = audioNFTImpl;
     }
 
     /// @inheritdoc ILensHub
@@ -117,7 +117,7 @@ contract Profile is
                 _calculateDigest(
                     keccak256(
                         abi.encode(
-                            SET_PROFILE_IMAGE_URI_WITH_SIG_TYPEHASH,
+                            SET_PROFILE_URI_WITH_SIG_TYPEHASH,
                             vars.profileId,
                             keccak256(bytes(vars.contentURI)),
                             sigNonces[owner]++,
@@ -132,74 +132,74 @@ contract Profile is
         _setProfileContentURI(vars.profileId, vars.contentURI);
     }
 
-    function postNewAudio(DataTypes.PostData calldata vars)
-        external
-        whenPublishingEnabled
-        returns (uint256)
-    {
-        _validateCallerIsProfileOwner(vars.profileId);
-        return _postNewAudio(vars.profileId, vars.audioURI);
-    }
+    // function postNewAudio(DataTypes.PostData calldata vars)
+    //     external
+    //     whenPublishingEnabled
+    //     returns (uint256)
+    // {
+    //     _validateCallerIsProfileOwner(vars.profileId);
+    //     return _postNewAudio(vars.profileId, vars.audioURI);
+    // }
 
-    function postNewAudioWithSig(DataTypes.PostWithSigData calldata vars)
-        external
-        whenPublishingEnabled
-        returns (uint256)
-    {
-        address owner = ownerOf(vars.profileId);
-        unchecked {
-            _validateRecoveredAddress(
-                _calculateDigest(
-                    keccak256(
-                        abi.encode(
-                            POST_WITH_SIG_TYPEHASH,
-                            vars.profileId,
-                            keccak256(bytes(vars.audioURI)),
-                            sigNonces[owner]++,
-                            vars.sig.deadline
-                        )
-                    )
-                ),
-                owner,
-                vars.sig
-            );
-        }
-        return _postNewAudio(vars.profileId, vars.audioURI);
-    }
+    // function postNewAudioWithSig(DataTypes.PostWithSigData calldata vars)
+    //     external
+    //     whenPublishingEnabled
+    //     returns (uint256)
+    // {
+    //     address owner = ownerOf(vars.profileId);
+    //     unchecked {
+    //         _validateRecoveredAddress(
+    //             _calculateDigest(
+    //                 keccak256(
+    //                     abi.encode(
+    //                         POST_WITH_SIG_TYPEHASH,
+    //                         vars.profileId,
+    //                         keccak256(bytes(vars.audioURI)),
+    //                         sigNonces[owner]++,
+    //                         vars.sig.deadline
+    //                     )
+    //                 )
+    //             ),
+    //             owner,
+    //             vars.sig
+    //         );
+    //     }
+    //     return _postNewAudio(vars.profileId, vars.audioURI);
+    // }
 
-    function putOnSale(DataTypes.OnSaleData calldata vars)
-        external
-        whenPublishingEnabled
-    {
-        _validateCallerIsProfileOwner(vars.profileId);
-        _putOnSale(vars.profileId, vars.audioId, vars.amount);
-    }
+    // function putOnSale(DataTypes.OnSaleData calldata vars)
+    //     external
+    //     whenPublishingEnabled
+    // {
+    //     _validateCallerIsProfileOwner(vars.profileId);
+    //     _putOnSale(vars.profileId, vars.audioId, vars.amount);
+    // }
 
-    function putOnSaleWithSig(DataTypes.OnSaleWithSigData calldata vars)
-        external
-        whenPublishingEnabled
-    {
-        address owner = ownerOf(vars.profileId);
-        unchecked {
-            _validateRecoveredAddress(
-                _calculateDigest(
-                    keccak256(
-                        abi.encode(
-                            ON_SALE_WITH_SIG_TYPEHASH,
-                            vars.profileId,
-                            vars.audioId,
-                            vars.amount,
-                            sigNonces[owner]++,
-                            vars.sig.deadline
-                        )
-                    )
-                ),
-                owner,
-                vars.sig
-            );
-        }
-        return _putOnSale(vars.profileId, vars.audioId, vars.amount);
-    }
+    // function putOnSaleWithSig(DataTypes.OnSaleWithSigData calldata vars)
+    //     external
+    //     whenPublishingEnabled
+    // {
+    //     address owner = ownerOf(vars.profileId);
+    //     unchecked {
+    //         _validateRecoveredAddress(
+    //             _calculateDigest(
+    //                 keccak256(
+    //                     abi.encode(
+    //                         ON_SALE_WITH_SIG_TYPEHASH,
+    //                         vars.profileId,
+    //                         vars.audioId,
+    //                         vars.amount,
+    //                         sigNonces[owner]++,
+    //                         vars.sig.deadline
+    //                     )
+    //                 )
+    //             ),
+    //             owner,
+    //             vars.sig
+    //         );
+    //     }
+    //     return _putOnSale(vars.profileId, vars.audioId, vars.amount);
+    // }
 
     function burn(uint256 tokenId) public override whenNotPaused {
         super.burn(tokenId);
@@ -243,25 +243,25 @@ contract Profile is
         return _profileById[profileId].handle;
     }
 
-    function getAudioPointer(uint256 profileId, uint256 audioId)
-        external
-        view
-        returns (uint256, uint256)
-    {
-        uint256 profileIdPointed = _audioByIdByProfile[profileId][audioId]
-            .profileIdPointed;
-        uint256 audioIdPointed = _audioByIdByProfile[profileId][audioId]
-            .audioIdPointed;
-        return (profileIdPointed, audioIdPointed);
-    }
+    // function getAudioPointer(uint256 profileId, uint256 audioId)
+    //     external
+    //     view
+    //     returns (uint256, uint256)
+    // {
+    //     uint256 profileIdPointed = _audioByIdByProfile[profileId][audioId]
+    //         .profileIdPointed;
+    //     uint256 audioIdPointed = _audioByIdByProfile[profileId][audioId]
+    //         .audioIdPointed;
+    //     return (profileIdPointed, audioIdPointed);
+    // }
 
-    function getContentURI(uint256 profileId, uint256 audioId)
-        external
-        view
-        returns (string memory)
-    {
-        return _audioByIdByProfile[profileId][audioId].contentURI;
-    }
+    // function getContentURI(uint256 profileId, uint256 audioId)
+    //     external
+    //     view
+    //     returns (string memory)
+    // {
+    //     return _audioByIdByProfile[profileId][audioId].contentURI;
+    // }
 
     /// @inheritdoc ILensHub
     function getProfileIdByHandle(string calldata handle)
@@ -283,33 +283,33 @@ contract Profile is
         return _profileById[profileId];
     }
 
-    function getAudio(uint256 profileId, uint256 audioId)
-        external
-        view
-        returns (DataTypes.AudioStruct memory)
-    {
-        return _audioByIdByProfile[profileId][audioId];
-    }
+    // function getAudio(uint256 profileId, uint256 audioId)
+    //     external
+    //     view
+    //     returns (DataTypes.AudioStruct memory)
+    // {
+    //     return _audioByIdByProfile[profileId][audioId];
+    // }
 
-    function getAudioType(uint256 profileId, uint256 audioId)
-        external
-        view
-        returns (DataTypes.PubType)
-    {
-        if (audioId == 0 || _profileById[profileId].audioCount < audioId) {
-            return DataTypes.PubType.Nonexistent;
-            // } else if (
-            //     _audioByIdByProfile[profileId][audioId].collectModule == address(0)
-            // ) {
-            //     return DataTypes.PubType.Mirror;
-        } else if (
-            _audioByIdByProfile[profileId][audioId].profileIdPointed == 0
-        ) {
-            return DataTypes.PubType.PostAudio;
-        } else {
-            return DataTypes.PubType.Unknown;
-        }
-    }
+    // function getAudioType(uint256 profileId, uint256 audioId)
+    //     external
+    //     view
+    //     returns (DataTypes.PubType)
+    // {
+    //     if (audioId == 0 || _profileById[profileId].audioCount < audioId) {
+    //         return DataTypes.PubType.Nonexistent;
+    //         // } else if (
+    //         //     _audioByIdByProfile[profileId][audioId].collectModule == address(0)
+    //         // ) {
+    //         //     return DataTypes.PubType.Mirror;
+    //     } else if (
+    //         _audioByIdByProfile[profileId][audioId].profileIdPointed == 0
+    //     ) {
+    //         return DataTypes.PubType.PostAudio;
+    //     } else {
+    //         return DataTypes.PubType.Unknown;
+    //     }
+    // }
 
     function contentURI(uint256 tokenId) public view returns (string memory) {
         return _profileById[tokenId].contentURI;
@@ -328,36 +328,6 @@ contract Profile is
             newGovernance,
             block.timestamp
         );
-    }
-
-    function _postNewAudio(uint256 profileId, string calldata contentURI)
-        internal
-        returns (uint256)
-    {
-        unchecked {
-            uint256 audioId = ++_profileById[profileId].audioCount;
-            PublishingLogic.postNewAudio(
-                profileId,
-                contentURI,
-                audioId,
-                AUDIO_NFT_IMPL,
-                _audioByIdByProfile,
-                _profileById
-            );
-            return audioId;
-        }
-    }
-
-    function _putOnSale(
-        uint256 profileId,
-        uint256 audioId,
-        uint256 amount
-    ) internal {
-        if (_profileById[profileId].audioCount < audioId) {
-            revert Errors.AudioIdInvalid();
-        }
-
-        PublishingLogic.putOnSale(profileId, audioId, amount, _profileById);
     }
 
     function _setProfileContentURI(
@@ -379,18 +349,18 @@ contract Profile is
         _profileIdByHandleHash[handleHash] = 0;
     }
 
-    // Trade ProfileNFT??
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override whenNotPaused {
-        if (_defaultProfileByAddress[from] == tokenId) {
-            _defaultProfileByAddress[from] = 0;
-        }
+    // // Trade ProfileNFT??
+    // function _beforeTokenTransfer(
+    //     address from,
+    //     address to,
+    //     uint256 tokenId
+    // ) internal override whenNotPaused {
+    //     if (_defaultProfileByAddress[from] == tokenId) {
+    //         _defaultProfileByAddress[from] = 0;
+    //     }
 
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
+    //     super._beforeTokenTransfer(from, to, tokenId);
+    // }
 
     function _validateCallerIsProfileOwner(uint256 profileId) internal view {
         if (msg.sender != ownerOf(profileId)) revert Errors.NotProfileOwner();

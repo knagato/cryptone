@@ -9,11 +9,11 @@ library DataTypes {
         Paused
     }
 
-    enum PubType {
-        PostAudio,
-        Nonexistent,
-        Unknown
-    }
+    // enum PubType {
+    //     PostAudio,
+    //     Nonexistent,
+    //     Unknown
+    // }
 
     struct EIP712Signature {
         uint8 v;
@@ -26,14 +26,14 @@ library DataTypes {
         uint256 audioCount;
         string handle;
         string contentURI;
-        address audioNFTContract;
+        // address audioNFTContract;
     }
 
-    struct AudioStruct {
-        uint256 profileIdPointed;
-        uint256 audioIdPointed;
-        string contentURI;
-    }
+    // struct AudioStruct {
+    //     uint256 profileIdPointed;
+    //     uint256 audioIdPointed;
+    //     string contentURI;
+    // }
 
     struct CreateProfileData {
         address to;
@@ -53,29 +53,29 @@ library DataTypes {
         EIP712Signature sig;
     }
 
-    struct PostData {
-        uint256 profileId;
-        string audioURI;
-    }
+    // struct PostData {
+    //     uint256 profileId;
+    //     string audioURI;
+    // }
 
-    struct PostWithSigData {
-        uint256 profileId;
-        string audioURI;
-        EIP712Signature sig;
-    }
+    // struct PostWithSigData {
+    //     uint256 profileId;
+    //     string audioURI;
+    //     EIP712Signature sig;
+    // }
 
-    struct OnSaleData {
-        uint256 profileId;
-        uint256 audioId;
-        uint256 amount;
-    }
+    // struct OnSaleData {
+    //     uint256 profileId;
+    //     uint256 audioId;
+    //     uint256 amount;
+    // }
 
-    struct OnSaleWithSigData {
-        uint256 profileId;
-        uint256 audioId;
-        uint256 amount;
-        EIP712Signature sig;
-    }
+    // struct OnSaleWithSigData {
+    //     uint256 profileId;
+    //     uint256 audioId;
+    //     uint256 amount;
+    //     EIP712Signature sig;
+    // }
 
     struct SetProfileMetadataWithSigData {
         uint256 profileId;

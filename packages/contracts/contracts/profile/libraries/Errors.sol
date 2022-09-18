@@ -17,11 +17,11 @@ library Errors {
     error HandleContainsInvalidCharacters();
     error ProfileContentURILengthInvalid();
 
-    error InitParamsInvalid();
-    error AudioIdInvalid();
-    error AudioNFTInvalid();
+    // error InitParamsInvalid();
+    // error AudioIdInvalid();
+    // error AudioNFTInvalid();
 
     // MultiState Errors
     error Paused();
-    error PublishingPaused();
+    // error PublishingPaused();
 }

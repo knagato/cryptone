@@ -7,6 +7,8 @@ import "../../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 contract Audio is ERC1155URIStorage, Ownable {
     constructor() ERC1155("") {}
 
+    // mapping(uint256 => mapping(uint256 => ))
+
     // tokenURI is expected IPFS CID
     function addNewType(uint256 tokenId, string memory tokenURI)
         external
