@@ -6,7 +6,7 @@ import {DataTypes} from "./DataTypes.sol";
 import {Errors} from "./Errors.sol";
 import {Events} from "./Events.sol";
 import {Constants} from "./Constants.sol";
-import {AudioNFT} from "../AudioNFT.sol";
+import {Audio} from "../../Audio.sol";
 
 library PublishingLogic {
     function createProfile(
@@ -49,7 +49,7 @@ library PublishingLogic {
             audioNFT = _deployAudioNFT(profileId, audioNFTImpl);
             _profileById[profileId].audioNFTContract = audioNFT;
         }
-        AudioNFT(audioNFT).addNewType(audioId, contentURI);
+        Audio(audioNFT).addNewType(audioId, contentURI);
 
         // kottigawa nimo hozon
         _audioByIdByProfile[profileId][audioId].profileIdPointed = profileId;
@@ -78,7 +78,7 @@ library PublishingLogic {
             revert Errors.AudioNFTInvalid();
         }
 
-        AudioNFT(audioNFT).mint(audioId, amount);
+        Audio(audioNFT).mint(audioId, amount);
     }
 
     function _emitProfileCreated(

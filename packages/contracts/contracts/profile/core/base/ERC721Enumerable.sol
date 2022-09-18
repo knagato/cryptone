@@ -3,8 +3,8 @@
 pragma solidity 0.8.16;
 
 import {ERC721Time} from "./ERC721Time.sol";
-import {IERC721Enumerable} from "../../../../../node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import {IERC165} from "../../../../../node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC721Enumerable} from "../../../../../../node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import {IERC165} from "../../../../../../node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @dev This implements an optional extension of {ERC721} defined in the EIP that adds
