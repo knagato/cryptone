@@ -98,6 +98,39 @@ contract CrypToneProfile is
         }
     }
 
+    function createProfileWithSig(
+        DataTypes.CreateProfileWithSigData calldata vars
+    ) external whenNotPaused returns (uint256) {
+        unchecked {
+            _validateRecoveredAddress(
+                _calculateDigest(
+                    keccak256(
+                        abi.encode(
+                            CREATE_PROFILE_WITH_SIG_TYPEHASH,
+                            vars.to,
+                            keccak256(bytes(vars.profileURI)),
+                            sigNonces[vars.to]++,
+                            vars.sig.deadline
+                        )
+                    )
+                ),
+                vars.to,
+                vars.sig
+            );
+            if (_profileIdByAddress[vars.to] > 0)
+                revert Errors.ProfileAlreadyExists();
+
+            uint256 profileId = ++_profileCounter;
+            _mint(vars.to, profileId);
+            PublishingLogic.createProfile(
+                DataTypes.CreateProfileData(vars.to, vars.profileURI),
+                profileId,
+                _profileById
+            );
+            return profileId;
+        }
+    }
+
     function setProfileURI(string calldata profileURI) external whenNotPaused {
         uint256 profileId = _profileIdByAddress[msg.sender];
         if (profileId == 0) revert Errors.ProfileNotFound();

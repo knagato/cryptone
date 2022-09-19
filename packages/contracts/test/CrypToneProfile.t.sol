@@ -15,7 +15,7 @@ contract CrypToneProfileTest is Test {
     function setUp() public returns (address) {
         governance = address(this);
         emergency = address(0);
-        user = msg.sender;
+        // user = msg.sender;
 
         profileContract = new CrypToneProfile();
         profileContract.initialize("CrypToneProfile", "CTP", governance);
@@ -39,7 +39,7 @@ contract CrypToneProfileTest is Test {
 
     function testCreateProfile() public {
         DataTypes.CreateProfileData memory myProfile = DataTypes
-            .CreateProfileData(user, "032-34ad5", "example.com");
+            .CreateProfileData(governance, "example.com");
         uint256 firstId = 1;
 
         // profileContract.setState(DataTypes.ProtocolState.Paused);

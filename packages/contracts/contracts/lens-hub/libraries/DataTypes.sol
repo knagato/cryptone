@@ -26,9 +26,9 @@ library DataTypes {
         string profileURI;
     }
 
-    struct SetDefaultProfileWithSigData {
-        address wallet;
-        uint256 profileId;
+    struct CreateProfileWithSigData {
+        address to;
+        string profileURI;
         EIP712Signature sig;
     }
 
