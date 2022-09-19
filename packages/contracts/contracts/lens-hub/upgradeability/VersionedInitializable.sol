@@ -33,8 +33,7 @@ abstract contract VersionedInitializable {
      */
     modifier initializer() {
         uint256 revision = getRevision();
-        if (address(this) == originalImpl)
-            revert Errors.CannotInitImplementation();
+        // if (address(this) == originalImpl) revert Errors.CannotInitImplementation();
         if (revision <= lastInitializedRevision) revert Errors.Initialized();
         lastInitializedRevision = revision;
         _;

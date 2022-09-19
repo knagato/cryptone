@@ -12,6 +12,7 @@
     "@typechain/hardhat": "^6.1.2",
     "dotenv": "^16.0.2",
     "ethers": "^5.7.0",
+    "forge-std": "foundry-rs/forge-std",
     "hardhat": "^2.11.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",

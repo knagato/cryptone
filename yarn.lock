@@ -3474,6 +3474,10 @@ for-each@^0.3.3:
   dependencies:
     is-callable "^1.1.3"
 
+forge-std@foundry-rs/forge-std:
+  version "0.1.0"
+  resolved "https://codeload.github.com/foundry-rs/forge-std/tar.gz/340fe86d25dc6424fa04cf2b05447fccc71ee86a"
+
 forwarded@0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/forwarded/-/forwarded-0.2.0.tgz"
