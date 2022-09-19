@@ -12,10 +12,13 @@ contract CrypToneAudio is ERC1155 {
 
     uint256 totalSupply = 0;
 
-    mapping(DataTypes.NFTType => mapping(address => mapping(uint256 => DataTypes.AudioStruct)))
-        internal audioByWorkIdByProfileByNFTType;
-    mapping(DataTypes.NFTType => mapping(address => uint256))
-        internal workCountByProfileByNFTType;
+    mapping(address => mapping(uint256 => DataTypes.AudioStruct))
+        internal audioByWorkIdByCreator;
+    mapping(address => uint256) internal totalAudioSupplyByCreator;
+
+    mapping(address => mapping(uint256 => DataTypes.InheritAudioStruct))
+        internal inheritAudioByWorkIdByCreator;
+    mapping(address => uint256) internal totalInheritAudioSupplyByCreator;
 
     constructor(address profileNFTContract) ERC1155("") {
         if (profileNFTContract == address(0)) {
@@ -32,16 +35,40 @@ contract CrypToneAudio is ERC1155 {
         if (!_profileNFTExists(msg.sender)) {
             revert Errors.ProfileNFTNotFound();
         }
-        uint256 newWorkId = workCountByProfileByNFTType[nftType][msg.sender];
-        audioByWorkIdByProfileByNFTType[nftType][msg.sender][newWorkId]
-            .tokenId = totalSupply;
-        audioByWorkIdByProfileByNFTType[nftType][msg.sender][newWorkId]
-            .tokenURI = tokenURI;
-        audioByWorkIdByProfileByNFTType[nftType][msg.sender][newWorkId]
-            .totalSupply = 0;
 
-        workCountByProfileByNFTType[nftType][msg.sender]++;
-        emit Events.AudioPosted(nftType, msg.sender, newWorkId, totalSupply);
+        uint256 newWorkId;
+        if (nftType == DataTypes.NFTType.Audio) {
+            newWorkId = totalAudioSupplyByCreator[msg.sender];
+            audioByWorkIdByCreator[msg.sender][newWorkId].tokenId = totalSupply;
+            audioByWorkIdByCreator[msg.sender][newWorkId].tokenURI = tokenURI;
+            audioByWorkIdByCreator[msg.sender][newWorkId].maxSupply = 0;
+
+            totalAudioSupplyByCreator[msg.sender]++;
+            emit Events.AudioPosted(
+                nftType,
+                msg.sender,
+                newWorkId,
+                totalSupply
+            );
+        } else if (nftType == DataTypes.NFTType.InheritAudio) {
+            newWorkId = totalInheritAudioSupplyByCreator[msg.sender];
+            inheritAudioByWorkIdByCreator[msg.sender][newWorkId]
+                .tokenId = totalSupply;
+            inheritAudioByWorkIdByCreator[msg.sender][newWorkId] 
+                .tokenURI = tokenURI;
+            inheritAudioByWorkIdByCreator[msg.sender][newWorkId].maxSupply = 0;
+
+            totalInheritAudioSupplyByCreator[msg.sender]++;
+            emit Events.AudioPosted(
+                nftType,
+                msg.sender,
+                newWorkId,
+                totalSupply
+            );
+        } else {
+            revert Errors.UnknownNFTType();
+        }
+
         totalSupply++;
         return newWorkId;
     }
@@ -51,15 +78,23 @@ contract CrypToneAudio is ERC1155 {
         uint256 workId,
         uint256 amount
     ) public {
-        if (workId >= workCountByProfileByNFTType[nftType][msg.sender]) {
-            revert Errors.MintWorkIdInvalid();
+        uint256 tokenId;
+        if (nftType == DataTypes.NFTType.Audio) {
+            if (workId >= totalAudioSupplyByCreator[msg.sender]) {
+                revert Errors.MintWorkIdInvalid();
+            }
+            tokenId = audioByWorkIdByCreator[msg.sender][workId].tokenId;
+            audioByWorkIdByCreator[msg.sender][workId].maxSupply += amount;
+        } else if (nftType == DataTypes.NFTType.InheritAudio) {
+            if (workId >= totalInheritAudioSupplyByCreator[msg.sender]) {
+                revert Errors.MintWorkIdInvalid();
+            }
+            tokenId = inheritAudioByWorkIdByCreator[msg.sender][workId].tokenId;
+            inheritAudioByWorkIdByCreator[msg.sender][workId]
+                .maxSupply += amount;
+        } else {
+            revert Errors.UnknownNFTType();
         }
-        uint256 tokenId = audioByWorkIdByProfileByNFTType[nftType][msg.sender][
-            workId
-        ].tokenId;
-
-        audioByWorkIdByProfileByNFTType[nftType][msg.sender][workId]
-            .totalSupply += amount;
 
         _mint(msg.sender, tokenId, amount, "");
         // setApprovalForAll( , true); // approve to market
@@ -78,17 +113,28 @@ contract CrypToneAudio is ERC1155 {
         }
         uint256[] memory ids = new uint256[](workIds.length);
         for (uint256 i = 0; i < workIds.length; i++) {
-            if (
-                workIds[i] >= workCountByProfileByNFTType[types[i]][msg.sender]
-            ) {
-                revert Errors.MintWorkIdInvalid();
-            }
-            ids[i] = audioByWorkIdByProfileByNFTType[types[i]][msg.sender][
-                workIds[i]
-            ].tokenId;
+            if (types[i] == DataTypes.NFTType.Audio) {
+                if (workIds[i] >= totalAudioSupplyByCreator[msg.sender]) {
+                    revert Errors.MintWorkIdInvalid();
+                }
+                ids[i] = audioByWorkIdByCreator[msg.sender][workIds[i]].tokenId;
 
-            audioByWorkIdByProfileByNFTType[types[i]][msg.sender][workIds[i]]
-                .totalSupply += amounts[i];
+                audioByWorkIdByCreator[msg.sender][workIds[i]]
+                    .maxSupply += amounts[i];
+            } else if (types[i] == DataTypes.NFTType.InheritAudio) {
+                if (
+                    workIds[i] >= totalInheritAudioSupplyByCreator[msg.sender]
+                ) {
+                    revert Errors.MintWorkIdInvalid();
+                }
+                ids[i] = inheritAudioByWorkIdByCreator[msg.sender][workIds[i]]
+                    .tokenId;
+
+                inheritAudioByWorkIdByCreator[msg.sender][workIds[i]]
+                    .maxSupply += amounts[i];
+            } else {
+                revert Errors.UnknownNFTType();
+            }
         }
         _mintBatch(msg.sender, ids, amounts, "");
     }

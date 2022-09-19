@@ -55,7 +55,7 @@ contract CrypToneTest is Test {
         DataTypes.ProfileStruct memory firstProfile = profileContract
             .getProfile(firstId);
         emit ProfEv(firstProfile);
-        assertEq(firstProfile.profileURI, "example.com");
+        assertEq(firstProfile.tokenURI, "example.com");
 
         // assertEq(profileContract.createProfile(myProfile), ++firstId);
     }

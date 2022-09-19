@@ -15,11 +15,11 @@ library PublishingLogic {
         mapping(address => uint256) storage _profileIdByAddress
     ) external {
         if (
-            bytes(vars.profileURI).length >
+            bytes(vars.tokenURI).length >
             Constants.MAX_PROFILE_CONTENT_URI_LENGTH
         ) revert Errors.ProfileURILengthInvalid();
 
-        _profileById[profileId].profileURI = vars.profileURI;
+        _profileById[profileId].tokenURI = vars.tokenURI;
         _profileById[profileId].exists = true;
         _profileIdByAddress[vars.to] = profileId;
 
@@ -34,7 +34,7 @@ library PublishingLogic {
             profileId,
             msg.sender, // Creator is always the msg sender
             vars.to,
-            vars.profileURI,
+            vars.tokenURI,
             block.timestamp
         );
     }

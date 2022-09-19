@@ -17,24 +17,25 @@ library DataTypes {
     }
 
     struct ProfileStruct {
-        string profileURI;
+        uint256 tokenId;
+        string tokenURI;
         bool exists;
     }
 
     struct CreateProfileData {
         address to;
-        string profileURI;
+        string tokenURI;
     }
 
     struct CreateProfileWithSigData {
         address to;
-        string profileURI;
+        string tokenURI;
         EIP712Signature sig;
     }
 
     struct SetProfileURIWithSigData {
         uint256 profileId;
-        string profileURI;
+        string tokenURI;
         EIP712Signature sig;
     }
 

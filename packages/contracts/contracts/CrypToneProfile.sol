@@ -113,7 +113,7 @@ contract CrypToneProfile is
                         abi.encode(
                             CREATE_PROFILE_WITH_SIG_TYPEHASH,
                             vars.to,
-                            keccak256(bytes(vars.profileURI)),
+                            keccak256(bytes(vars.tokenURI)),
                             sigNonces[vars.to]++,
                             vars.sig.deadline
                         )
@@ -128,7 +128,7 @@ contract CrypToneProfile is
             uint256 profileId = ++_profileCounter;
             _mint(vars.to, profileId);
             PublishingLogic.createProfile(
-                DataTypes.CreateProfileData(vars.to, vars.profileURI),
+                DataTypes.CreateProfileData(vars.to, vars.tokenURI),
                 profileId,
                 _profileById,
                 _profileIdByAddress
@@ -137,11 +137,11 @@ contract CrypToneProfile is
         }
     }
 
-    function setProfileURI(string calldata profileURI) external whenNotPaused {
+    function setProfileURI(string calldata tokenURI) external whenNotPaused {
         uint256 profileId = _profileIdByAddress[msg.sender];
         if (profileId == 0) revert Errors.ProfileNotFound();
 
-        _setProfileURI(profileId, profileURI);
+        _setProfileURI(profileId, tokenURI);
     }
 
     function setProfileURIWithSig(
@@ -155,7 +155,7 @@ contract CrypToneProfile is
                         abi.encode(
                             SET_PROFILE_URI_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            keccak256(bytes(vars.profileURI)),
+                            keccak256(bytes(vars.tokenURI)),
                             sigNonces[owner]++,
                             vars.sig.deadline
                         )
@@ -165,7 +165,7 @@ contract CrypToneProfile is
                 vars.sig
             );
         }
-        _setProfileURI(vars.profileId, vars.profileURI);
+        _setProfileURI(vars.profileId, vars.tokenURI);
     }
 
     // function burn() public whenNotPaused {
@@ -203,7 +203,7 @@ contract CrypToneProfile is
     }
 
     function profileURI(uint256 profileId) public view returns (string memory) {
-        return _profileById[profileId].profileURI;
+        return _profileById[profileId].tokenURI;
     }
 
     /// @inheritdoc ILensHub
@@ -226,13 +226,13 @@ contract CrypToneProfile is
         );
     }
 
-    function _setProfileURI(uint256 profileId, string calldata profileURI)
+    function _setProfileURI(uint256 profileId, string calldata tokenURI)
         internal
     {
-        if (bytes(profileURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
+        if (bytes(tokenURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
             revert Errors.ProfileURILengthInvalid();
-        _profileById[profileId].profileURI = profileURI;
-        emit Events.ProfileURISet(profileId, profileURI, block.timestamp);
+        _profileById[profileId].tokenURI = tokenURI;
+        emit Events.ProfileURISet(profileId, tokenURI, block.timestamp);
     }
 
     function _validateCallerIsProfileOwner(uint256 profileId) internal view {

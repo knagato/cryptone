@@ -7,12 +7,12 @@ import {DataTypes} from "../../libraries/DataTypes.sol";
 abstract contract LensHubStorage {
     bytes32 internal constant CREATE_PROFILE_WITH_SIG_TYPEHASH =
         keccak256(
-            "CreateProfileWithSig(address to,string profileURI,uint256 nonce,uint256 deadline)"
+            "CreateProfileWithSig(address to,string tokenURI,uint256 nonce,uint256 deadline)"
         );
 
     bytes32 internal constant SET_PROFILE_URI_WITH_SIG_TYPEHASH =
         keccak256(
-            "SetProfileURIWithSig(uint256 profileId,string profileURI,uint256 nonce,uint256 deadline)"
+            "SetProfileURIWithSig(uint256 profileId,string tokenURI,uint256 nonce,uint256 deadline)"
         );
 
     mapping(uint256 => DataTypes.ProfileStruct) internal _profileById;
