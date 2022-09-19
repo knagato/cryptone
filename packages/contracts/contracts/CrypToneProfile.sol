@@ -93,7 +93,12 @@ contract CrypToneProfile is
         unchecked {
             uint256 profileId = ++_profileCounter;
             _mint(vars.to, profileId);
-            PublishingLogic.createProfile(vars, profileId, _profileById);
+            PublishingLogic.createProfile(
+                vars,
+                profileId,
+                _profileById,
+                _profileIdByAddress
+            );
             return profileId;
         }
     }
@@ -125,7 +130,8 @@ contract CrypToneProfile is
             PublishingLogic.createProfile(
                 DataTypes.CreateProfileData(vars.to, vars.profileURI),
                 profileId,
-                _profileById
+                _profileById,
+                _profileIdByAddress
             );
             return profileId;
         }

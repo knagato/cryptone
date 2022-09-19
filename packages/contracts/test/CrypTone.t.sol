@@ -4,13 +4,18 @@ pragma solidity 0.8.16;
 import "../lib/forge-std/src/Test.sol";
 import "../lib/forge-std/src/Vm.sol";
 import "../contracts/CrypToneProfile.sol";
+import "../contracts/CrypToneAudio.sol";
 import "../contracts/lens-hub/libraries/DataTypes.sol";
 
-contract CrypToneProfileTest is Test {
+contract CrypToneTest is Test {
     CrypToneProfile profileContract;
+    CrypToneAudio audioContract;
+
     address governance;
     address emergency;
     address user;
+
+    event ProfEv(DataTypes.ProfileStruct profile);
 
     function setUp() public returns (address) {
         governance = address(this);
@@ -21,6 +26,8 @@ contract CrypToneProfileTest is Test {
         profileContract.initialize("CrypToneProfile", "CTP", governance);
         profileContract.setEmergencyAdmin(emergency);
         profileContract.setState(DataTypes.ProtocolState.Unpaused);
+
+        audioContract = new CrypToneAudio(address(profileContract));
     }
 
     function testGovernance() public {
@@ -34,8 +41,6 @@ contract CrypToneProfileTest is Test {
         profileContract.setState(DataTypes.ProtocolState.Paused);
         assertEq(uint256(profileContract.getState()), 2);
     }
-
-    event ProfEv(DataTypes.ProfileStruct profile);
 
     function testCreateProfile() public {
         DataTypes.CreateProfileData memory myProfile = DataTypes
@@ -51,5 +56,31 @@ contract CrypToneProfileTest is Test {
             .getProfile(firstId);
         emit ProfEv(firstProfile);
         assertEq(firstProfile.profileURI, "example.com");
+
+        // assertEq(profileContract.createProfile(myProfile), ++firstId);
+    }
+
+    function testMintAudio() public {
+        DataTypes.CreateProfileData memory myProfile = DataTypes
+            .CreateProfileData(governance, "example.com");
+        uint256 firstId = 1;
+
+        profileContract.setState(DataTypes.ProtocolState.Unpaused);
+        assertEq(profileContract.createProfile(myProfile), firstId);
+
+        uint256 work1 = audioContract.postWork(
+            CrypToneAudio.NFTType.Audio,
+            "example1.example1"
+        );
+        uint256 work2 = audioContract.postWork(
+            CrypToneAudio.NFTType.Audio,
+            "example2.example2"
+        );
+        uint256 work3 = audioContract.postWork(
+            CrypToneAudio.NFTType.InheritAudio,
+            "example3.example3"
+        );
+
+        audioContract.mint(CrypToneAudio.NFTType.Audio, work2, 250);
     }
 }

@@ -11,7 +11,8 @@ library PublishingLogic {
     function createProfile(
         DataTypes.CreateProfileData calldata vars,
         uint256 profileId,
-        mapping(uint256 => DataTypes.ProfileStruct) storage _profileById
+        mapping(uint256 => DataTypes.ProfileStruct) storage _profileById,
+        mapping(address => uint256) storage _profileIdByAddress
     ) external {
         if (
             bytes(vars.profileURI).length >
@@ -20,6 +21,7 @@ library PublishingLogic {
 
         _profileById[profileId].profileURI = vars.profileURI;
         _profileById[profileId].exists = true;
+        _profileIdByAddress[vars.to] = profileId;
 
         _emitProfileCreated(profileId, vars);
     }
