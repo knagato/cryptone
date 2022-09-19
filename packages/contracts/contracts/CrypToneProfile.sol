@@ -12,7 +12,7 @@ import {LensMultiState} from "./profile/core/base/LensMultiState.sol";
 import {LensHubStorage} from "./profile/core/storage/LensHubStorage.sol";
 import {VersionedInitializable} from "./profile/upgradeability/VersionedInitializable.sol";
 
-contract Profile is
+contract CrypToneProfile is
     LensNFTBase,
     VersionedInitializable,
     LensMultiState,
@@ -222,6 +222,10 @@ contract Profile is
         returns (uint256)
     {
         return _defaultProfileByAddress[wallet];
+    }
+
+    function profileExists(address wallet) external view returns (bool) {
+        return getProfile(defaultProfile(wallet)).exists;
     }
 
     /// @inheritdoc ILensHub

@@ -23,10 +23,11 @@ library DataTypes {
     }
 
     struct ProfileStruct {
-        uint256 audioCount;
+        // uint256 audioCount;
         string handle;
         string contentURI;
         // address audioNFTContract;
+        bool exists;
     }
 
     // struct AudioStruct {
