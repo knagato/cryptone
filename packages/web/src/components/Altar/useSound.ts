@@ -19,7 +19,6 @@ export interface PlayOptions {
 export type PlayFunction = (options?: PlayOptions) => void;
 
 export interface ExposedData {
-  instance: Howl | null;
   stop: () => void;
 }
 
@@ -64,5 +63,5 @@ export const useSound = <T = any>(
     instance.current?.stop();
   };
 
-  return [play, { instance: instance.current, stop }];
+  return [play, { stop }];
 };

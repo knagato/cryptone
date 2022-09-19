@@ -38,17 +38,19 @@ const audios: Jacket[] = [
   },
 ];
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-};
+type Props = {};
 
-export const SelectJacketModal: FC<Props> = ({ onClose, open }) => {
+export const SelectJacketModal: FC<Props> = ({}) => {
   const actions = useStore((state) => state.actions);
+  const open = useStore((state) => state.selectJacketModalOpen);
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => actions.closeSelectJacketModal()}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -73,33 +75,31 @@ export const SelectJacketModal: FC<Props> = ({ onClose, open }) => {
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                <div>
-                  <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title
-                      as="h3"
-                      className="text-lg font-medium leading-6 text-gray-900"
-                    >
-                      Select music jacket images
-                    </Dialog.Title>
-                    <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                      {audios.map((audio) => (
-                        <div key={audio.id}>
-                          <button
-                            onClick={() => {
-                              actions.setJacket(audio);
-                            }}
-                            className="group"
-                          >
-                            <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
-                              <img alt={audio.title} src={audio.thumbnailSrc} />
-                            </div>
-                            <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                              <h3>{audio.title}</h3>
-                            </div>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                <div className="mt-3 text-center sm:mt-5">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Select music jacket images
+                  </Dialog.Title>
+                  <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                    {audios.map((audio) => (
+                      <div key={audio.id}>
+                        <button
+                          onClick={() => {
+                            actions.selectJacket(audio);
+                          }}
+                          className="group"
+                        >
+                          <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
+                            <img alt={audio.title} src={audio.thumbnailSrc} />
+                          </div>
+                          <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
+                            <h3>{audio.title}</h3>
+                          </div>
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </Dialog.Panel>

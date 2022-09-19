@@ -7,10 +7,15 @@ export type JacketKey = "1" | "2" | "3" | "4";
 type AltarState = {
   selectedJacket?: JacketKey;
   displayedJacket: Record<JacketKey, Jacket | undefined>;
+  selectJacketModalOpen: boolean;
+  jacketDetailModalOpen: boolean;
   actions: {
     init: () => void;
-    setOpenJacketModal: (key?: JacketKey) => void;
-    setJacket: (src: Jacket) => void;
+    openSelectJacketModal: (key?: JacketKey) => void;
+    closeSelectJacketModal: () => void;
+    openJacketDetailModal: () => void;
+    closeJacketDetailModal: () => void;
+    selectJacket: (src: Jacket) => void;
   };
 };
 
@@ -23,21 +28,43 @@ const useStore = create<AltarState>()((set, get) => {
       "3": undefined,
       "4": undefined,
     },
+    selectJacketModalOpen: false,
+    jacketDetailModalOpen: false,
     actions: {
       init: () => {
         //
       },
-      setOpenJacketModal: (key) => {
-        set({ selectedJacket: key });
+      openSelectJacketModal: (key) => {
+        if (key) {
+          set({
+            selectedJacket: key,
+            selectJacketModalOpen: true,
+            jacketDetailModalOpen: false,
+          });
+          return;
+        }
+        set({ selectJacketModalOpen: true, jacketDetailModalOpen: false });
       },
-      setJacket: (src) => {
+      closeSelectJacketModal: () => {
+        set({ selectJacketModalOpen: false });
+      },
+      openJacketDetailModal: () => {
+        set({ jacketDetailModalOpen: true });
+      },
+      closeJacketDetailModal: () => {
+        set({ jacketDetailModalOpen: false });
+      },
+      selectJacket: (src) => {
         const { displayedJacket, selectedJacket } = get();
         if (selectedJacket === undefined) return;
 
         const newJacket = produce(displayedJacket, (draft) => {
           draft[selectedJacket] = src;
         });
-        set({ displayedJacket: newJacket, selectedJacket: undefined });
+        set({
+          displayedJacket: newJacket,
+          selectJacketModalOpen: false,
+        });
       },
     },
   };

@@ -27,19 +27,17 @@ export const JacketImage: FC<Props> = ({ jacketKey }) => {
   });
   useTexture.preload(textureUrl);
 
-  const [play] = useSound(displayedJacket[jacketKey]?.audioSrc);
-
   return (
     <group
       position={jacket.position}
       rotation={[-Math.PI / 2, 0, 0]}
       scale={100}
       onClick={() => {
-        if (!displayedJacket[jacketKey]) {
-          actions?.setOpenJacketModal(jacketKey);
+        if (displayedJacket[jacketKey]) {
+          actions.openJacketDetailModal();
           return;
         }
-        play();
+        actions?.openSelectJacketModal(jacketKey);
       }}
     >
       <mesh>
