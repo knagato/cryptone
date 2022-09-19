@@ -3,8 +3,8 @@ pragma solidity 0.8.16;
 
 import "../lib/forge-std/src/Test.sol";
 import "../lib/forge-std/src/Vm.sol";
-import "../contracts/CrypToneProfile.sol";
-import "../contracts/CrypToneAudio.sol";
+import {CrypToneProfile} from "../contracts/CrypToneProfile.sol";
+import {CrypToneAudio, DataTypes as AudioTypes} from "../contracts/CrypToneAudio.sol";
 import "../contracts/lens-hub/libraries/DataTypes.sol";
 
 contract CrypToneTest is Test {
@@ -69,18 +69,18 @@ contract CrypToneTest is Test {
         assertEq(profileContract.createProfile(myProfile), firstId);
 
         uint256 work1 = audioContract.postWork(
-            CrypToneAudio.NFTType.Audio,
+            AudioTypes.NFTType.Audio,
             "example1.example1"
         );
         uint256 work2 = audioContract.postWork(
-            CrypToneAudio.NFTType.Audio,
+            AudioTypes.NFTType.Audio,
             "example2.example2"
         );
         uint256 work3 = audioContract.postWork(
-            CrypToneAudio.NFTType.InheritAudio,
+            AudioTypes.NFTType.InheritAudio,
             "example3.example3"
         );
 
-        audioContract.mint(CrypToneAudio.NFTType.Audio, work2, 250);
+        audioContract.mint(AudioTypes.NFTType.Audio, work2, 250);
     }
 }
