@@ -15,13 +15,8 @@ library Errors {
     error HandleTaken();
     error HandleLengthInvalid();
     error HandleContainsInvalidCharacters();
-    error ProfileContentURILengthInvalid();
-
-    // error InitParamsInvalid();
-    // error AudioIdInvalid();
-    // error AudioNFTInvalid();
-
+    error ProfileURILengthInvalid();
+    
     // MultiState Errors
     error Paused();
-    // error PublishingPaused();
 }

@@ -14,11 +14,6 @@ abstract contract LensMultiState {
         _;
     }
 
-    // modifier whenPublishingEnabled() {
-    //     _validatePublishingEnabled();
-    //     _;
-    // }
-
     function getState() external view returns (DataTypes.ProtocolState) {
         return _state;
     }
@@ -28,12 +23,6 @@ abstract contract LensMultiState {
         _state = newState;
         emit Events.StateSet(msg.sender, prevState, newState, block.timestamp);
     }
-
-    // function _validatePublishingEnabled() internal view {
-    //     if (_state != DataTypes.ProtocolState.Unpaused) {
-    //         revert Errors.PublishingPaused();
-    //     }
-    // }
 
     function _validateNotPaused() internal view {
         if (_state == DataTypes.ProtocolState.Paused) revert Errors.Paused();

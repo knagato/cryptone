@@ -37,16 +37,9 @@ library Events {
         uint256 timestamp
     );
 
-    event ProfileContentURISet(
+    event ProfileURISet(
         uint256 indexed profileId,
         string contentURI,
         uint256 timestamp
     );
-
-    // event PostCreated(
-    //     uint256 indexed profileId,
-    //     uint256 indexed pubId,
-    //     string contentURI,
-    //     uint256 timestamp
-    // );
 }

@@ -2,12 +2,9 @@
 pragma solidity 0.8.16;
 
 import "../../../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-// import "../../../node_modules/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
-// import "../../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./CrypToneProfile.sol";
 
-// contract CrypToneAudio is ERC1155URIStorage {
-contract CrypToneAudio {
+contract CrypToneAudio is ERC1155 {
     address internal immutable PROFILE_NFT_CONTRACT;
 
     enum NFTType {
@@ -26,10 +23,6 @@ contract CrypToneAudio {
     mapping(NFTType => mapping(address => uint256))
         internal audioCountByProfileByNFTType;
 
-    // mapping(uint256 => mapping(uint256 => uint256))
-    //     internal inheritAudioNFTByWorkIdByProfile;
-    // mapping(uint256 => uint256) internal inheritAudioCountByProfile;
-
     error InitParamsInvalid();
     error ProfileNFTNotFound();
     error ProfileIdInvalid();
@@ -37,30 +30,24 @@ contract CrypToneAudio {
     error ProfileAddressInvalid();
 
     constructor(address profileNFTContract) ERC1155("") {
-        // constructor() ERC1155("") {
-        if (profileNFTContract == address(0)) revert InitParamsInvalid();
+        if (profileNFTContract == address(0)) {
+            revert InitParamsInvalid();
+        }
         PROFILE_NFT_CONTRACT = profileNFTContract;
     }
 
     // tokenURI is expected IPFS CID
     function postWork(NFTType nftType, string memory tokenURI) internal {
-        // TODO:if caller profileNFT does not exist, this function revert.
-        if (!_profileNFTExists(msg.sender)) revert ProfileNFTNotFound();
-        // if (nftType == NFTType.Audio) {
+        if (!_profileNFTExists(msg.sender)) {
+            revert ProfileNFTNotFound();
+        }
         uint256 newWorkId = audioCountByProfileByNFTType[nftType][msg.sender];
-
         audioByWorkIdByProfileByNFTType[nftType][msg.sender][newWorkId]
             .tokenId = tokenCount;
         audioByWorkIdByProfileByNFTType[nftType][msg.sender][newWorkId]
             .tokenURI = tokenURI;
 
         audioCountByProfileByNFTType[nftType][msg.sender]++;
-        // } else if (nftType == NFTType.InheritAudio) {
-        //     uint256 newWorkId = inheritAudioCountByProfile[msg.sender];
-        //     inheritAudioNFTByWorkIdByProfile[msg.sender][newWorkId];
-        //     inheritAudioCountByProfile[msg.sender]++;
-        // }
-        // _setURI(tokenCount, tokenURI);
         tokenCount++;
     }
 
@@ -69,32 +56,25 @@ contract CrypToneAudio {
         uint256 workId,
         uint256 amount
     ) public {
-        // if (!_checkProfileId(msg.sender, profileId)) revert ProfileIdInvalid();
-        if (workId >= audioCountByProfileByNFTType[msg.sender][nftType])
+        if (workId >= audioCountByProfileByNFTType[nftType][msg.sender]) {
             revert MintWorkIdInvalid();
-
-        uint256 tokenId = audioByWorkIdByProfileByNFTType[msg.sender][nftType][
+        }
+        uint256 tokenId = audioByWorkIdByProfileByNFTType[nftType][msg.sender][
             workId
-        ];
-        // if (nftType == NFTType.Audio) {
-        //     tokenId = audioNFTByWorkIdByProfile[msg.sender][workId];
-        // } else if (nftType == NFTType.InheritAudio) {
-        //     tokenId = inheritAudioNFTByWorkIdByProfile[msg.sender][workId];
-        // }
-
+        ].tokenId;
         _mint(msg.sender, tokenId, amount, "");
         // setApprovalForAll( , true); // approve to market
     }
 
     function _profileNFTExists(address profileAddress)
         internal
-        pure
+        view
         returns (bool)
     {
-        if (profileAddress == address(0)) revert ProfileAddressInvalid();
-
+        if (profileAddress == address(0)) {
+            revert ProfileAddressInvalid();
+        }
         return
             CrypToneProfile(PROFILE_NFT_CONTRACT).profileExists(profileAddress);
-        // return profileId == fetchedId;
     }
 }

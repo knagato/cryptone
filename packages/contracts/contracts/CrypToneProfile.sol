@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import {ILensHub} from "./profile/interfaces/ILensHub.sol";
-import {Events} from "./profile/libraries/Events.sol";
-import {Constants} from "./profile/libraries/Constants.sol";
-import {DataTypes} from "./profile/libraries/DataTypes.sol";
-import {Errors} from "./profile/libraries/Errors.sol";
-import {PublishingLogic} from "./profile/libraries/PublishingLogic.sol";
-import {LensNFTBase} from "./profile/core/base/LensNFTBase.sol";
-import {LensMultiState} from "./profile/core/base/LensMultiState.sol";
-import {LensHubStorage} from "./profile/core/storage/LensHubStorage.sol";
-import {VersionedInitializable} from "./profile/upgradeability/VersionedInitializable.sol";
+import {ILensHub} from "./lens-hub/interfaces/ILensHub.sol";
+import {Events} from "./lens-hub/libraries/Events.sol";
+import {Constants} from "./lens-hub/libraries/Constants.sol";
+import {DataTypes} from "./lens-hub/libraries/DataTypes.sol";
+import {Errors} from "./lens-hub/libraries/Errors.sol";
+import {PublishingLogic} from "./lens-hub/libraries/PublishingLogic.sol";
+import {LensNFTBase} from "./lens-hub/core/base/LensNFTBase.sol";
+import {LensMultiState} from "./lens-hub/core/base/LensMultiState.sol";
+import {LensHubStorage} from "./lens-hub/core/storage/LensHubStorage.sol";
+import {VersionedInitializable} from "./lens-hub/upgradeability/VersionedInitializable.sol";
 
 contract CrypToneProfile is
     LensNFTBase,
@@ -21,17 +21,12 @@ contract CrypToneProfile is
 {
     uint256 internal constant REVISION = 1;
 
-    // address internal immutable AUDIO_NFT_IMPL;
-
     modifier onlyGov() {
         _validateCallerIsGovernance();
         _;
     }
 
-    constructor() {
-        // if (audioNFTImpl == address(0)) revert Errors.InitParamsInvalid();
-        // AUDIO_NFT_IMPL = audioNFTImpl;
-    }
+    constructor() {}
 
     /// @inheritdoc ILensHub
     function initialize(
@@ -81,6 +76,10 @@ contract CrypToneProfile is
         _setState(newState);
     }
 
+    /// *********************************
+    /// *****PROFILE OWNER FUNCTIONS*****
+    /// *********************************
+
     function createProfile(DataTypes.CreateProfileData calldata vars)
         external
         override
@@ -100,16 +99,16 @@ contract CrypToneProfile is
         }
     }
 
-    function setProfileContentURI(uint256 profileId, string calldata contentURI)
+    function setProfileURI(uint256 profileId, string calldata profileURI)
         external
         whenNotPaused
     {
         _validateCallerIsProfileOwner(profileId);
-        _setProfileContentURI(profileId, contentURI);
+        _setProfileURI(profileId, profileURI);
     }
 
-    function setProfileContentURIWithSig(
-        DataTypes.SetProfileContentURIWithSigData calldata vars
+    function setProfileURIWithSig(
+        DataTypes.SetProfileURIWithSigData calldata vars
     ) external whenNotPaused {
         address owner = ownerOf(vars.profileId);
         unchecked {
@@ -119,7 +118,7 @@ contract CrypToneProfile is
                         abi.encode(
                             SET_PROFILE_URI_WITH_SIG_TYPEHASH,
                             vars.profileId,
-                            keccak256(bytes(vars.contentURI)),
+                            keccak256(bytes(vars.profileURI)),
                             sigNonces[owner]++,
                             vars.sig.deadline
                         )
@@ -129,77 +128,8 @@ contract CrypToneProfile is
                 vars.sig
             );
         }
-        _setProfileContentURI(vars.profileId, vars.contentURI);
+        _setProfileURI(vars.profileId, vars.profileURI);
     }
-
-    // function postNewAudio(DataTypes.PostData calldata vars)
-    //     external
-    //     whenPublishingEnabled
-    //     returns (uint256)
-    // {
-    //     _validateCallerIsProfileOwner(vars.profileId);
-    //     return _postNewAudio(vars.profileId, vars.audioURI);
-    // }
-
-    // function postNewAudioWithSig(DataTypes.PostWithSigData calldata vars)
-    //     external
-    //     whenPublishingEnabled
-    //     returns (uint256)
-    // {
-    //     address owner = ownerOf(vars.profileId);
-    //     unchecked {
-    //         _validateRecoveredAddress(
-    //             _calculateDigest(
-    //                 keccak256(
-    //                     abi.encode(
-    //                         POST_WITH_SIG_TYPEHASH,
-    //                         vars.profileId,
-    //                         keccak256(bytes(vars.audioURI)),
-    //                         sigNonces[owner]++,
-    //                         vars.sig.deadline
-    //                     )
-    //                 )
-    //             ),
-    //             owner,
-    //             vars.sig
-    //         );
-    //     }
-    //     return _postNewAudio(vars.profileId, vars.audioURI);
-    // }
-
-    // function putOnSale(DataTypes.OnSaleData calldata vars)
-    //     external
-    //     whenPublishingEnabled
-    // {
-    //     _validateCallerIsProfileOwner(vars.profileId);
-    //     _putOnSale(vars.profileId, vars.audioId, vars.amount);
-    // }
-
-    // function putOnSaleWithSig(DataTypes.OnSaleWithSigData calldata vars)
-    //     external
-    //     whenPublishingEnabled
-    // {
-    //     address owner = ownerOf(vars.profileId);
-    //     unchecked {
-    //         _validateRecoveredAddress(
-    //             _calculateDigest(
-    //                 keccak256(
-    //                     abi.encode(
-    //                         ON_SALE_WITH_SIG_TYPEHASH,
-    //                         vars.profileId,
-    //                         vars.audioId,
-    //                         vars.amount,
-    //                         sigNonces[owner]++,
-    //                         vars.sig.deadline
-    //                     )
-    //                 )
-    //             ),
-    //             owner,
-    //             vars.sig
-    //         );
-    //     }
-    //     return _putOnSale(vars.profileId, vars.audioId, vars.amount);
-    // }
 
     function burn(uint256 tokenId) public override whenNotPaused {
         super.burn(tokenId);
@@ -225,16 +155,12 @@ contract CrypToneProfile is
     }
 
     function profileExists(address wallet) external view returns (bool) {
-        return getProfile(defaultProfile(wallet)).exists;
+        return _profileById[_defaultProfileByAddress[wallet]].exists;
     }
 
     /// @inheritdoc ILensHub
     function getGovernance() external view override returns (address) {
         return _governance;
-    }
-
-    function getAudioCount(uint256 profileId) external view returns (uint256) {
-        return _profileById[profileId].audioCount;
     }
 
     /// @inheritdoc ILensHub
@@ -246,26 +172,6 @@ contract CrypToneProfile is
     {
         return _profileById[profileId].handle;
     }
-
-    // function getAudioPointer(uint256 profileId, uint256 audioId)
-    //     external
-    //     view
-    //     returns (uint256, uint256)
-    // {
-    //     uint256 profileIdPointed = _audioByIdByProfile[profileId][audioId]
-    //         .profileIdPointed;
-    //     uint256 audioIdPointed = _audioByIdByProfile[profileId][audioId]
-    //         .audioIdPointed;
-    //     return (profileIdPointed, audioIdPointed);
-    // }
-
-    // function getContentURI(uint256 profileId, uint256 audioId)
-    //     external
-    //     view
-    //     returns (string memory)
-    // {
-    //     return _audioByIdByProfile[profileId][audioId].contentURI;
-    // }
 
     /// @inheritdoc ILensHub
     function getProfileIdByHandle(string calldata handle)
@@ -287,36 +193,8 @@ contract CrypToneProfile is
         return _profileById[profileId];
     }
 
-    // function getAudio(uint256 profileId, uint256 audioId)
-    //     external
-    //     view
-    //     returns (DataTypes.AudioStruct memory)
-    // {
-    //     return _audioByIdByProfile[profileId][audioId];
-    // }
-
-    // function getAudioType(uint256 profileId, uint256 audioId)
-    //     external
-    //     view
-    //     returns (DataTypes.PubType)
-    // {
-    //     if (audioId == 0 || _profileById[profileId].audioCount < audioId) {
-    //         return DataTypes.PubType.Nonexistent;
-    //         // } else if (
-    //         //     _audioByIdByProfile[profileId][audioId].collectModule == address(0)
-    //         // ) {
-    //         //     return DataTypes.PubType.Mirror;
-    //     } else if (
-    //         _audioByIdByProfile[profileId][audioId].profileIdPointed == 0
-    //     ) {
-    //         return DataTypes.PubType.PostAudio;
-    //     } else {
-    //         return DataTypes.PubType.Unknown;
-    //     }
-    // }
-
-    function contentURI(uint256 tokenId) public view returns (string memory) {
-        return _profileById[tokenId].contentURI;
+    function profileURI(uint256 tokenId) public view returns (string memory) {
+        return _profileById[tokenId].profileURI;
     }
 
     /// ****************************
@@ -334,37 +212,19 @@ contract CrypToneProfile is
         );
     }
 
-    function _setProfileContentURI(
-        uint256 profileId,
-        string calldata contentURI
-    ) internal {
-        if (bytes(contentURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
-            revert Errors.ProfileContentURILengthInvalid();
-        _profileById[profileId].contentURI = contentURI;
-        emit Events.ProfileContentURISet(
-            profileId,
-            contentURI,
-            block.timestamp
-        );
+    function _setProfileURI(uint256 profileId, string calldata profileURI)
+        internal
+    {
+        if (bytes(profileURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
+            revert Errors.ProfileURILengthInvalid();
+        _profileById[profileId].profileURI = profileURI;
+        emit Events.ProfileURISet(profileId, profileURI, block.timestamp);
     }
 
     function _clearHandleHash(uint256 profileId) internal {
         bytes32 handleHash = keccak256(bytes(_profileById[profileId].handle));
         _profileIdByHandleHash[handleHash] = 0;
     }
-
-    // // Trade ProfileNFT??
-    // function _beforeTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 tokenId
-    // ) internal override whenNotPaused {
-    //     if (_defaultProfileByAddress[from] == tokenId) {
-    //         _defaultProfileByAddress[from] = 0;
-    //     }
-
-    //     super._beforeTokenTransfer(from, to, tokenId);
-    // }
 
     function _validateCallerIsProfileOwner(uint256 profileId) internal view {
         if (msg.sender != ownerOf(profileId)) revert Errors.NotProfileOwner();
