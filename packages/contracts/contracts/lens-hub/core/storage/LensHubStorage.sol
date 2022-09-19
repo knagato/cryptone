@@ -10,13 +10,8 @@ abstract contract LensHubStorage {
             "SetProfileURIWithSig(uint256 profileId,string profileURI,uint256 nonce,uint256 deadline)"
         );
 
-    mapping(bytes32 => uint256) internal _profileIdByHandleHash;
     mapping(uint256 => DataTypes.ProfileStruct) internal _profileById;
-
-    // mapping(uint256 => mapping(uint256 => DataTypes.AudioStruct))
-    //     internal _audioByIdByProfile;
-
-    mapping(address => uint256) internal _defaultProfileByAddress;
+    mapping(address => uint256) internal _profileIdByAddress;
 
     uint256 internal _profileCounter;
     address internal _governance;

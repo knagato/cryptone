@@ -12,11 +12,12 @@ library Errors {
     error NotGovernanceOrEmergencyAdmin();
     error EmergencyAdminCannotUnpause();
     error NotProfileOwner();
-    error HandleTaken();
-    error HandleLengthInvalid();
-    error HandleContainsInvalidCharacters();
     error ProfileURILengthInvalid();
     
+    error ProfileAlreadyExists();
+    error ProfileNotFound();
+    error NotSenderAddress();
+
     // MultiState Errors
     error Paused();
 }

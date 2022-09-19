@@ -17,14 +17,12 @@ library DataTypes {
     }
 
     struct ProfileStruct {
-        string handle;
         string profileURI;
         bool exists;
     }
 
     struct CreateProfileData {
         address to;
-        string handle;
         string profileURI;
     }
 

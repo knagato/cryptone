@@ -21,16 +21,7 @@ interface ILensHub {
         external
         returns (uint256);
 
-    function defaultProfile(address wallet) external view returns (uint256);
-
     function getGovernance() external view returns (address);
-
-    function getHandle(uint256 profileId) external view returns (string memory);
-
-    function getProfileIdByHandle(string calldata handle)
-        external
-        view
-        returns (uint256);
 
     function getProfile(uint256 profileId)
         external

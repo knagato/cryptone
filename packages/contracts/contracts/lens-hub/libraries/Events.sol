@@ -32,7 +32,6 @@ library Events {
         uint256 indexed profileId,
         address indexed creator,
         address indexed to,
-        string handle,
         string contentURI,
         uint256 timestamp
     );

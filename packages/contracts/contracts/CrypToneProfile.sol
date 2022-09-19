@@ -86,24 +86,22 @@ contract CrypToneProfile is
         whenNotPaused
         returns (uint256)
     {
+        if (vars.to != msg.sender) revert Errors.NotSenderAddress();
+        if (_profileIdByAddress[msg.sender] > 0)
+            revert Errors.ProfileAlreadyExists();
+
         unchecked {
             uint256 profileId = ++_profileCounter;
             _mint(vars.to, profileId);
-            PublishingLogic.createProfile(
-                vars,
-                profileId,
-                _profileIdByHandleHash,
-                _profileById
-            );
+            PublishingLogic.createProfile(vars, profileId, _profileById);
             return profileId;
         }
     }
 
-    function setProfileURI(uint256 profileId, string calldata profileURI)
-        external
-        whenNotPaused
-    {
-        _validateCallerIsProfileOwner(profileId);
+    function setProfileURI(string calldata profileURI) external whenNotPaused {
+        uint256 profileId = _profileIdByAddress[msg.sender];
+        if (profileId == 0) revert Errors.ProfileNotFound();
+
         _setProfileURI(profileId, profileURI);
     }
 
@@ -131,56 +129,24 @@ contract CrypToneProfile is
         _setProfileURI(vars.profileId, vars.profileURI);
     }
 
-    function burn(uint256 tokenId) public override whenNotPaused {
-        super.burn(tokenId);
-        _clearHandleHash(tokenId);
-    }
+    // function burn() public whenNotPaused {
+    //     uint256 profileId = _profileIdByAddress[msg.sender];
+    //     if (profileId == 0) revert Errors.ProfileNotFound();
 
-    function burnWithSig(
-        uint256 tokenId,
-        DataTypes.EIP712Signature calldata sig
-    ) public override whenNotPaused {
-        super.burnWithSig(tokenId, sig);
-        _clearHandleHash(tokenId);
-    }
+    //     super.burn(profileId);
+    //     _clearHandleHash(profileId);
+    // }
 
-    /// @inheritdoc ILensHub
-    function defaultProfile(address wallet)
-        external
-        view
-        override
-        returns (uint256)
-    {
-        return _defaultProfileByAddress[wallet];
-    }
+    // function burnWithSig(
+    //     uint256 tokenId,
+    //     DataTypes.EIP712Signature calldata sig
+    // ) public override whenNotPaused {
+    //     super.burnWithSig(tokenId, sig);
+    //     _clearHandleHash(tokenId);
+    // }
 
-    function profileExists(address wallet) external view returns (bool) {
-        return _profileById[_defaultProfileByAddress[wallet]].exists;
-    }
-
-    /// @inheritdoc ILensHub
-    function getGovernance() external view override returns (address) {
-        return _governance;
-    }
-
-    /// @inheritdoc ILensHub
-    function getHandle(uint256 profileId)
-        external
-        view
-        override
-        returns (string memory)
-    {
-        return _profileById[profileId].handle;
-    }
-
-    /// @inheritdoc ILensHub
-    function getProfileIdByHandle(string calldata handle)
-        external
-        view
-        returns (uint256)
-    {
-        bytes32 handleHash = keccak256(bytes(handle));
-        return _profileIdByHandleHash[handleHash];
+    function getProfileId(address wallet) external view returns (uint256) {
+        return _profileIdByAddress[wallet];
     }
 
     /// @inheritdoc ILensHub
@@ -193,8 +159,17 @@ contract CrypToneProfile is
         return _profileById[profileId];
     }
 
-    function profileURI(uint256 tokenId) public view returns (string memory) {
-        return _profileById[tokenId].profileURI;
+    function profileExists(address wallet) external view returns (bool) {
+        return _profileById[_profileIdByAddress[wallet]].exists;
+    }
+
+    function profileURI(uint256 profileId) public view returns (string memory) {
+        return _profileById[profileId].profileURI;
+    }
+
+    /// @inheritdoc ILensHub
+    function getGovernance() external view override returns (address) {
+        return _governance;
     }
 
     /// ****************************
@@ -219,11 +194,6 @@ contract CrypToneProfile is
             revert Errors.ProfileURILengthInvalid();
         _profileById[profileId].profileURI = profileURI;
         emit Events.ProfileURISet(profileId, profileURI, block.timestamp);
-    }
-
-    function _clearHandleHash(uint256 profileId) internal {
-        bytes32 handleHash = keccak256(bytes(_profileById[profileId].handle));
-        _profileIdByHandleHash[handleHash] = 0;
     }
 
     function _validateCallerIsProfileOwner(uint256 profileId) internal view {
