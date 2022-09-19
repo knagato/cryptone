@@ -11,5 +11,54 @@ datasource db {
 }
 
 model User {
-  address String @id
+  id Int @id @default(autoincrement())
+  address String @unique
+  nickname String?
+}
+
+model UploadAudio {
+  id Int @id @default(autoincrement())
+  title String?
+  description String?
+  audioUrl String
+  audioSize Int
+  encryptedAudioCID String?
+  symmetricKey String?
+  previewAudioCID String?
+}
+
+model Images {
+  id Int @id @default(autoincrement())
+  imageUrl String
+  prompts String
+  imageCID String?
+}
+
+model AudioNFT {
+  id Int @id @default(autoincrement())
+  chainId Int
+  contractAddress String
+  tokenId Int
+  title String
+  encryptedAudioCID String
+  encryptedSymmetricKey String
+  jacketImageCID String
+  creatorAddress String
+  previewAudioCID String
+}
+
+model AlterTemplate {
+  id Int @id @default(autoincrement())
+  name String
+  thumbnailUrl String
+  roomUrl String
+}
+
+model Alter {
+  id Int @id @default(autoincrement())
+  templateId Int
+  title String
+  description String
+  creatorId Int
+  arrangementData Json
 }

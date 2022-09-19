@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "studio": "prisma studio",
     "seed": "prisma db seed"
   },
   "prisma": {
