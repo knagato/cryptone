@@ -125,20 +125,14 @@ contract CrypToneProfile is
     }
 
     function setProfileURI(string calldata tokenURI) external whenNotPaused {
-        uint256 profileId = _profileIdByAddress[msg.sender];
-        if (profileId == 0) revert Errors.ProfileNotFound();
-
-        _setProfileURI(profileId, tokenURI);
+        _setProfileURI(msg.sender, tokenURI);
     }
 
     function setProfileURIOnlyGov(
         address profileAddress,
         string calldata tokenURI
     ) external whenNotPaused onlyGov {
-        uint256 profileId = _profileIdByAddress[profileAddress];
-        if (profileId == 0) revert Errors.ProfileNotFound();
-
-        _setProfileURI(profileId, tokenURI);
+        _setProfileURI(profileAddress, tokenURI);
     }
 
     // function burn() public whenNotPaused {
@@ -191,9 +185,12 @@ contract CrypToneProfile is
         );
     }
 
-    function _setProfileURI(uint256 profileId, string calldata tokenURI)
+    function _setProfileURI(address profileAddress, string calldata tokenURI)
         internal
     {
+        uint256 profileId = _profileIdByAddress[profileAddress];
+        if (profileId == 0) revert Errors.ProfileNotFound();
+
         if (bytes(tokenURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
             revert Errors.ProfileURILengthInvalid();
         _profileById[profileId].tokenURI = tokenURI;
