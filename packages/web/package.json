@@ -29,6 +29,7 @@
     "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use": "^17.4.0",
     "replicate-js": "github:nicholascelestin/replicate-js",
     "siwe": "^1.1.6",
     "three": "^0.144.0",

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 const user = {
   id: "user1",
+  name: "Taro",
   altars: [
     {
       id: "altar-pastel",
@@ -28,10 +29,10 @@ const Home: NextPage = () => {
     <div className="container mx-auto py-16">
       <div className="md:flex md:items-center md:justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-          My Altars
+          {`${user.name}'s Altars`}
         </h2>
         <Link href="/mypage/altars/new">
-          <a className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a className="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block">
             Create
           </a>
         </Link>
@@ -44,7 +45,7 @@ const Home: NextPage = () => {
 
         <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
           {user.altars.map((altar) => (
-            <Link key={altar.id} href={`/mypage/altars/${altar.id}`}>
+            <Link key={altar.id} href={`/altars/${altar.id}`}>
               <a className="group">
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg sm:aspect-w-2 sm:aspect-h-3 relative">
                   <Image
