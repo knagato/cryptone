@@ -11,7 +11,6 @@ library DataTypes {
         uint256 tokenId;
         address creatorAddress;
         uint256 generation;
-        string tokenURI;
         uint256 maxSupply;
     }
 
@@ -19,8 +18,13 @@ library DataTypes {
         uint256 tokenId;
         address creatorAddress;
         uint256 generation;
-        string tokenURI;
         uint256 parentTokenId;
         uint256 maxSupply;
+    }
+
+    struct RefStruct {
+        address creatorAddress;
+        uint256 workId;
+        bool exists;
     }
 }

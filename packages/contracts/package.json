@@ -19,6 +19,7 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3"
+    "@openzeppelin/contracts": "^4.7.3",
+    "@tableland/evm": "^2.0.4"
   }
 }

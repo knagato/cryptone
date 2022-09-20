@@ -1180,6 +1180,11 @@
   dependencies:
     tslib "^2.4.0"
 
+"@tableland/evm@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@tableland/evm/-/evm-2.0.4.tgz#ddc9a608cd04f2a77f2a4b3cb08dfbf52cd9bc95"
+  integrity sha512-LCKBk4XViHQSt+iDgS8ZBfGxrQVnqWbKZcLy7yolznu0UvxIO7wta8a0vMfdaElB9sLeN0e8XLzWeD2fHt9lhA==
+
 "@tailwindcss/aspect-ratio@^0.4.2":
   version "0.4.2"
   resolved "https://registry.npmjs.org/@tailwindcss/aspect-ratio/-/aspect-ratio-0.4.2.tgz"
