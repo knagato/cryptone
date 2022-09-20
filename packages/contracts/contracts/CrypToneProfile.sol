@@ -80,21 +80,20 @@ contract CrypToneProfile is
     /// *****PROFILE OWNER FUNCTIONS*****
     /// *********************************
 
-    function createProfile(DataTypes.CreateProfileData calldata vars)
+    function createProfile(string calldata tokenURI)
         external
-        override
         whenNotPaused
         returns (uint256)
     {
-        if (vars.to != msg.sender) revert Errors.NotSenderAddress();
         if (_profileIdByAddress[msg.sender] > 0)
             revert Errors.ProfileAlreadyExists();
 
         unchecked {
             uint256 profileId = ++_profileCounter;
-            _mint(vars.to, profileId);
+            _mint(msg.sender, profileId);
             PublishingLogic.createProfile(
-                vars,
+                msg.sender,
+                tokenURI,
                 profileId,
                 _profileById,
                 _profileIdByAddress
@@ -103,32 +102,20 @@ contract CrypToneProfile is
         }
     }
 
-    function createProfileWithSig(
-        DataTypes.CreateProfileWithSigData calldata vars
-    ) external whenNotPaused returns (uint256) {
-        unchecked {
-            _validateRecoveredAddress(
-                _calculateDigest(
-                    keccak256(
-                        abi.encode(
-                            CREATE_PROFILE_WITH_SIG_TYPEHASH,
-                            vars.to,
-                            keccak256(bytes(vars.tokenURI)),
-                            sigNonces[vars.to]++,
-                            vars.sig.deadline
-                        )
-                    )
-                ),
-                vars.to,
-                vars.sig
-            );
-            if (_profileIdByAddress[vars.to] > 0)
-                revert Errors.ProfileAlreadyExists();
+    function createProfileOnlyGov(address to, string calldata tokenURI)
+        external
+        whenNotPaused
+        onlyGov
+        returns (uint256)
+    {
+        if (_profileIdByAddress[to] > 0) revert Errors.ProfileAlreadyExists();
 
+        unchecked {
             uint256 profileId = ++_profileCounter;
-            _mint(vars.to, profileId);
+            _mint(to, profileId);
             PublishingLogic.createProfile(
-                DataTypes.CreateProfileData(vars.to, vars.tokenURI),
+                to,
+                tokenURI,
                 profileId,
                 _profileById,
                 _profileIdByAddress
@@ -144,28 +131,14 @@ contract CrypToneProfile is
         _setProfileURI(profileId, tokenURI);
     }
 
-    function setProfileURIWithSig(
-        DataTypes.SetProfileURIWithSigData calldata vars
-    ) external whenNotPaused {
-        address owner = ownerOf(vars.profileId);
-        unchecked {
-            _validateRecoveredAddress(
-                _calculateDigest(
-                    keccak256(
-                        abi.encode(
-                            SET_PROFILE_URI_WITH_SIG_TYPEHASH,
-                            vars.profileId,
-                            keccak256(bytes(vars.tokenURI)),
-                            sigNonces[owner]++,
-                            vars.sig.deadline
-                        )
-                    )
-                ),
-                owner,
-                vars.sig
-            );
-        }
-        _setProfileURI(vars.profileId, vars.tokenURI);
+    function setProfileURIOnlyGov(
+        address profileAddress,
+        string calldata tokenURI
+    ) external whenNotPaused onlyGov {
+        uint256 profileId = _profileIdByAddress[profileAddress];
+        if (profileId == 0) revert Errors.ProfileNotFound();
+
+        _setProfileURI(profileId, tokenURI);
     }
 
     // function burn() public whenNotPaused {
@@ -174,14 +147,6 @@ contract CrypToneProfile is
 
     //     super.burn(profileId);
     //     _clearHandleHash(profileId);
-    // }
-
-    // function burnWithSig(
-    //     uint256 tokenId,
-    //     DataTypes.EIP712Signature calldata sig
-    // ) public override whenNotPaused {
-    //     super.burnWithSig(tokenId, sig);
-    //     _clearHandleHash(tokenId);
     // }
 
     function getProfileId(address wallet) external view returns (uint256) {

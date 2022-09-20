@@ -9,32 +9,32 @@ import {Constants} from "./Constants.sol";
 
 library PublishingLogic {
     function createProfile(
-        DataTypes.CreateProfileData calldata vars,
+        address to,
+        string calldata tokenURI,
         uint256 profileId,
         mapping(uint256 => DataTypes.ProfileStruct) storage _profileById,
         mapping(address => uint256) storage _profileIdByAddress
     ) external {
-        if (
-            bytes(vars.tokenURI).length >
-            Constants.MAX_PROFILE_CONTENT_URI_LENGTH
-        ) revert Errors.ProfileURILengthInvalid();
+        if (bytes(tokenURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
+            revert Errors.ProfileURILengthInvalid();
 
-        _profileById[profileId].tokenURI = vars.tokenURI;
+        _profileById[profileId].tokenURI = tokenURI;
         _profileById[profileId].exists = true;
-        _profileIdByAddress[vars.to] = profileId;
+        _profileIdByAddress[to] = profileId;
 
-        _emitProfileCreated(profileId, vars);
+        _emitProfileCreated(profileId, to, tokenURI);
     }
 
     function _emitProfileCreated(
         uint256 profileId,
-        DataTypes.CreateProfileData calldata vars
+        address to,
+        string calldata tokenURI
     ) internal {
         emit Events.ProfileCreated(
             profileId,
             msg.sender, // Creator is always the msg sender
-            vars.to,
-            vars.tokenURI,
+            to,
+            tokenURI,
             block.timestamp
         );
     }

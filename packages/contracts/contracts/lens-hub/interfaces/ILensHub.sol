@@ -17,10 +17,6 @@ interface ILensHub {
 
     function setState(DataTypes.ProtocolState newState) external;
 
-    function createProfile(DataTypes.CreateProfileData calldata vars)
-        external
-        returns (uint256);
-
     function getGovernance() external view returns (address);
 
     function getProfile(uint256 profileId)
