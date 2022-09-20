@@ -3,14 +3,15 @@ pragma solidity 0.8.16;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Strings.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@tableland/evm/contracts/ITablelandTables.sol";
 import "./audio-libs/DataTypes.sol";
 import "./audio-libs/Events.sol";
 import "./audio-libs/Errors.sol";
 import {CrypToneProfile} from "./CrypToneProfile.sol";
 
-contract CrypToneAudio is ERC1155 {
-    address internal immutable PROFILE_NFT_CONTRACT; // TODO:setter only owner
+contract CrypToneAudio is ERC1155, Ownable {
+    address internal profileContract;
 
     uint256 totalSupply = 0;
 
@@ -34,15 +35,20 @@ contract CrypToneAudio is ERC1155 {
     string private _chainName; // ex:polygon-mumbai
 
     constructor(
-        address profileNFTContract,
+        address _profileContract,
         address tableRegistry,
         string memory chainName
     ) ERC1155("") {
-        if (profileNFTContract == address(0)) {
+        if (_profileContract == address(0)) {
             revert Errors.InitParamsInvalid();
         }
-        PROFILE_NFT_CONTRACT = profileNFTContract;
+        profileContract = _profileContract;
         _initTableland(tableRegistry, chainName);
+    }
+
+    function setProfileNFTContract(address newContract) external onlyOwner {
+        profileContract = newContract;
+        emit Events.ProfileContractChanged(newContract);
     }
 
     // tokenURI is expected IPFS CID
@@ -202,7 +208,7 @@ contract CrypToneAudio is ERC1155 {
         if (profileAddress == address(0)) {
             revert Errors.ProfileAddressInvalid();
         }
-        return CrypToneProfile(PROFILE_NFT_CONTRACT).profileExists(profileAddress);
+        return CrypToneProfile(profileContract).profileExists(profileAddress);
     }
 
     /// ****************************

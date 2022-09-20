@@ -10,10 +10,15 @@ library Events {
         uint256 workId,
         uint256 tokenId
     );
+
     event AudioMinted(
         DataTypes.NFTType nftType,
         address owner,
         uint256 workId,
         uint256 amount
+    );
+
+    event ProfileContractChanged(
+        address newContract
     );
 }
