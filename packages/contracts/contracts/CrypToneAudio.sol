@@ -19,9 +19,9 @@ contract CrypToneAudio is ERC1155, Ownable {
         internal audioByWorkIdByCreator;
     mapping(address => uint256) internal totalAudioSupplyByCreator;
 
-    mapping(address => mapping(uint256 => DataTypes.InheritAudioStruct))
-        internal inheritAudioByWorkIdByCreator;
-    mapping(address => uint256) internal totalInheritAudioSupplyByCreator;
+    mapping(address => mapping(uint256 => DataTypes.InheritStruct))
+        internal inheritByWorkIdByCreator;
+    mapping(address => uint256) internal totalInheritSupplyByCreator;
 
     mapping(uint256 => DataTypes.RefStruct) internal refByTokenId;
 
@@ -51,42 +51,56 @@ contract CrypToneAudio is ERC1155, Ownable {
         emit Events.ProfileContractChanged(newContract);
     }
 
-    // postWork
-    function postWork(
-        uint256 parentTokenId,
-        string calldata encryptedAudioCID,
-        string calldata encryptedSymmetricKey,
-        string calldata previewAudioCID,
-        string calldata jacketCID
-    ) public returns (uint256) {
-        return
-            _postWork(
-                msg.sender,
-                parentTokenId,
-                encryptedAudioCID,
-                encryptedSymmetricKey,
-                previewAudioCID,
-                jacketCID
-            );
+    // createWork
+    function createWork(uint256 parentTokenId) public returns (uint256) {
+        return _createWork(msg.sender, parentTokenId);
     }
 
-    function postWorkOnlyOwner(
-        address creatorAddress,
-        uint256 parentTokenId,
+    function createWorkOnlyOwner(address creatorAddress, uint256 parentTokenId)
+        public
+        onlyOwner
+        returns (uint256)
+    {
+        return _createWork(creatorAddress, parentTokenId);
+    }
+
+    function setMetadata(
+        uint256 tokenId,
+        uint256 generation,
         string calldata encryptedAudioCID,
         string calldata encryptedSymmetricKey,
         string calldata previewAudioCID,
         string calldata jacketCID
-    ) public onlyOwner returns (uint256) {
-        return
-            _postWork(
-                creatorAddress,
-                parentTokenId,
-                encryptedAudioCID,
-                encryptedSymmetricKey,
-                previewAudioCID,
-                jacketCID
-            );
+    ) public {
+        if (refByTokenId[tokenId].creatorAddress != msg.sender)
+            revert Errors.NotTokenOwner();
+
+        _insertNewWork(
+            tokenId,
+            generation,
+            encryptedAudioCID,
+            encryptedSymmetricKey,
+            previewAudioCID,
+            jacketCID
+        );
+    }
+
+    function setMetadataOnlyOwner(
+        uint256 tokenId,
+        uint256 generation,
+        string calldata encryptedAudioCID,
+        string calldata encryptedSymmetricKey,
+        string calldata previewAudioCID,
+        string calldata jacketCID
+    ) public onlyOwner {
+        _insertNewWork(
+            tokenId,
+            generation,
+            encryptedAudioCID,
+            encryptedSymmetricKey,
+            previewAudioCID,
+            jacketCID
+        );
     }
 
     // mint
@@ -134,105 +148,81 @@ contract CrypToneAudio is ERC1155, Ownable {
     /// *****PRIVATE FUNCTIONS*****
     /// ****************************
 
-    function _postWork(
-        address creatorAddress,
-        uint256 parentTokenId,
-        string calldata encryptedAudioCID,
-        string calldata encryptedSymmetricKey,
-        string calldata previewAudioCID,
-        string calldata jacketCID
-    ) private returns (uint256) {
+    function _createWork(address creatorAddress, uint256 parentTokenId)
+        private
+        returns (uint256 newTokenId)
+    {
         if (!_profileNFTExists(creatorAddress)) {
             revert Errors.ProfileNFTNotFound();
         }
 
-        uint256 newWorkId;
-        uint256 generation;
-        DataTypes.NFTType nftType;
-
         DataTypes.RefStruct memory parentRef = refByTokenId[parentTokenId];
-        if (!parentRef.exists) {
-            (newWorkId, generation, nftType) = _audioPost(creatorAddress);
+        if (parentRef.exists) {
+            _createInherit(creatorAddress, parentRef);
         } else {
-            (newWorkId, generation, nftType, parentRef) = _inheritAudioPost(
-                creatorAddress
-            );
+            _createAudio(creatorAddress);
         }
+        newTokenId = totalSupply;
+        totalSupply++;
+        return newTokenId;
+    }
+
+    function _createAudio(address creatorAddress) private {
+        // audio
+        uint256 newWorkId = totalAudioSupplyByCreator[creatorAddress];
+        audioByWorkIdByCreator[creatorAddress][newWorkId].tokenId = totalSupply;
+
+        uint256 generation = 0;
+        audioByWorkIdByCreator[creatorAddress][newWorkId]
+            .generation = generation;
+
+        totalAudioSupplyByCreator[creatorAddress]++;
 
         refByTokenId[totalSupply] = DataTypes.RefStruct(
+            DataTypes.NFTType.Audio,
             creatorAddress,
             newWorkId,
             true
         );
 
-        _insertNewWork(
-            generation,
-            encryptedAudioCID,
-            encryptedSymmetricKey,
-            previewAudioCID,
-            jacketCID
-        );
-
-        emit Events.AudioPosted(
-            nftType,
+        emit Events.AudioCreated(
+            totalSupply,
             creatorAddress,
             newWorkId,
-            totalSupply
+            generation
         );
-        totalSupply++;
-        return newWorkId;
     }
 
-    function _audioPost(address creatorAddress)
-        private
-        returns (
-            uint256 newWorkId,
-            uint256 generation,
-            DataTypes.NFTType nftType
-        )
-    {
-        // audio
-        newWorkId = totalAudioSupplyByCreator[creatorAddress];
-        audioByWorkIdByCreator[creatorAddress][newWorkId].tokenId = totalSupply;
-
-        generation = 0;
-        audioByWorkIdByCreator[creatorAddress][newWorkId]
-            .generation = generation;
-
-        nftType = DataTypes.NFTType.Audio;
-
-        totalAudioSupplyByCreator[creatorAddress]++;
-
-        return (newWorkId, generation, nftType);
-    }
-
-    function _inheritAudioPost(address creatorAddress)
-        private
-        returns (
-            uint256 newWorkId,
-            uint256 generation,
-            DataTypes.NFTType nftType,
-            DataTypes.RefStruct memory parentRef
-        )
-    {
+    function _createInherit(
+        address creatorAddress,
+        DataTypes.RefStruct memory parentRef
+    ) private {
         // inherit audio
-        newWorkId = totalInheritAudioSupplyByCreator[creatorAddress];
-        inheritAudioByWorkIdByCreator[creatorAddress][newWorkId]
+        uint256 newWorkId = totalInheritSupplyByCreator[creatorAddress];
+        inheritByWorkIdByCreator[creatorAddress][newWorkId]
             .tokenId = totalSupply;
 
-        generation =
-            inheritAudioByWorkIdByCreator[parentRef.creatorAddress][
-                parentRef.workId
-            ].generation +
-            1;
-        inheritAudioByWorkIdByCreator[creatorAddress][newWorkId]
+        uint256 generation = inheritByWorkIdByCreator[parentRef.creatorAddress][
+            parentRef.workId
+        ].generation + 1;
+        inheritByWorkIdByCreator[creatorAddress][newWorkId]
             .generation = generation;
 
-        nftType = DataTypes.NFTType.InheritAudio;
+        totalInheritSupplyByCreator[creatorAddress]++;
 
-        totalInheritAudioSupplyByCreator[creatorAddress]++;
+        refByTokenId[totalSupply] = DataTypes.RefStruct(
+            DataTypes.NFTType.Inherit,
+            creatorAddress,
+            newWorkId,
+            true
+        );
 
-        return (newWorkId, generation, nftType, parentRef);
+        emit Events.AudioCreated(
+            totalSupply,
+            creatorAddress,
+            newWorkId,
+            generation
+        );
     }
 
     function _beforeMint(
@@ -245,25 +235,17 @@ contract CrypToneAudio is ERC1155, Ownable {
         uint256 tokenId;
         uint256 maxSupply;
         if (nftType == DataTypes.NFTType.Audio) {
-            if (workId >= totalAudioSupplyByCreator[creatorAddress]) {
-                revert Errors.MintWorkIdInvalid();
-            }
-            tokenId = audioByWorkIdByCreator[creatorAddress][workId].tokenId;
-            audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
-            // for tableland
-            maxSupply = audioByWorkIdByCreator[creatorAddress][workId]
-                .maxSupply;
-        } else if (nftType == DataTypes.NFTType.InheritAudio) {
-            if (workId >= totalInheritAudioSupplyByCreator[creatorAddress]) {
-                revert Errors.MintWorkIdInvalid();
-            }
-            tokenId = inheritAudioByWorkIdByCreator[creatorAddress][workId]
-                .tokenId;
-            inheritAudioByWorkIdByCreator[creatorAddress][workId]
-                .maxSupply += amount;
-            // for tableland
-            maxSupply = inheritAudioByWorkIdByCreator[creatorAddress][workId]
-                .maxSupply;
+            (tokenId, maxSupply) = _beforeMintAudio(
+                creatorAddress,
+                workId,
+                amount
+            );
+        } else if (nftType == DataTypes.NFTType.Inherit) {
+            (tokenId, maxSupply) = _beforeMintInherit(
+                creatorAddress,
+                workId,
+                amount
+            );
         } else {
             revert Errors.UnknownNFTType();
         }
@@ -271,9 +253,39 @@ contract CrypToneAudio is ERC1155, Ownable {
         _mint(creatorAddress, tokenId, amount, "");
         // setApprovalForAll( , true); // approve to market
 
-        _updateOnMint(tokenId, maxSupply, salesPrice);
+        _updateTableOnMint(tokenId, maxSupply, salesPrice);
 
         emit Events.AudioMinted(nftType, creatorAddress, workId, amount);
+    }
+
+    function _beforeMintAudio(
+        address creatorAddress,
+        uint256 workId,
+        uint256 amount
+    ) private returns (uint256 tokenId, uint256 maxSupply) {
+        if (workId >= totalAudioSupplyByCreator[creatorAddress]) {
+            revert Errors.MintWorkIdInvalid();
+        }
+        tokenId = audioByWorkIdByCreator[creatorAddress][workId].tokenId;
+        audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        // for tableland
+        maxSupply = audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        return (tokenId, maxSupply);
+    }
+
+    function _beforeMintInherit(
+        address creatorAddress,
+        uint256 workId,
+        uint256 amount
+    ) private returns (uint256 tokenId, uint256 maxSupply) {
+        if (workId >= totalInheritSupplyByCreator[creatorAddress]) {
+            revert Errors.MintWorkIdInvalid();
+        }
+        tokenId = inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
+        inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        // for tableland
+        maxSupply = inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        return (tokenId, maxSupply);
     }
 
     function _beforeMintBatch(
@@ -292,44 +304,54 @@ contract CrypToneAudio is ERC1155, Ownable {
         uint256[] memory maxSupplies = new uint256[](workIds.length);
         for (uint256 i = 0; i < workIds.length; i++) {
             if (types[i] == DataTypes.NFTType.Audio) {
-                if (workIds[i] >= totalAudioSupplyByCreator[creatorAddress]) {
-                    revert Errors.MintWorkIdInvalid();
-                }
-                ids[i] = audioByWorkIdByCreator[creatorAddress][workIds[i]]
-                    .tokenId;
-
-                audioByWorkIdByCreator[creatorAddress][workIds[i]]
-                    .maxSupply += amounts[i];
-
-                // for tableland
-                maxSupplies[i] = audioByWorkIdByCreator[creatorAddress][
-                    workIds[i]
-                ].maxSupply;
-            } else if (types[i] == DataTypes.NFTType.InheritAudio) {
-                if (
-                    workIds[i] >=
-                    totalInheritAudioSupplyByCreator[creatorAddress]
-                ) {
-                    revert Errors.MintWorkIdInvalid();
-                }
-                ids[i] = inheritAudioByWorkIdByCreator[creatorAddress][
-                    workIds[i]
-                ].tokenId;
-
-                inheritAudioByWorkIdByCreator[creatorAddress][workIds[i]]
-                    .maxSupply += amounts[i];
-
-                // for tableland
-                maxSupplies[i] = inheritAudioByWorkIdByCreator[creatorAddress][
-                    workIds[i]
-                ].maxSupply;
+                (ids[i], maxSupplies[i]) = _beforeMintBatchAudio(
+                    creatorAddress,
+                    workIds[i],
+                    amounts[i]
+                );
+            } else if (types[i] == DataTypes.NFTType.Inherit) {
+                (ids[i], maxSupplies[i]) = _beforeMintBatchInherit(
+                    creatorAddress,
+                    workIds[i],
+                    amounts[i]
+                );
             } else {
                 revert Errors.UnknownNFTType();
             }
         }
         _mintBatch(creatorAddress, ids, amounts, "");
 
-        _updateOnMintBatch(ids, maxSupplies, salesPrices);
+        _updateTableOnMintBatch(ids, maxSupplies, salesPrices);
+    }
+
+    function _beforeMintBatchAudio(
+        address creatorAddress,
+        uint256 workId,
+        uint256 amount
+    ) private returns (uint256 tokenId, uint256 maxSupply) {
+        if (workId >= totalAudioSupplyByCreator[creatorAddress]) {
+            revert Errors.MintWorkIdInvalid();
+        }
+        tokenId = audioByWorkIdByCreator[creatorAddress][workId].tokenId;
+        audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        // for tableland
+        maxSupply = audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        return (tokenId, maxSupply);
+    }
+
+    function _beforeMintBatchInherit(
+        address creatorAddress,
+        uint256 workId,
+        uint256 amount
+    ) private returns (uint256 tokenId, uint256 maxSupply) {
+        if (workId >= totalInheritSupplyByCreator[creatorAddress]) {
+            revert Errors.MintWorkIdInvalid();
+        }
+        tokenId = inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
+        inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        // for tableland
+        maxSupply = inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        return (tokenId, maxSupply);
     }
 
     function _profileNFTExists(address profileAddress)
@@ -376,6 +398,7 @@ contract CrypToneAudio is ERC1155, Ownable {
     }
 
     function _insertNewWork(
+        uint256 tokenId,
         uint256 generation,
         string calldata encryptedAudioCID,
         string calldata encryptedSymmetricKey,
@@ -398,7 +421,7 @@ contract CrypToneAudio is ERC1155, Ownable {
         );
         query = string.concat(
             query,
-            Strings.toString(totalSupply),
+            Strings.toString(tokenId),
             "','0','0','0',",
             Strings.toString(generation), // generation
             ",'",
@@ -417,7 +440,7 @@ contract CrypToneAudio is ERC1155, Ownable {
         _tableland.runSQL(address(this), _metadataTableId, query);
     }
 
-    function _updateOnMint(
+    function _updateTableOnMint(
         uint256 tokenId,
         uint256 maxSupply,
         uint256 salesPrice
@@ -439,7 +462,7 @@ contract CrypToneAudio is ERC1155, Ownable {
         );
     }
 
-    function _updateOnMintBatch(
+    function _updateTableOnMintBatch(
         uint256[] memory tokenIds,
         uint256[] memory maxSupplies,
         uint256[] memory salesPrices
@@ -476,7 +499,11 @@ contract CrypToneAudio is ERC1155, Ownable {
                 bytes(idPhrase).length;
             if (strLength > 34500) {
                 // devide query
-                _runUpdateOnMintBatch(suppliesPhrase, pricesPhrase, idPhrase);
+                _runUpdateTableOnMintBatch(
+                    suppliesPhrase,
+                    pricesPhrase,
+                    idPhrase
+                );
                 suppliesPhrase = "";
                 pricesPhrase = "";
                 idPhrase = "";
@@ -484,10 +511,10 @@ contract CrypToneAudio is ERC1155, Ownable {
                 idPhrase = string.concat(idPhrase, ",");
             }
         }
-        _runUpdateOnMintBatch(suppliesPhrase, pricesPhrase, idPhrase);
+        _runUpdateTableOnMintBatch(suppliesPhrase, pricesPhrase, idPhrase);
     }
 
-    function _runUpdateOnMintBatch(
+    function _runUpdateTableOnMintBatch(
         string memory suppliesPhrase,
         string memory pricesPhrase,
         string memory idPhrase

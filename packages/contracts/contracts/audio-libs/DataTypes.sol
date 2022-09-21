@@ -4,7 +4,7 @@ pragma solidity 0.8.16;
 library DataTypes {
     enum NFTType {
         Audio,
-        InheritAudio
+        Inherit
     }
 
     struct AudioStruct {
@@ -14,7 +14,7 @@ library DataTypes {
         uint256 maxSupply;
     }
 
-    struct InheritAudioStruct {
+    struct InheritStruct {
         uint256 tokenId;
         address creatorAddress;
         uint256 generation;
@@ -23,6 +23,7 @@ library DataTypes {
     }
 
     struct RefStruct {
+        NFTType nftType;
         address creatorAddress;
         uint256 workId;
         bool exists;

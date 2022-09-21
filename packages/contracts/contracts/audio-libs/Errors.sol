@@ -6,6 +6,7 @@ library Errors {
     error ProfileNFTNotFound();
     error UnknownNFTType();
     error ProfileIdInvalid();
+    error NotTokenOwner();
     error MintWorkIdInvalid();
     error ProfileAddressInvalid();
     error MintBatchLengthInvalid();

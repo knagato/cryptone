@@ -77,7 +77,7 @@ contract CrypToneTest is Test {
             "example2.example2"
         );
         uint256 work3 = audioContract.postWork(
-            AudioTypes.NFTType.InheritAudio,
+            AudioTypes.NFTType.Inherit,
             "example3.example3"
         );
 

@@ -4,11 +4,11 @@ pragma solidity 0.8.16;
 import "./DataTypes.sol";
 
 library Events {
-    event AudioPosted(
-        DataTypes.NFTType nftType,
+    event AudioCreated(
+        uint256 tokenId,
         address owner,
         uint256 workId,
-        uint256 tokenId
+        uint256 generation
     );
 
     event AudioMinted(
@@ -18,7 +18,5 @@ library Events {
         uint256 amount
     );
 
-    event ProfileContractChanged(
-        address newContract
-    );
+    event ProfileContractChanged(address newContract);
 }
