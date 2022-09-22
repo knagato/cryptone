@@ -69,7 +69,6 @@ class Lit {
     }
 
     const { encryptedFile, symmetricKey } = await lit.encryptFile({ file });
-    console.log({ encryptedFile, symmetricKey });
 
     return { encryptedFile, symmetricKey };
   }
