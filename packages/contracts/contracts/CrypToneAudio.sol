@@ -124,8 +124,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
             msg.sender,
             types,
             workIds,
-            amounts,
-            salesPrices
+            amounts
         );
         _mintBatch(msg.sender, ids, amounts, "");
         super._updateTableOnMintBatch(ids, salesPrices);
@@ -142,8 +141,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
             creatorAddress,
             types,
             workIds,
-            amounts,
-            salesPrices
+            amounts
         );
         _mintBatch(creatorAddress, ids, amounts, "");
         super._updateTableOnMintBatch(ids, salesPrices);
@@ -332,8 +330,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         address creatorAddress,
         DataTypes.NFTType[] calldata types,
         uint256[] calldata workIds,
-        uint256[] calldata amounts,
-        uint256[] calldata salesPrices
+        uint256[] calldata amounts
     ) private returns (uint256[] memory) {
         if (
             types.length != workIds.length || workIds.length != amounts.length

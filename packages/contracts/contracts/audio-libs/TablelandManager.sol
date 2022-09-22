@@ -61,7 +61,10 @@ abstract contract TablelandManager {
             " (chain, contractAddress, tokenId, ", // polygon-mumbai
             "salesPrice, ",
             "generation, encryptedAudioCID, ",
-            "encryptedSymmetricKey, previewAudioCID, jacketCID)",
+            "encryptedSymmetricKey, previewAudioCID, jacketCID)"
+        );
+        query = string.concat(
+            query,
             " SELECT '",
             _chainName,
             "','",
@@ -83,7 +86,10 @@ abstract contract TablelandManager {
             "','",
             previewAudioCID,
             "','",
-            jacketCID,
+            jacketCID
+        );
+        query = string.concat(
+            query,
             "' WHERE NOT EXISTS (SELECT 1 FROM ",
             _metadataTable,
             " WHERE tokenId='",
