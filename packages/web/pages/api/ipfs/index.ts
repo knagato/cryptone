@@ -7,7 +7,7 @@ import {
 import fs from "fs"
 import { NFTStorage, Blob } from "nft.storage";
 
-const debug = true;
+const debug = false;
 
 export const config = {
   api: {
@@ -26,7 +26,10 @@ const nftStorage = NFT_STORAGE_KEY
   ? new NFTStorage({ token: NFT_STORAGE_KEY })
   : undefined;
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   switch (req.method) {
     case 'POST':
       const data: ParsedData = await new Promise((resolve, reject) => {
