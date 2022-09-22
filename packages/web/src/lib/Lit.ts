@@ -13,7 +13,7 @@ type EncryptStringResult = {
 
 type EncryptFileResult = {
   encryptedFile: Blob;
-  encryptedSymmetricKey: string;
+  symmetricKey: Uint8Array;
 };
 
 type DecryptWithUnzipResult = {
@@ -63,18 +63,24 @@ class Lit {
   }
 
   // using encryptFile
-  async encryptFile(
-    file: Blob | File,
-    conditionTokenId: Number
-  ): Promise<EncryptFileResult> {
+  async encryptFile(file: Blob | File): Promise<EncryptFileResult> {
     if (!this.litNodeClient) {
       await this.connect();
     }
 
+    const { encryptedFile, symmetricKey } = await lit.encryptFile({ file });
+    console.log({ encryptedFile, symmetricKey });
+
+    return { encryptedFile, symmetricKey };
+  }
+
+  async saveEncriptionKey(symmetricKey: string) {
+    // TODO: mint original audio token to smart contract
+    const conditionTokenId = 0;
     this.setConditionTokenId(conditionTokenId);
+
     const authSig = await lit.checkAndSignAuthMessage({ chain });
 
-    const { encryptedFile, symmetricKey } = await lit.encryptFile({ file });
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
       accessControlConditions: this.accessControlConditions,
       symmetricKey: symmetricKey,
@@ -82,7 +88,6 @@ class Lit {
       chain: chain,
     });
     return {
-      encryptedFile,
       encryptedSymmetricKey: lit.uint8arrayToString(
         encryptedSymmetricKey,
         "base16"
