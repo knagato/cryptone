@@ -14,17 +14,7 @@ const PutOnSale: NextPage = () => {
   };
 
   return (
-    <div>
-      <div className="font-semibold flex justify-center">
-        {/* TODO:Header */}
-        <Link href="/">
-          <a className="text-blue-500">Home</a>
-        </Link>
-        /
-        <Link href="/postNewAudio">
-          <a className="text-blue-500">Post New Audio</a>
-        </Link>
-      </div>
+    <div className="py-10">
       <FormCard
         title="Put NFTs On Sale"
         buttonName="submit"
