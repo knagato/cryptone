@@ -40,17 +40,17 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         emit Events.ProfileContractChanged(newContract);
     }
 
-    // createWork
-    function createWork(uint256 parentTokenId) public returns (uint256) {
-        return _createWork(msg.sender, parentTokenId);
+    // postNewWork
+    function postNewWork(uint256 parentTokenId) public returns (uint256) {
+        return _postNewWork(msg.sender, parentTokenId);
     }
 
-    function createWorkOnlyOwner(address creatorAddress, uint256 parentTokenId)
+    function postNewWorkOnlyOwner(address creatorAddress, uint256 parentTokenId)
         public
         onlyOwner
         returns (uint256)
     {
-        return _createWork(creatorAddress, parentTokenId);
+        return _postNewWork(creatorAddress, parentTokenId);
     }
 
     // setMetadata
@@ -137,8 +137,8 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
     /// *****PRIVATE FUNCTIONS*****
     /// ****************************
 
-    // _createWork
-    function _createWork(address creatorAddress, uint256 parentTokenId)
+    // _postNewWork
+    function _postNewWork(address creatorAddress, uint256 parentTokenId)
         private
         returns (uint256 newTokenId)
     {
@@ -148,16 +148,16 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
 
         DataTypes.RefStruct memory parentRef = refByTokenId[parentTokenId];
         if (parentRef.exists) {
-            _createInherit(creatorAddress, parentRef);
+            _postNewInherit(creatorAddress, parentRef);
         } else {
-            _createAudio(creatorAddress);
+            _postNewAudio(creatorAddress);
         }
         newTokenId = totalSupply;
         totalSupply++;
         return newTokenId;
     }
 
-    function _createAudio(address creatorAddress) private {
+    function _postNewAudio(address creatorAddress) private {
         // audio
         uint256 newWorkId = totalAudioSupplyByCreator[creatorAddress];
         audioByWorkIdByCreator[creatorAddress][newWorkId].tokenId = totalSupply;
@@ -183,7 +183,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         );
     }
 
-    function _createInherit(
+    function _postNewInherit(
         address creatorAddress,
         DataTypes.RefStruct memory parentRef
     ) private {
