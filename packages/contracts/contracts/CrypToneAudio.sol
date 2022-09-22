@@ -23,7 +23,9 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
     mapping(uint256 => DataTypes.RefStruct) internal _refByTokenId;
 
     constructor(address tableRegistry, string memory chainName)
-        ERC1155("")
+        ERC1155(
+            "https://testnet.tableland.network/query?mode=list&s=select+json_object%28%27description%27%2C+%27abc%27%2C+%27external_url%27%2C+PreviewAudioCID%27.ipfs.nftstorage.link%27%2C+%27image%27%2C+jacketCID%27.ipfs.nftstorage.link%27%2C+%27name%27%2C+%27abc%27%2C+%27chain%27%2C+chain%2C+%27contractAddress%27%2C+contractAddress%2C+%27tokenId%27%2C+tokenId%2C+%27salesPrice%27%2C+salesPrice%2C+%27generation%27%2C+generation%2C+%27encryptedAudioCID%27%2C+encryptedAudioCID%2C+%27encryptedSymmetricKey%27%2C+encryptedSymmetricKey%2C+%27previewAudioCID%27%2C+previewAudioCID%2C+%27jacketCID%27%2C+jacketCID%29+from+_metadataTable+where+tokenId%3D{id}"
+        )
         TablelandManager(tableRegistry, chainName)
     {}
 
@@ -72,6 +74,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         string calldata jacketCID
     ) public onlyOwner {
         // TODO:if the record exist, use not UPDATE but INSERT
+
         super._insertNewWork(
             tokenId,
             _getGeneration(tokenId),
@@ -89,7 +92,11 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 amount,
         uint256 salesPrice
     ) public {
-        _beforeMint(msg.sender, nftType, workId, amount, salesPrice);
+        uint256 tokenId = _beforeMint(msg.sender, nftType, workId, amount);
+        _mint(msg.sender, tokenId, amount, "");
+        // setApprovalForAll( , true); // approve to market
+        super._updateTableOnMint(tokenId, salesPrice);
+        emit Events.AudioMinted(nftType, msg.sender, workId, amount);
     }
 
     function mintOnlyOwner(
@@ -99,7 +106,11 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 amount,
         uint256 salesPrice
     ) public onlyOwner {
-        _beforeMint(creatorAddress, nftType, workId, amount, salesPrice);
+        uint256 tokenId = _beforeMint(creatorAddress, nftType, workId, amount);
+        _mint(creatorAddress, tokenId, amount, "");
+        // setApprovalForAll( , true); // approve to market
+        super._updateTableOnMint(tokenId, salesPrice);
+        emit Events.AudioMinted(nftType, creatorAddress, workId, amount);
     }
 
     // mintBatch
@@ -218,6 +229,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
             _postNewAudio(creatorAddress);
         }
         newTokenId = totalWorkCount;
+
         totalWorkCount++;
         return newTokenId;
     }
@@ -277,10 +289,8 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         address creatorAddress,
         DataTypes.NFTType nftType,
         uint256 workId,
-        uint256 amount,
-        uint256 salesPrice
-    ) private {
-        uint256 tokenId;
+        uint256 amount
+    ) private returns (uint256 tokenId) {
         if (nftType == DataTypes.NFTType.Audio) {
             tokenId = _beforeMintAudio(creatorAddress, workId, amount);
         } else if (nftType == DataTypes.NFTType.Inherit) {
@@ -288,13 +298,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         } else {
             revert Errors.UnknownNFTType();
         }
-
-        _mint(creatorAddress, tokenId, amount, "");
-        // setApprovalForAll( , true); // approve to market
-
-        super._updateTableOnMint(tokenId, salesPrice);
-
-        emit Events.AudioMinted(nftType, creatorAddress, workId, amount);
+        return tokenId;
     }
 
     function _beforeMintAudio(

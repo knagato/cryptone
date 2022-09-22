@@ -18,10 +18,6 @@ abstract contract TablelandManager {
         _initTableland(tableRegistry, chainName);
     }
 
-    /// ****************************
-    /// *****TABLELAND FUNCTIONS*****
-    /// ****************************
-
     function _initTableland(address tableRegistry, string memory chainName)
         private
     {
