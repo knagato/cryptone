@@ -3,9 +3,9 @@
 pragma solidity 0.8.16;
 
 import {ILensNFTBase} from "../../interfaces/ILensNFTBase.sol";
-import {Errors} from "../../libraries/Errors.sol";
-import {DataTypes} from "../../libraries/DataTypes.sol";
-import {Events} from "../../libraries/Events.sol";
+import {ProfileLib} from "../../libraries/ProfileLib.sol";
+import {ProfileLib} from "../../libraries/ProfileLib.sol";
+import {ProfileLib} from "../../libraries/ProfileLib.sol";
 import {ERC721Time} from "./ERC721Time.sol";
 import {ERC721Enumerable} from "./ERC721Enumerable.sol";
 
@@ -28,13 +28,13 @@ abstract contract LensNFTBase is ERC721Enumerable, ILensNFTBase {
     {
         ERC721Time.__ERC721_Init(name, symbol);
 
-        emit Events.BaseInitialized(name, symbol, block.timestamp);
+        emit ProfileLib.BaseInitialized(name, symbol, block.timestamp);
     }
 
     /// @inheritdoc ILensNFTBase
     function burn(uint256 tokenId) public virtual override {
         if (!_isApprovedOrOwner(msg.sender, tokenId))
-            revert Errors.NotOwnerOrApproved();
+            revert ProfileLib.NotOwnerOrApproved();
         _burn(tokenId);
     }
 }

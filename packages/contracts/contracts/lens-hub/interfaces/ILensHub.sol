@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.16;
 
-import {DataTypes} from "../libraries/DataTypes.sol";
+import {ProfileLib} from "../libraries/ProfileLib.sol";
 
 interface ILensHub {
     function initialize(
@@ -15,12 +15,12 @@ interface ILensHub {
 
     function setEmergencyAdmin(address newEmergencyAdmin) external;
 
-    function setState(DataTypes.ProtocolState newState) external;
+    function setState(ProfileLib.ProtocolState newState) external;
 
     function getGovernance() external view returns (address);
 
     function getProfile(uint256 profileId)
         external
         view
-        returns (DataTypes.ProfileStruct memory);
+        returns (ProfileLib.ProfileStruct memory);
 }

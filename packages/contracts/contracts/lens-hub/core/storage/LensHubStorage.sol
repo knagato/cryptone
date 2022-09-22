@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.16;
 
-import {DataTypes} from "../../libraries/DataTypes.sol";
+import {ProfileLib} from "../../libraries/ProfileLib.sol";
 
 abstract contract LensHubStorage {
     bytes32 internal constant CREATE_PROFILE_WITH_SIG_TYPEHASH =
@@ -15,7 +15,7 @@ abstract contract LensHubStorage {
             "SetProfileURIWithSig(uint256 profileId,string tokenURI,uint256 nonce,uint256 deadline)"
         );
 
-    mapping(uint256 => DataTypes.ProfileStruct) internal _profileById;
+    mapping(uint256 => ProfileLib.ProfileStruct) internal _profileById;
     mapping(address => uint256) internal _profileIdByAddress;
 
     uint256 internal _profileCounter;

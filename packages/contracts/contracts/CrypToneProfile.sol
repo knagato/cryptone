@@ -2,11 +2,7 @@
 pragma solidity 0.8.16;
 
 import {ILensHub} from "./lens-hub/interfaces/ILensHub.sol";
-import {Events} from "./lens-hub/libraries/Events.sol";
-import {Constants} from "./lens-hub/libraries/Constants.sol";
-import {DataTypes} from "./lens-hub/libraries/DataTypes.sol";
-import {Errors} from "./lens-hub/libraries/Errors.sol";
-import {PublishingLogic} from "./lens-hub/libraries/PublishingLogic.sol";
+import {ProfileLib} from "./lens-hub/libraries/ProfileLib.sol";
 import {LensNFTBase} from "./lens-hub/core/base/LensNFTBase.sol";
 import {LensMultiState} from "./lens-hub/core/base/LensMultiState.sol";
 import {LensHubStorage} from "./lens-hub/core/storage/LensHubStorage.sol";
@@ -35,7 +31,7 @@ contract CrypToneProfile is
         address newGovernance
     ) external override initializer {
         super._initialize(name, symbol);
-        _setState(DataTypes.ProtocolState.Paused);
+        _setState(ProfileLib.ProtocolState.Paused);
         _setGovernance(newGovernance);
     }
 
@@ -56,7 +52,7 @@ contract CrypToneProfile is
     {
         address prevEmergencyAdmin = _emergencyAdmin;
         _emergencyAdmin = newEmergencyAdmin;
-        emit Events.EmergencyAdminSet(
+        emit ProfileLib.EmergencyAdminSet(
             msg.sender,
             prevEmergencyAdmin,
             newEmergencyAdmin,
@@ -65,13 +61,13 @@ contract CrypToneProfile is
     }
 
     /// @inheritdoc ILensHub
-    function setState(DataTypes.ProtocolState newState) external override {
+    function setState(ProfileLib.ProtocolState newState) external override {
         if (msg.sender == _emergencyAdmin) {
-            if (newState == DataTypes.ProtocolState.Unpaused)
-                revert Errors.EmergencyAdminCannotUnpause();
+            if (newState == ProfileLib.ProtocolState.Unpaused)
+                revert ProfileLib.EmergencyAdminCannotUnpause();
             _validateNotPaused();
         } else if (msg.sender != _governance) {
-            revert Errors.NotGovernanceOrEmergencyAdmin();
+            revert ProfileLib.NotGovernanceOrEmergencyAdmin();
         }
         _setState(newState);
     }
@@ -86,12 +82,12 @@ contract CrypToneProfile is
         returns (uint256)
     {
         if (_profileIdByAddress[msg.sender] > 0)
-            revert Errors.ProfileAlreadyExists();
+            revert ProfileLib.ProfileAlreadyExists();
 
         unchecked {
             uint256 profileId = ++_profileCounter;
             _mint(msg.sender, profileId);
-            PublishingLogic.createProfile(
+            ProfileLib.createProfile(
                 msg.sender,
                 tokenURI,
                 profileId,
@@ -108,12 +104,13 @@ contract CrypToneProfile is
         onlyGov
         returns (uint256)
     {
-        if (_profileIdByAddress[to] > 0) revert Errors.ProfileAlreadyExists();
+        if (_profileIdByAddress[to] > 0)
+            revert ProfileLib.ProfileAlreadyExists();
 
         unchecked {
             uint256 profileId = ++_profileCounter;
             _mint(to, profileId);
-            PublishingLogic.createProfile(
+            ProfileLib.createProfile(
                 to,
                 tokenURI,
                 profileId,
@@ -137,7 +134,7 @@ contract CrypToneProfile is
 
     // function burn() public whenNotPaused {
     //     uint256 profileId = _profileIdByAddress[msg.sender];
-    //     if (profileId == 0) revert Errors.ProfileNotFound();
+    //     if (profileId == 0) revert ProfileLib.ProfileNotFound();
 
     //     super.burn(profileId);
     //     _clearHandleHash(profileId);
@@ -152,7 +149,7 @@ contract CrypToneProfile is
         external
         view
         override
-        returns (DataTypes.ProfileStruct memory)
+        returns (ProfileLib.ProfileStruct memory)
     {
         return _profileById[profileId];
     }
@@ -177,7 +174,7 @@ contract CrypToneProfile is
     function _setGovernance(address newGovernance) internal {
         address prevGovernance = _governance;
         _governance = newGovernance;
-        emit Events.GovernanceSet(
+        emit ProfileLib.GovernanceSet(
             msg.sender,
             prevGovernance,
             newGovernance,
@@ -189,20 +186,21 @@ contract CrypToneProfile is
         internal
     {
         uint256 profileId = _profileIdByAddress[profileAddress];
-        if (profileId == 0) revert Errors.ProfileNotFound();
+        if (profileId == 0) revert ProfileLib.ProfileNotFound();
 
-        if (bytes(tokenURI).length > Constants.MAX_PROFILE_CONTENT_URI_LENGTH)
-            revert Errors.ProfileURILengthInvalid();
+        if (bytes(tokenURI).length > ProfileLib.MAX_PROFILE_CONTENT_URI_LENGTH)
+            revert ProfileLib.ProfileURILengthInvalid();
         _profileById[profileId].tokenURI = tokenURI;
-        emit Events.ProfileURISet(profileId, tokenURI, block.timestamp);
+        emit ProfileLib.ProfileURISet(profileId, tokenURI, block.timestamp);
     }
 
     function _validateCallerIsProfileOwner(uint256 profileId) internal view {
-        if (msg.sender != ownerOf(profileId)) revert Errors.NotProfileOwner();
+        if (msg.sender != ownerOf(profileId))
+            revert ProfileLib.NotProfileOwner();
     }
 
     function _validateCallerIsGovernance() internal view {
-        if (msg.sender != _governance) revert Errors.NotGovernance();
+        if (msg.sender != _governance) revert ProfileLib.NotGovernance();
     }
 
     function getRevision() internal pure virtual override returns (uint256) {

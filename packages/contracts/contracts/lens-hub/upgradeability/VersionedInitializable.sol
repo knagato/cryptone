@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import {Errors} from "../libraries/Errors.sol";
+import {ProfileLib} from "../libraries/ProfileLib.sol";
 
 /**
  * @title VersionedInitializable
@@ -33,8 +33,8 @@ abstract contract VersionedInitializable {
      */
     modifier initializer() {
         uint256 revision = getRevision();
-        // if (address(this) == originalImpl) revert Errors.CannotInitImplementation();
-        if (revision <= lastInitializedRevision) revert Errors.Initialized();
+        // if (address(this) == originalImpl) revert ProfileLib.CannotInitImplementation();
+        if (revision <= lastInitializedRevision) revert ProfileLib.Initialized();
         lastInitializedRevision = revision;
         _;
     }
