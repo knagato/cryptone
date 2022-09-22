@@ -3,10 +3,11 @@ import { useGLTF } from "@react-three/drei";
 import { GLTFResult } from "./type";
 import { JacketImage } from "./JacketImage";
 
+const modelUrl =
+  "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/scene.gltf";
+
 export function PastelGamingRoom(props: JSX.IntrinsicElements["group"]) {
-  const { nodes, materials } = useGLTF(
-    "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/scene.gltf"
-  ) as GLTFResult;
+  const { nodes, materials } = useGLTF(modelUrl) as GLTFResult;
 
   return (
     <group {...props} dispose={null}>
@@ -1604,4 +1605,4 @@ export function PastelGamingRoom(props: JSX.IntrinsicElements["group"]) {
   );
 }
 
-useGLTF.preload("/scene.gltf");
+useGLTF.preload(modelUrl);

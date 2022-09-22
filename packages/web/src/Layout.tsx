@@ -11,7 +11,7 @@ export const Layout = ({ children }: LayoutProps) => (
       <div className='relative z-20'>
         <Header />
       </div>
-      <div className='flex-grow relative z-10'>
+      <div className='flex-grow relative'>
         {children}
       </div>
       <div className='relative z-20'>

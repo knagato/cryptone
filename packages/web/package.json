@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "prisma generate",
+    "predev": "prisma generate",
     "start": "next start",
     "lint": "next lint",
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "studio": "prisma studio",
     "seed": "prisma db seed"
   },
   "prisma": {
@@ -23,11 +28,13 @@
     "@react-three/fiber": "^8.7.2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "ethers": "^5.7.0",
+    "howler": "^2.2.3",
     "immer": "^9.0.15",
     "next": "12.2.5",
     "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use": "^17.4.0",
     "replicate-js": "github:nicholascelestin/replicate-js",
     "siwe": "^1.1.6",
     "three": "^0.144.0",
@@ -35,6 +42,7 @@
     "zustand": "4.1.1"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.7",
     "@types/node": "18.7.14",
     "@types/react": "18.0.18",
     "@types/react-dom": "18.0.6",
