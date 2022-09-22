@@ -10,13 +10,15 @@ library DataTypes {
     struct AudioStruct {
         uint256 tokenId;
         uint256 maxSupply;
+        uint256 totalSupply;
     }
 
     struct InheritStruct {
         uint256 tokenId;
+        uint256 maxSupply;
+        uint256 totalSupply;
         uint256 generation;
         uint256 parentTokenId;
-        uint256 maxSupply;
     }
 
     struct RefStruct {

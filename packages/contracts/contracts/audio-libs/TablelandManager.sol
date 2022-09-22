@@ -35,7 +35,7 @@ abstract contract TablelandManager {
                 "_",
                 Strings.toString(block.chainid),
                 "(chain text, contractAddress text, tokenId text, ",
-                "maxSupply text, salesPrice text, totalSupply text, ",
+                "salesPrice text, ",
                 "generation int, encryptedAudioCID text, ",
                 "encryptedSymmetricKey text, previewAudioCID text, jacketCID text);"
             )
@@ -62,11 +62,11 @@ abstract contract TablelandManager {
         string memory query = string.concat(
             "INSERT INTO ",
             _metadataTable,
-            // " (chain, contractAddress, tokenId, ", // polygon-mumbai
-            // "maxSupply, salesPrice, totalSupply, ",
-            // "generation, encryptedAudioCID, ",
-            // "encryptedSymmetricKey, previewAudioCID, jacketCID)",
-            " VALUES ('",
+            " (chain, contractAddress, tokenId, ", // polygon-mumbai
+            "salesPrice, ",
+            "generation, encryptedAudioCID, ",
+            "encryptedSymmetricKey, previewAudioCID, jacketCID)",
+            " SELECT '",
             _chainName,
             "','",
             Strings.toHexString(address(this)),
@@ -75,7 +75,7 @@ abstract contract TablelandManager {
         query = string.concat(
             query,
             Strings.toString(tokenId),
-            "','0','0','0',",
+            "','0',",
             Strings.toString(generation), // generation
             ",'",
             encryptedAudioCID,
@@ -88,25 +88,23 @@ abstract contract TablelandManager {
             previewAudioCID,
             "','",
             jacketCID,
+            "' WHERE NOT EXISTS (SELECT 1 FROM ",
+            _metadataTable,
+            " WHERE tokenId='",
+            Strings.toString(tokenId),
             "');"
         );
         _tableland.runSQL(address(this), _metadataTableId, query);
     }
 
-    function _updateTableOnMint(
-        uint256 tokenId,
-        uint256 maxSupply,
-        uint256 salesPrice
-    ) internal {
+    function _updateTableOnMint(uint256 tokenId, uint256 salesPrice) internal {
         _tableland.runSQL(
             address(this),
             _metadataTableId,
             string.concat(
                 "UPDATE ",
                 _metadataTable,
-                " SET maxSupply = '",
-                Strings.toString(maxSupply),
-                "', salesPrice = '",
+                " SET salesPrice = '",
                 Strings.toString(salesPrice),
                 "' WHERE tokenId = '",
                 Strings.toString(tokenId),
@@ -117,21 +115,11 @@ abstract contract TablelandManager {
 
     function _updateTableOnMintBatch(
         uint256[] memory tokenIds,
-        uint256[] memory maxSupplies,
         uint256[] memory salesPrices
     ) internal {
-        string memory suppliesPhrase = "";
         string memory pricesPhrase = "";
         string memory idPhrase = "";
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            suppliesPhrase = string.concat(
-                suppliesPhrase,
-                "WHEN'",
-                Strings.toString(tokenIds[i]),
-                "'THEN'",
-                Strings.toString(maxSupplies[i]),
-                "'"
-            );
             pricesPhrase = string.concat(
                 pricesPhrase,
                 "WHEN'",
@@ -147,28 +135,21 @@ abstract contract TablelandManager {
                 "'"
             );
             // Query size is limited to a maximum of 35kb.
-            uint256 strLength = bytes(suppliesPhrase).length +
-                bytes(pricesPhrase).length +
+            uint256 strLength = bytes(pricesPhrase).length +
                 bytes(idPhrase).length;
             if (strLength > 34500) {
                 // devide query
-                _runUpdateTableOnMintBatch(
-                    suppliesPhrase,
-                    pricesPhrase,
-                    idPhrase
-                );
-                suppliesPhrase = "";
+                _runUpdateTableOnMintBatch(pricesPhrase, idPhrase);
                 pricesPhrase = "";
                 idPhrase = "";
             } else if (i < tokenIds.length - 1) {
                 idPhrase = string.concat(idPhrase, ",");
             }
         }
-        _runUpdateTableOnMintBatch(suppliesPhrase, pricesPhrase, idPhrase);
+        _runUpdateTableOnMintBatch(pricesPhrase, idPhrase);
     }
 
     function _runUpdateTableOnMintBatch(
-        string memory suppliesPhrase,
         string memory pricesPhrase,
         string memory idPhrase
     ) internal {
@@ -178,9 +159,7 @@ abstract contract TablelandManager {
             string.concat(
                 "UPDATE ",
                 _metadataTable,
-                " SET maxSupply=CASE tokenId ",
-                suppliesPhrase,
-                "END,salesPrice=CASE tokenId ",
+                " SET salesPrice=CASE tokenId ",
                 pricesPhrase,
                 "END WHERE tokenId IN(",
                 idPhrase,
