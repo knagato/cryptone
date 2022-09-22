@@ -10,45 +10,35 @@ import "./audio-libs/TablelandManager.sol";
 import {CrypToneProfile} from "./CrypToneProfile.sol";
 
 contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
-    address internal profileContract;
-
     uint256 totalSupply = 0;
-
+    // audio
     mapping(address => mapping(uint256 => DataTypes.AudioStruct))
-        internal audioByWorkIdByCreator;
-    mapping(address => uint256) internal totalAudioSupplyByCreator;
-
+        internal _audioByWorkIdByCreator;
+    mapping(address => uint256) internal _totalAudioCountByCreator;
+    // inherit
     mapping(address => mapping(uint256 => DataTypes.InheritStruct))
-        internal inheritByWorkIdByCreator;
-    mapping(address => uint256) internal totalInheritSupplyByCreator;
+        internal _inheritByWorkIdByCreator;
+    mapping(address => uint256) internal _totalInheritCountByCreator;
+    // reference
+    mapping(uint256 => DataTypes.RefStruct) internal _refByTokenId;
 
-    mapping(uint256 => DataTypes.RefStruct) internal refByTokenId;
-
-    constructor(
-        address _profileContract,
-        address tableRegistry,
-        string memory chainName
-    ) ERC1155("") TablelandManager(tableRegistry, chainName) {
-        if (_profileContract == address(0)) {
-            revert Errors.InitParamsInvalid();
-        }
-        profileContract = _profileContract;
-    }
-
-    function setProfileNFTContract(address newContract) external onlyOwner {
-        profileContract = newContract;
-        emit Events.ProfileContractChanged(newContract);
-    }
+    constructor(address tableRegistry, string memory chainName)
+        ERC1155("")
+        TablelandManager(tableRegistry, chainName)
+    {}
 
     // postNewWork
-    function postNewWork(uint256 parentTokenId) public returns (uint256) {
+    function postNewWork(uint256 parentTokenId)
+        public
+        returns (uint256 newTokenId)
+    {
         return _postNewWork(msg.sender, parentTokenId);
     }
 
     function postNewWorkOnlyOwner(address creatorAddress, uint256 parentTokenId)
         public
         onlyOwner
-        returns (uint256)
+        returns (uint256 newTokenId)
     {
         return _postNewWork(creatorAddress, parentTokenId);
     }
@@ -56,18 +46,17 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
     // setMetadata
     function setMetadata(
         uint256 tokenId,
-        uint256 generation,
         string calldata encryptedAudioCID,
         string calldata encryptedSymmetricKey,
         string calldata previewAudioCID,
         string calldata jacketCID
     ) public {
-        if (refByTokenId[tokenId].creatorAddress != msg.sender)
+        if (_refByTokenId[tokenId].creatorAddress != msg.sender)
             revert Errors.NotTokenOwner();
-
+        // TODO:if the record exist, use not UPDATE but INSERT
         super._insertNewWork(
             tokenId,
-            generation,
+            _getGeneration(tokenId),
             encryptedAudioCID,
             encryptedSymmetricKey,
             previewAudioCID,
@@ -77,15 +66,15 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
 
     function setMetadataOnlyOwner(
         uint256 tokenId,
-        uint256 generation,
         string calldata encryptedAudioCID,
         string calldata encryptedSymmetricKey,
         string calldata previewAudioCID,
         string calldata jacketCID
     ) public onlyOwner {
+        // TODO:if the record exist, use not UPDATE but INSERT
         super._insertNewWork(
             tokenId,
-            generation,
+            _getGeneration(tokenId),
             encryptedAudioCID,
             encryptedSymmetricKey,
             previewAudioCID,
@@ -133,6 +122,44 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         _beforeMintBatch(creatorAddress, types, workIds, amounts, salesPrices);
     }
 
+    // getter
+    function getCreatorWorkCount(
+        address creatorAddress,
+        DataTypes.NFTType nftType
+    ) public view returns (uint256 count) {
+        if (nftType == DataTypes.NFTType.Audio) {
+            return _totalAudioCountByCreator[creatorAddress];
+        } else if (nftType == DataTypes.NFTType.Inherit) {
+            return _totalInheritCountByCreator[creatorAddress];
+        } else {
+            revert Errors.UnknownNFTType();
+        }
+    }
+
+    function getAudioData(address creatorAddress, uint256 workId)
+        public
+        view
+        returns (DataTypes.AudioStruct memory)
+    {
+        return _audioByWorkIdByCreator[creatorAddress][workId];
+    }
+
+    function getInheritData(address creatorAddress, uint256 workId)
+        public
+        view
+        returns (DataTypes.InheritStruct memory)
+    {
+        return _inheritByWorkIdByCreator[creatorAddress][workId];
+    }
+
+    function getReferenceToWork(uint256 tokenId)
+        public
+        view
+        returns (DataTypes.RefStruct memory)
+    {
+        return _refByTokenId[tokenId];
+    }
+
     /// ****************************
     /// *****PRIVATE FUNCTIONS*****
     /// ****************************
@@ -142,11 +169,7 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         private
         returns (uint256 newTokenId)
     {
-        if (!_profileNFTExists(creatorAddress)) {
-            revert Errors.ProfileNFTNotFound();
-        }
-
-        DataTypes.RefStruct memory parentRef = refByTokenId[parentTokenId];
+        DataTypes.RefStruct memory parentRef = _refByTokenId[parentTokenId];
         if (parentRef.exists) {
             _postNewInherit(creatorAddress, parentRef);
         } else {
@@ -159,28 +182,20 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
 
     function _postNewAudio(address creatorAddress) private {
         // audio
-        uint256 newWorkId = totalAudioSupplyByCreator[creatorAddress];
-        audioByWorkIdByCreator[creatorAddress][newWorkId].tokenId = totalSupply;
+        uint256 newWorkId = _totalAudioCountByCreator[creatorAddress];
+        _audioByWorkIdByCreator[creatorAddress][newWorkId]
+            .tokenId = totalSupply;
 
-        uint256 generation = 0;
-        audioByWorkIdByCreator[creatorAddress][newWorkId]
-            .generation = generation;
+        _totalAudioCountByCreator[creatorAddress]++;
 
-        totalAudioSupplyByCreator[creatorAddress]++;
-
-        refByTokenId[totalSupply] = DataTypes.RefStruct(
+        _refByTokenId[totalSupply] = DataTypes.RefStruct(
             DataTypes.NFTType.Audio,
             creatorAddress,
             newWorkId,
             true
         );
 
-        emit Events.AudioCreated(
-            totalSupply,
-            creatorAddress,
-            newWorkId,
-            generation
-        );
+        emit Events.AudioCreated(totalSupply, creatorAddress, newWorkId, 0);
     }
 
     function _postNewInherit(
@@ -188,19 +203,19 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         DataTypes.RefStruct memory parentRef
     ) private {
         // inherit audio
-        uint256 newWorkId = totalInheritSupplyByCreator[creatorAddress];
-        inheritByWorkIdByCreator[creatorAddress][newWorkId]
+        uint256 newWorkId = _totalInheritCountByCreator[creatorAddress];
+        _inheritByWorkIdByCreator[creatorAddress][newWorkId]
             .tokenId = totalSupply;
 
-        uint256 generation = inheritByWorkIdByCreator[parentRef.creatorAddress][
-            parentRef.workId
-        ].generation + 1;
-        inheritByWorkIdByCreator[creatorAddress][newWorkId]
+        uint256 generation = _inheritByWorkIdByCreator[
+            parentRef.creatorAddress
+        ][parentRef.workId].generation + 1;
+        _inheritByWorkIdByCreator[creatorAddress][newWorkId]
             .generation = generation;
 
-        totalInheritSupplyByCreator[creatorAddress]++;
+        _totalInheritCountByCreator[creatorAddress]++;
 
-        refByTokenId[totalSupply] = DataTypes.RefStruct(
+        _refByTokenId[totalSupply] = DataTypes.RefStruct(
             DataTypes.NFTType.Inherit,
             creatorAddress,
             newWorkId,
@@ -254,13 +269,13 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 workId,
         uint256 amount
     ) private returns (uint256 tokenId, uint256 maxSupply) {
-        if (workId >= totalAudioSupplyByCreator[creatorAddress]) {
+        if (workId >= _totalAudioCountByCreator[creatorAddress]) {
             revert Errors.MintWorkIdInvalid();
         }
-        tokenId = audioByWorkIdByCreator[creatorAddress][workId].tokenId;
-        audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        tokenId = _audioByWorkIdByCreator[creatorAddress][workId].tokenId;
+        _audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
         // for tableland
-        maxSupply = audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        maxSupply = _audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
         return (tokenId, maxSupply);
     }
 
@@ -269,13 +284,13 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 workId,
         uint256 amount
     ) private returns (uint256 tokenId, uint256 maxSupply) {
-        if (workId >= totalInheritSupplyByCreator[creatorAddress]) {
+        if (workId >= _totalInheritCountByCreator[creatorAddress]) {
             revert Errors.MintWorkIdInvalid();
         }
-        tokenId = inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
-        inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        tokenId = _inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
+        _inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
         // for tableland
-        maxSupply = inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        maxSupply = _inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
         return (tokenId, maxSupply);
     }
 
@@ -321,13 +336,13 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 workId,
         uint256 amount
     ) private returns (uint256 tokenId, uint256 maxSupply) {
-        if (workId >= totalAudioSupplyByCreator[creatorAddress]) {
+        if (workId >= _totalAudioCountByCreator[creatorAddress]) {
             revert Errors.MintWorkIdInvalid();
         }
-        tokenId = audioByWorkIdByCreator[creatorAddress][workId].tokenId;
-        audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        tokenId = _audioByWorkIdByCreator[creatorAddress][workId].tokenId;
+        _audioByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
         // for tableland
-        maxSupply = audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        maxSupply = _audioByWorkIdByCreator[creatorAddress][workId].maxSupply;
         return (tokenId, maxSupply);
     }
 
@@ -336,24 +351,32 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager {
         uint256 workId,
         uint256 amount
     ) private returns (uint256 tokenId, uint256 maxSupply) {
-        if (workId >= totalInheritSupplyByCreator[creatorAddress]) {
+        if (workId >= _totalInheritCountByCreator[creatorAddress]) {
             revert Errors.MintWorkIdInvalid();
         }
-        tokenId = inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
-        inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
+        tokenId = _inheritByWorkIdByCreator[creatorAddress][workId].tokenId;
+        _inheritByWorkIdByCreator[creatorAddress][workId].maxSupply += amount;
         // for tableland
-        maxSupply = inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
+        maxSupply = _inheritByWorkIdByCreator[creatorAddress][workId].maxSupply;
         return (tokenId, maxSupply);
     }
 
-    function _profileNFTExists(address profileAddress)
-        internal
+    function _getGeneration(uint256 tokenId)
+        private
         view
-        returns (bool)
+        returns (uint256 generation)
     {
-        if (profileAddress == address(0)) {
-            revert Errors.ProfileAddressInvalid();
+        if (_refByTokenId[tokenId].nftType == DataTypes.NFTType.Audio) {
+            generation = 0;
+        } else if (
+            _refByTokenId[tokenId].nftType == DataTypes.NFTType.Inherit
+        ) {
+            generation = _inheritByWorkIdByCreator[
+                _refByTokenId[tokenId].creatorAddress
+            ][_refByTokenId[tokenId].workId].generation;
+        } else {
+            revert Errors.UnknownNFTType();
         }
-        return CrypToneProfile(profileContract).profileExists(profileAddress);
+        return generation;
     }
 }

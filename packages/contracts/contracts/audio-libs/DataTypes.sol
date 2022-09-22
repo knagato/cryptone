@@ -9,14 +9,11 @@ library DataTypes {
 
     struct AudioStruct {
         uint256 tokenId;
-        address creatorAddress;
-        uint256 generation;
         uint256 maxSupply;
     }
 
     struct InheritStruct {
         uint256 tokenId;
-        address creatorAddress;
         uint256 generation;
         uint256 parentTokenId;
         uint256 maxSupply;

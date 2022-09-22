@@ -13,27 +13,30 @@ contract CrypToneTest is Test {
 
     address governance;
     address emergency;
-    address user;
+    address user1 = ;
+    address user2 = ;
+
+    address tableRegistry = 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
+    string chainName = "polygon-mumbai";
 
     event ProfEv(DataTypes.ProfileStruct profile);
 
     function setUp() public returns (address) {
         governance = address(this);
-        emergency = address(0);
-        // user = msg.sender;
+        emergency = user1;
 
         profileContract = new CrypToneProfile();
         profileContract.initialize("CrypToneProfile", "CTP", governance);
         profileContract.setEmergencyAdmin(emergency);
         profileContract.setState(DataTypes.ProtocolState.Unpaused);
 
-        audioContract = new CrypToneAudio(address(profileContract));
+        audioContract = new CrypToneAudio(tableRegistry, chainName);
     }
 
     function testGovernance() public {
         assertEq(profileContract.getGovernance(), governance);
-        profileContract.setGovernance(address(0));
-        assertEq(profileContract.getGovernance(), address(0));
+        profileContract.setGovernance(user1);
+        assertEq(profileContract.getGovernance(), user1);
     }
 
     function testState() public {
@@ -43,44 +46,67 @@ contract CrypToneTest is Test {
     }
 
     function testCreateProfile() public {
-        DataTypes.CreateProfileData memory myProfile = DataTypes
-            .CreateProfileData(governance, "example.com");
-        uint256 firstId = 1;
-
-        // profileContract.setState(DataTypes.ProtocolState.Paused);
-        // Vm.expectRevert(profileContract.createProfile(myProfile));
         profileContract.setState(DataTypes.ProtocolState.Unpaused);
-        assertEq(profileContract.createProfile(myProfile), firstId);
+        uint256 firstProfileId = profileContract.createProfileOnlyGov(
+            user1,
+            "example.com"
+        );
+        assertEq(firstProfileId, 1);
+        uint256 secondProfileId = profileContract.createProfileOnlyGov(
+            user2,
+            "example.com/blob"
+        );
+        assertEq(secondProfileId, 2);
 
         DataTypes.ProfileStruct memory firstProfile = profileContract
-            .getProfile(firstId);
+            .getProfile(firstProfileId);
         emit ProfEv(firstProfile);
         assertEq(firstProfile.tokenURI, "example.com");
-
-        // assertEq(profileContract.createProfile(myProfile), ++firstId);
     }
 
     function testMintAudio() public {
-        DataTypes.CreateProfileData memory myProfile = DataTypes
-            .CreateProfileData(governance, "example.com");
-        uint256 firstId = 1;
-
         profileContract.setState(DataTypes.ProtocolState.Unpaused);
-        assertEq(profileContract.createProfile(myProfile), firstId);
-
-        uint256 work1 = audioContract.postWork(
-            AudioTypes.NFTType.Audio,
-            "example1.example1"
-        );
-        uint256 work2 = audioContract.postWork(
-            AudioTypes.NFTType.Audio,
-            "example2.example2"
-        );
-        uint256 work3 = audioContract.postWork(
-            AudioTypes.NFTType.Inherit,
-            "example3.example3"
+        uint256 firstProfileId = profileContract.createProfileOnlyGov(
+            user1,
+            "example.com"
         );
 
-        audioContract.mint(AudioTypes.NFTType.Audio, work2, 250);
+        uint256 firstTokenId = audioContract.postNewWorkOnlyOwner(user1, 0);
+        assertEq(firstTokenId, 1);
+        audioContract.setMetadata(
+            firstTokenId,
+            "enaucid-1",
+            "ensymkey-1",
+            "pvaucid-1",
+            "jackcid-1"
+        );
+
+        uint256 secondTokenId = audioContract.postNewWorkOnlyOwner(user1, 0);
+        assertEq(secondTokenId, 1);
+        audioContract.setMetadata(
+            secondTokenId,
+            "enaucid-2",
+            "ensymkey-2",
+            "pvaucid-2",
+            "jackcid-2"
+        );
+
+        uint256 thirdTokenId = audioContract.postNewWorkOnlyOwner(user1, 1);
+        assertEq(thirdTokenId, 1);
+        audioContract.setMetadata(
+            thirdTokenId,
+            "enaucid-3",
+            "ensymkey-3",
+            "pvaucid-3",
+            "jackcid-3"
+        );
+
+        audioContract.mintOnlyOwner(
+            user1,
+            AudioTypes.NFTType.Audio,
+            secondTokenId,
+            250,
+            1000
+        );
     }
 }
