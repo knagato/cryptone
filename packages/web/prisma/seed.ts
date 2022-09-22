@@ -4,7 +4,15 @@ const prisma = new PrismaClient();
 
 const users: Prisma.UserCreateInput[] = [
   {
-    address: "0x00",
+    address: "0x01",
+    nickname: "Alice",
+  },
+  {
+    address: "0x02",
+    nickname: "Bob",
+  },
+  { address: "0x03",
+    nickname: "Carol"
   },
 ];
 

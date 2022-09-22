@@ -2,7 +2,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+First, prepare database:
+
+```bash
+yarn run generate # generate models
+yarn run push # create tables
+yarn run seed # insert sample data
+```
+
+Run the development server:
 
 ```bash
 npm run dev

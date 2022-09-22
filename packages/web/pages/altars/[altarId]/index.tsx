@@ -7,30 +7,36 @@ import { Room } from "src/components/Altar/Room";
 
 const Altar: NextPage = () => {
   return (
-    <div className="h-[100vh]">
-      <Canvas
-        gl={{
-          antialias: true,
-          preserveDrawingBuffer: true,
-          alpha: true,
-        }}
-        // Legacy color management
-        legacy
-      >
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <color attach="background" args={["rgb(40, 40, 40)"]} />
-        <OrbitControls
-          makeDefault
-          target={[0, 0, 0]}
-          rotation={[0, 0, 0]}
-          enableZoom
-          enablePan
-        />
-        <Suspense fallback={<Loader />}>
-          <Room />
-        </Suspense>
-      </Canvas>
+    <div className="container mx-auto py-16">
+      <div className="md:flex md:items-center md:justify-between">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+          My awesome altar1
+        </h2>
+      </div>
+
+      <div className="h-[70vh]">
+        <Canvas
+          gl={{
+            antialias: true,
+            preserveDrawingBuffer: true,
+            alpha: true,
+          }}
+        >
+          <ambientLight />
+          <pointLight position={[10, 10, 10]} />
+          <color attach="background" args={["gray"]} />
+          <OrbitControls
+            makeDefault
+            target={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            enableZoom
+            enablePan
+          />
+          <Suspense fallback={<Loader />}>
+            <Room />
+          </Suspense>
+        </Canvas>
+      </div>
     </div>
   );
 };

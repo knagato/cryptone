@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "prisma generate",
+    "predev": "prisma generate",
     "start": "next start",
     "lint": "next lint",
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "studio": "prisma studio",
     "seed": "prisma db seed"
   },
   "prisma": {
@@ -25,12 +30,14 @@
     "@types/formidable": "^2.0.5",
     "ethers": "^5.7.0",
     "formidable": "^2.0.1",
+    "howler": "^2.2.3",
     "immer": "^9.0.15",
     "next": "12.2.5",
     "nft.storage": "^7.0.0",
     "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use": "^17.4.0",
     "replicate-js": "github:nicholascelestin/replicate-js",
     "siwe": "^1.1.6",
     "three": "^0.144.0",
@@ -39,6 +46,7 @@
   },
   "devDependencies": {
     "@types/formidable": "^2.0.5",
+    "@types/howler": "^2.2.7",
     "@types/node": "18.7.14",
     "@types/react": "18.0.18",
     "@types/react-dom": "18.0.6",
