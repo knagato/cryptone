@@ -43,23 +43,23 @@ const PostNewAudio: NextPage = () => {
 
     const { encryptedFile, symmetricKey } = await Lit.encryptFile(audioFile);
 
-    // TODO: store encryptedFile to IPFS
-    // TODO: store jacketFile to IPFS
+    const formData = new FormData();
+    formData.append("title", data.name);
+    if (data.description) {
+      formData.append("description", data.description);
+    }
+    formData.append(
+      "originalAudio",
+      new Blob([audioFile], { type: "application/octet-stream" })
+    );
+    formData.append(
+      "jacket",
+      new Blob([jacketFile], { type: "application/octet-stream" })
+    );
 
     const res = await fetch("/api/audios", {
       method: "POST",
-      body: JSON.stringify({
-        title: data.name,
-        description: data.description,
-        audioUrl: "TODO",
-        audioSize: audioFile.size,
-        encryptedAudioCID: "TODO",
-        symmetricKey: new TextDecoder().decode(symmetricKey),
-        previewAudioCID: "TODO",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: formData,
     });
 
     const { id } = await res.json();
