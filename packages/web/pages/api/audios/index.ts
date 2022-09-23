@@ -18,8 +18,6 @@ export default async function handler(
       const {
         title,
         description,
-        audioUrl,
-        audioSize,
         encryptedAudioCID,
         symmetricKey,
         previewAudioCID,
@@ -29,8 +27,6 @@ export default async function handler(
         data: {
           title,
           description,
-          audioUrl,
-          audioSize,
           encryptedAudioCID,
           symmetricKey,
           previewAudioCID,

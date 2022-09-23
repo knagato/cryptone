@@ -136,7 +136,7 @@ const Materials: NextPage<Props> = (props: Props) => {
 
 Materials.getInitialProps = async (ctx) => {
   try {
-    const host = ctx.req.headers.host || 'localhost:3000'
+    const host = ctx.req && ctx.req.headers && ctx.req.headers.host ? ctx.req.headers.host : 'localhost:3000'
     const protocol = /^localhost/.test(host) ? 'http' : 'https' 
     const res = await fetch(`${protocol}://${host}/api/materials/images`)
         .then(data => data.json())
