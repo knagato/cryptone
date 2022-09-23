@@ -64,21 +64,18 @@ export default async function handler(
 
         const originalAudioBuf = fs.readFileSync(originalAudio.filepath);
 
-        // const split = new MediaSplit({ input: originalAudio.filepath, sections: ['[00:00 - 00:15] preview'], output: '/tmp' });
-        // const splitSections = await split.parse()
-        // const previewAudioFilename = splitSections[0].name
-        // const previewAudioBuf = fs.readFileSync('/tmp/preview.mp3')
+        const split = new MediaSplit({ input: originalAudio.filepath, sections: ['[00:00 - 00:15] preview'], output: '/tmp' });
+        const splitSections = await split.parse()
+        const previewAudioFilename = splitSections[0].name
+        const previewAudioBuf = fs.readFileSync('/tmp/preview.mp3')
 
-        const originalAudioS3 = await putOriginalAudio({
-          file: originalAudioBuf,
-          creatorAddress: address,
-          filenameWithExtention: audioFilename || originalAudio.newFilename,
-          contentType: originalAudio.mimetype,
-        });
-        const originalAudioSignedUrl = await getOriginalAudioSignedUrl({ key: originalAudioS3.key });
-        const { encryptedFile, symmetricKey } = await Lit.encryptFile(
-          new Blob([originalAudioBuf])
-        );
+        // const originalAudioS3 = await putOriginalAudio({
+        //   file: originalAudioBuf,
+        //   creatorAddress: address,
+        //   filenameWithExtention: audioFilename || originalAudio.newFilename,
+        //   contentType: originalAudio.mimetype,
+        // });
+        // const originalAudioSignedUrl = await getOriginalAudioSignedUrl({ key: originalAudioS3.key });
 
         // const previewAudioS3 = await putOriginalAudio({
         //   file: previewAudioBuf,
@@ -88,22 +85,25 @@ export default async function handler(
         // })
         // const previewAudioSignedUrl = await getOriginalAudioSignedUrl({ key: previewAudioS3.key });
 
+        const { encryptedFile, symmetricKey } = await Lit.encryptFile(
+          new Blob([originalAudioBuf])
+        );
         const encryptedAudioFile = new Web3File([encryptedFile], 'encryptedAudio', { type: '' })
         const encryptedAudioCID = await web3Storage?.put([encryptedAudioFile])
 
-        // const previewAudioFile = new Web3File([previewAudioBuf], 'previewAudio', { type: 'audio/*' })
-        // const previewAudioCID = await web3Storage?.put([previewAudioFile])
+        const previewAudioFile = new Web3File([previewAudioBuf], 'previewAudio', { type: 'audio/*' })
+        const previewAudioCID = await web3Storage?.put([previewAudioFile])
 
         const createUploadAudio = prisma.uploadAudio.create({
           data: {
             title: title,
             description: description,
-            audioUrl: originalAudioSignedUrl,
-            previewUrl: 'previewAudioSignedUrl',
+            audioUrl: "originalAudioSignedUrl",
+            previewUrl: "previewAudioSignedUrl",
             audioSize: originalAudio.size,
             encryptedAudioCID: encryptedAudioCID,
             symmetricKey: new TextDecoder().decode(symmetricKey),
-            previewAudioCID: 'previewAudioCID',
+            previewAudioCID: previewAudioCID,
             creatorAddress: address,
           },
         });
