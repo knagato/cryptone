@@ -20,6 +20,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.0",
     "@heroicons/react": "^2.0.10",
+    "@hookform/resolvers": "^2.9.8",
     "@lit-protocol/sdk-browser": "^1.1.218",
     "@prisma/client": "^4.3.1",
     "@rainbow-me/rainbowkit": "0.5.3",
@@ -40,6 +41,7 @@
     "siwe": "^1.1.6",
     "three": "^0.144.0",
     "wagmi": "^0.6.6",
+    "yup": "^0.32.11",
     "zustand": "4.1.1"
   },
   "devDependencies": {

@@ -1,25 +1,37 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import Lit from "src/lib/Lit";
+import * as yup from "yup";
 
-type Schema = {
-  name?: string;
-  description?: string;
-  audio: FileList;
-  jacket: FileList;
-};
+const schema = yup.object({}).shape({
+  name: yup.string().required("This field is required."),
+  description: yup.string(),
+  audio: yup.mixed().test({
+    message: "This field is required.",
+    test: (file) => file.length > 0,
+  }),
+  jacket: yup.mixed().test({
+    message: "This field is required.",
+    test: (file) => file.length > 0,
+  }),
+});
+
+type Schema = yup.InferType<typeof schema>;
 
 const PostNewAudio: NextPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
+    watch,
   } = useForm<Schema>({
     defaultValues: {
       name: "",
       description: "",
     },
+    resolver: yupResolver(schema),
   });
   const router = useRouter();
 
@@ -27,14 +39,12 @@ const PostNewAudio: NextPage = () => {
     const audioFile = data.audio.item(0);
     const jacketFile = data.jacket.item(0);
 
-    // TODO: store jacketFile to IPFS
-    jacketFile;
-
     if (!audioFile || !jacketFile) return;
 
     const { encryptedFile, symmetricKey } = await Lit.encryptFile(audioFile);
 
     // TODO: store encryptedFile to IPFS
+    // TODO: store jacketFile to IPFS
 
     const res = await fetch("/api/audios", {
       method: "POST",
@@ -65,10 +75,10 @@ const PostNewAudio: NextPage = () => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-3 items-center gap-4 border-t border-gray-200 py-4">
+        <div className="grid grid-cols-3 items-start gap-4 border-t border-gray-200 py-4">
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 mt-2"
           >
             Audio name
           </label>
@@ -79,13 +89,18 @@ const PostNewAudio: NextPage = () => {
               id="name"
               className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
             />
+            {errors.name && (
+              <p className="mt-2 text-sm text-red-600" id="email-error">
+                {errors.name.message}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 items-center gap-4 border-t border-gray-200 py-4">
+        <div className="grid grid-cols-3 items-start gap-4 border-t border-gray-200 py-4">
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 mt-2"
           >
             Audio description
           </label>
@@ -95,11 +110,16 @@ const PostNewAudio: NextPage = () => {
               id="description"
               className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
+            {errors.description && (
+              <p className="mt-2 text-sm text-red-600" id="email-error">
+                {errors.description.message}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 items-center gap-4 border-t border-gray-200 py-4">
-          <label className="block text-sm font-medium text-gray-700">
+        <div className="grid grid-cols-3 items-start gap-4 border-t border-gray-200 py-4">
+          <label className="block text-sm font-medium text-gray-700 mt-2">
             Original Audio
           </label>
           <div className="mt-1 col-span-2">
@@ -139,13 +159,21 @@ const PostNewAudio: NextPage = () => {
                 </p>
               </div>
             </div>
+            {watch("audio")?.item(0) && (
+              <p className="mt-2 text-sm">{watch("audio").item(0).name}</p>
+            )}
+            {errors.audio && (
+              <p className="mt-2 text-sm text-red-600">
+                {errors.audio.message?.toString()}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 items-center gap-4 border-t border-gray-200 py-4">
+        <div className="grid grid-cols-3 items-start gap-4 border-t border-gray-200 py-4">
           <label
             htmlFor="jacket"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 mt-2"
           >
             Jacket
           </label>
@@ -186,12 +214,20 @@ const PostNewAudio: NextPage = () => {
                 </p>
               </div>
             </div>
+            {watch("jacket")?.item(0) && (
+              <p className="mt-2 text-sm">{watch("jacket").item(0).name}</p>
+            )}
+            {errors.jacket && (
+              <p className="mt-2 text-sm text-red-600" id="email-error">
+                {errors.jacket.message?.toString()}
+              </p>
+            )}
           </div>
         </div>
 
         <div className="flex justify-end border-t pt-4">
           <button
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isDirty}
             type="submit"
             className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
           >
