@@ -85,31 +85,32 @@ export default async function handler(
         // })
         // const previewAudioSignedUrl = await getOriginalAudioSignedUrl({ key: previewAudioS3.key });
 
-        const { encryptedFile, symmetricKey } = await Lit.encryptFile(
-          new Blob([originalAudioBuf])
-        );
-        const encryptedAudioFile = new Web3File([encryptedFile], 'encryptedAudio', { type: '' })
-        const encryptedAudioCID = await web3Storage?.put([encryptedAudioFile])
+        // const { encryptedFile, symmetricKey } = await Lit.encryptFile(
+        //   new Blob([originalAudioBuf])
+        // );
+        // const encryptedAudioFile = new Web3File([encryptedFile], 'encryptedAudio', { type: '' })
+        // const encryptedAudioCID = await web3Storage?.put([encryptedAudioFile])
 
-        const previewAudioFile = new Web3File([previewAudioBuf], 'previewAudio', { type: 'audio/*' })
-        const previewAudioCID = await web3Storage?.put([previewAudioFile])
+        // const previewAudioFile = new Web3File([previewAudioBuf], 'previewAudio', { type: 'audio/*' })
+        // const previewAudioCID = await web3Storage?.put([previewAudioFile])
 
-        const createUploadAudio = prisma.uploadAudio.create({
-          data: {
-            title: title,
-            description: description,
-            audioUrl: "originalAudioSignedUrl",
-            previewUrl: "previewAudioSignedUrl",
-            audioSize: originalAudio.size,
-            encryptedAudioCID: encryptedAudioCID,
-            symmetricKey: new TextDecoder().decode(symmetricKey),
-            previewAudioCID: previewAudioCID,
-            creatorAddress: address,
-          },
-        });
-        const [uploadAudio] = await prisma.$transaction([createUploadAudio]);
+        // const createUploadAudio = prisma.uploadAudio.create({
+        //   data: {
+        //     title: title,
+        //     description: description,
+        //     audioUrl: "originalAudioSignedUrl",
+        //     previewUrl: "previewAudioSignedUrl",
+        //     audioSize: originalAudio.size,
+        //     encryptedAudioCID: encryptedAudioCID,
+        //     symmetricKey: new TextDecoder().decode(symmetricKey),
+        //     previewAudioCID: previewAudioCID,
+        //     creatorAddress: address,
+        //   },
+        // });
+        // const [uploadAudio] = await prisma.$transaction([createUploadAudio]);
 
-        res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
+        // res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
+        res.status(200).end(JSON.stringify({ id: "0" }));
       } catch (err) {
         if (err instanceof Error) {
           res.status(500).end(err.message);
