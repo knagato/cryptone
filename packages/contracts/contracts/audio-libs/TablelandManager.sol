@@ -11,7 +11,7 @@ abstract contract TablelandManager {
     ITablelandTables private _tableland;
     string private _metadataTable;
     uint256 private _metadataTableId;
-    string private _tablePrefix = "canvas";
+    string private _tablePrefix = "CrypTone";
     string private _chainName; // e.g. polygon-mumbai
 
     constructor(address tableRegistry, string memory chainName) {
@@ -31,9 +31,10 @@ abstract contract TablelandManager {
                 "_",
                 Strings.toString(block.chainid),
                 "(chain text, contractAddress text, tokenId text, ",
-                "salesPrice text, ",
-                "generation int, encryptedAudioCID text, ",
-                "encryptedSymmetricKey text, previewAudioCID text, jacketCID text);"
+                "salesPrice text, generation int, ",
+                "name text, description text, encryptedAudioCID text, ",
+                "encryptedSymmetricKey text, previewAudioCID text, jacketCID text,",
+                "image text, external_url);"
             )
         );
 
@@ -46,26 +47,26 @@ abstract contract TablelandManager {
         );
     }
 
-    function _insertNewWork(
+    function _getTemplateURI() internal view returns (string memory metadata) {
+        return
+            string.concat(
+                _baseURIString,
+                "select+json_object%28%27name%27%2C+name%2C+%27description%27%2C+description%2C+%27image%27%2C+image%2C+%27animation_url%27%2C+animation_url%2C+%27chain%27%2C+chain%2C+%27contractAddress%27%2C+contractAddress%2C+%27tokenId%27%2C+tokenId%2C+%27salesPrice%27%2C+salesPrice%2C+%27generation%27%2C+generation%2C+%27encryptedAudioCID%27%2C+encryptedAudioCID%2C+%27encryptedSymmetricKey%27%2C+encryptedSymmetricKey%2C+%27previewAudioCID%27%2C+previewAudioCID%2C+%27jacketCID%27%2C+jacketCID%29+from+",
+                _metadataTable,
+                "+where+tokenId%3D"
+            );
+    }
+
+    function _initMetadataFirstHalf(
         uint256 tokenId,
         uint256 generation,
-        string calldata encryptedAudioCID,
-        string calldata encryptedSymmetricKey,
-        string calldata previewAudioCID,
-        string calldata jacketCID
+        string calldata name,
+        string calldata description
     ) internal {
-        // too long concat makes the hardhat compile faiied.
         string memory query = string.concat(
             "INSERT INTO ",
             _metadataTable,
-            " (chain, contractAddress, tokenId, ", // polygon-mumbai
-            "salesPrice, ",
-            "generation, encryptedAudioCID, ",
-            "encryptedSymmetricKey, previewAudioCID, jacketCID)"
-        );
-        query = string.concat(
-            query,
-            " SELECT '",
+            " (chain,contractAddress,tokenId,salesPrice,generation,name,description) VALUES('",
             _chainName,
             "','",
             Strings.toHexString(address(this)),
@@ -77,24 +78,47 @@ abstract contract TablelandManager {
             "','0',",
             Strings.toString(generation), // generation
             ",'",
+            name,
+            "','",
+            description,
+            "');"
+        );
+        _tableland.runSQL(address(this), _metadataTableId, query);
+    }
+
+    /// use this after setMetadataFirstHalf
+    function _initMetadataSecondHalf(
+        uint256 tokenId,
+        string calldata encryptedAudioCID,
+        string calldata encryptedSymmetricKey,
+        string calldata previewAudioCID,
+        string calldata jacketCID
+    ) internal {
+        // too long concat makes the hardhat compile faiied.
+        string memory query = string.concat(
+            "UPDATE ",
+            _metadataTable,
+            " SET encryptedAudioCID='",
             encryptedAudioCID,
-            "','"
+            "',encryptedSymmetricKey='",
+            encryptedSymmetricKey
         );
         query = string.concat(
             query,
-            encryptedSymmetricKey,
-            "','",
+            "',previewAudioCID='",
             previewAudioCID,
-            "','",
+            "',jacketCID='",
             jacketCID
         );
         query = string.concat(
             query,
-            "' WHERE NOT EXISTS (SELECT 1 FROM ",
-            _metadataTable,
-            " WHERE tokenId='",
+            "',image='ipfs://",
+            jacketCID,
+            "',animation_url='ipfs://",
+            previewAudioCID,
+            "' WHERE tokenId='",
             Strings.toString(tokenId),
-            "');"
+            "';"
         );
         _tableland.runSQL(address(this), _metadataTableId, query);
     }
@@ -168,5 +192,9 @@ abstract contract TablelandManager {
                 ");"
             )
         );
+    }
+
+    function getTableName() public view returns (string memory) {
+        return _metadataTable;
     }
 }

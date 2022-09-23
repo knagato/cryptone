@@ -11,6 +11,8 @@ library AudioLib {
         uint256 tokenId;
         uint256 maxSupply;
         uint256 totalSupply;
+        bool metadataFirstHalfInit;
+        bool metadataSecondHalfInit;
     }
 
     struct InheritStruct {
@@ -19,6 +21,8 @@ library AudioLib {
         uint256 totalSupply;
         uint256 generation;
         uint256 parentTokenId;
+        bool metadataFirstHalfInit;
+        bool metadataSecondHalfInit;
     }
 
     struct RefStruct {
@@ -36,20 +40,6 @@ library AudioLib {
     error MintWorkIdInvalid();
     error ProfileAddressInvalid();
     error MintBatchLengthInvalid();
-
-    event AudioCreated(
-        uint256 tokenId,
-        address owner,
-        uint256 workId,
-        uint256 generation
-    );
-
-    event AudioMinted(
-        AudioLib.NFTType nftType,
-        address owner,
-        uint256 workId,
-        uint256 amount
-    );
-
-    event ProfileContractChanged(address newContract);
+    error FirstHalfNotInitialized();
+    error ThisHalfAlreadyInitialized();
 }

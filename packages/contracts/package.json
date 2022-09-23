@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",
-    "@tableland/evm": "^2.0.4"
+    "@tableland/evm": "^2.0.4",
+    "hardhat": "^2.11.2"
   }
 }
