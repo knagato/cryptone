@@ -44,6 +44,7 @@ export default async function handler(
       })
       break;
     case "POST":
+
       if (!address) {
         return res.status(401).end("401 Unauthorized");
       }
@@ -54,6 +55,8 @@ export default async function handler(
           res.status(500).send("Internal Server Error");
           return;
         }
+        try {
+
         const title = fields.title as string;
         const description = fields.description as string | undefined;
         const originalAudio = files.originalAudio as File;
@@ -107,6 +110,13 @@ export default async function handler(
         const [uploadAudio] = await prisma.$transaction([createUploadAudio]);
 
         res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
+      } catch (err) {
+        if (err instanceof Error) {
+          res.status(500).end(err.message);
+        } else {
+          res.status(500).end("Internal Server Error");
+        }
+      }
         return;
       });
 
