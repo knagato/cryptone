@@ -64,6 +64,14 @@ export default async function handler(
 
         const originalAudioBuf = fs.readFileSync(originalAudio.filepath);
 
+        res.status(200).end(JSON.stringify({ 
+          title: title,
+          description: description,
+          originalAudio: originalAudio.filepath,
+          audioFilename: audioFilename
+         }));
+
+
         const split = new MediaSplit({ input: originalAudio.filepath, sections: ['[00:00 - 00:15] preview'], output: '/tmp' });
         const splitSections = await split.parse()
         const previewAudioFilename = splitSections[0].name
