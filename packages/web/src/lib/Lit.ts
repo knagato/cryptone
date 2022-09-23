@@ -1,5 +1,5 @@
 // this is any type.
-import lit from "@lit-protocol/sdk-browser";
+import lit from "@lit-protocol/sdk-nodejs";
 import { access } from "fs";
 import { SAMPLE_CONTRACT_ADDRESS } from "src/utils/constants";
 

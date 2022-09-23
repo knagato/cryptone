@@ -2,7 +2,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import Lit from "src/lib/Lit";
 import * as yup from "yup";
 
 const schema = yup.object({}).shape({
@@ -36,17 +35,16 @@ const PostNewAudio: NextPage = () => {
 
     if (!audioFile) return;
 
-    const { encryptedFile, symmetricKey } = await Lit.encryptFile(audioFile);
-
-    // TODO: store encryptedFile to IPFS
-    // TODO: store jacketFile to IPFS
-
     const formData = new FormData();
+    formData.append("title", data.name);
+    if (data.description) {
+      formData.append("description", data.description);
+    }
     formData.append(
-      "audio",
+      "originalAudio",
       new Blob([audioFile], { type: "application/octet-stream" })
     );
-    
+
     const response = await fetch("/api/ipfs", {
       method: "POST",
       headers: {},
@@ -56,18 +54,7 @@ const PostNewAudio: NextPage = () => {
 
     const res = await fetch("/api/audios", {
       method: "POST",
-      body: JSON.stringify({
-        title: data.name,
-        description: data.description,
-        audioUrl: "TODO",
-        audioSize: audioFile.size,
-        encryptedAudioCID: "TODO",
-        symmetricKey: new TextDecoder().decode(symmetricKey),
-        previewAudioCID: "TODO",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: formData,
     });
 
     const { id } = await res.json();
