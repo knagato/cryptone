@@ -4,6 +4,7 @@ import { useIsMounted } from "src/hooks/useIsMounted";
 import { useAccount } from "wagmi";
 import React, { useState, useEffect } from "react";
 import { Image, UploadAudio } from "@prisma/client";
+import Link from "next/link";
 
 const defaultAudios = [
   {id: 1, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
@@ -59,7 +60,10 @@ const Materials: NextPage = () => {
                       Description
                     </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-4 py-4 text-left">
-                      URL
+                      EncryptedAudioCID
+                    </th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-4 py-4 text-left">
+                      Link
                     </th>
                   </tr>
                 </thead>
@@ -76,7 +80,10 @@ const Materials: NextPage = () => {
                       {audio.description}
                     </td>
                     <td className="text-sm text-gray-900 font-light px-4 py-4 whitespace-nowrap">
-                      <p className="truncate">{audio.audioUrl}</p>
+                      {audio.encryptedAudioCID}
+                    </td>
+                    <td className="text-sm text-gray-900 font-light px-4 py-4 whitespace-nowrap">
+                      <Link href={audio.audioUrl || ''}><a>URL</a></Link>
                     </td>
                   </tr>
                   ))}

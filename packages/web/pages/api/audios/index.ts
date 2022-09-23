@@ -6,6 +6,13 @@ import { prisma } from "src/lib/prisma";
 import { getOriginalAudioSignedUrl, putOriginalAudio } from "src/lib/s3";
 import Lit from "src/lib/Lit";
 import { UploadAudio } from "@prisma/client";
+import { Web3Storage, File as Web3File } from 'web3.storage'
+
+
+const WEB3_STORAGE_KEY = process.env.WEB3_STORAGE_KEY
+const web3Storage = WEB3_STORAGE_KEY
+  ? new Web3Storage({ token: WEB3_STORAGE_KEY })
+  : undefined;
 
 export const config = {
   api: {
@@ -31,7 +38,7 @@ export default async function handler(
       res.status(200).json({
         audios: audios
       })
-
+      break;
     case "POST":
       if (!address) {
         return res.status(401).end("401 Unauthorized");
@@ -60,6 +67,12 @@ export default async function handler(
         const { encryptedFile, symmetricKey } = await Lit.encryptFile(
           new Blob([audioBuf])
         );
+        console.log(originalAudio.originalFilename)
+
+        const file = new Web3File([encryptedFile], 'tmp', { type: 'audio/*' })
+
+        const encryptedAudioCID = await web3Storage?.put([file])
+        console.log(encryptedAudioCID);
 
         const createUploadAudio = prisma.uploadAudio.create({
           data: {
@@ -67,7 +80,7 @@ export default async function handler(
             description: description,
             audioUrl: url,
             audioSize: originalAudio.size,
-            encryptedAudioCID: "TODO",
+            encryptedAudioCID: encryptedAudioCID,
             symmetricKey: new TextDecoder().decode(symmetricKey),
             previewAudioCID: "TODO",
           },
