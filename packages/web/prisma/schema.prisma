@@ -27,7 +27,7 @@ model UploadAudio {
   previewUrl String?
   audioSize Int?
   encryptedAudioCID String?
-  symmetricKey String?
+  symmetricKey Bytes?
   previewAudioCID String?
   creatorAddress String?
   creator User? @relation(fields: [creatorAddress], references: [address])

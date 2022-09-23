@@ -99,7 +99,7 @@ export default async function handler(
             previewUrl: previewAudioSignedUrl || '',
             audioSize: originalAudio.size,
             encryptedAudioCID: encryptedAudioCID,
-            symmetricKey: new TextDecoder().decode(symmetricKey),
+            symmetricKey: Buffer.from(symmetricKey),
             previewAudioCID: previewAudioCID || '',
             creatorAddress: address,
           },
