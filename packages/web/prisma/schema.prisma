@@ -30,7 +30,7 @@ model UploadAudio {
   symmetricKey String?
   previewAudioCID String?
   creatorAddress String
-  creator User @relation(fields: [creatorAddress], references: [address])
+  creator User? @relation(fields: [creatorAddress], references: [address])
 }
 
 model Image {
@@ -39,7 +39,7 @@ model Image {
   prompt String
   jacketCID String?
   creatorAddress String
-  creator User @relation(fields: [creatorAddress], references: [address])
+  creator User? @relation(fields: [creatorAddress], references: [address])
 }
 
 model AudioNFT {
