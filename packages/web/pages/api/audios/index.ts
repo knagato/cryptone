@@ -5,12 +5,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "src/lib/prisma";
 import { getOriginalAudioSignedUrl, putOriginalAudio } from "src/lib/s3";
 import Lit from "src/lib/Lit";
+import { UploadAudio } from "@prisma/client";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+export async function getUploadAudios(limit: number = 100): Promise<UploadAudio[]> {
+  const audios = await prisma.uploadAudio.findMany()
+  return audios
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,6 +26,12 @@ export default async function handler(
   const address = token?.sub ?? null;
 
   switch (req.method) {
+    case "GET":
+      const audios = await getUploadAudios()
+      res.status(200).json({
+        audios: audios
+      })
+
     case "POST":
       if (!address) {
         return res.status(401).end("401 Unauthorized");
@@ -32,13 +44,11 @@ export default async function handler(
           res.status(500).send("Internal Server Error");
           return;
         }
-        const name = fields.name as string;
+        const title = fields.title as string;
         const description = fields.description as string | undefined;
         const originalAudio = files.originalAudio as File;
-        const jacket = files.jacket as File;
 
         const audioBuf = fs.readFileSync(originalAudio.filepath);
-        const jacketBuf = fs.readFileSync(jacket.filepath);
 
         const { url, key } = await putOriginalAudio({
           file: audioBuf,
@@ -51,12 +61,9 @@ export default async function handler(
           new Blob([audioBuf])
         );
 
-        // TODO: store encryptedFile to IPFS
-        // TODO: store jacket to IPFS
-
         const createUploadAudio = prisma.uploadAudio.create({
           data: {
-            title: name,
+            title: title,
             description: description,
             audioUrl: url,
             audioSize: originalAudio.size,

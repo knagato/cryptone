@@ -3,27 +3,41 @@ import { useRouter } from "next/router";
 import { useIsMounted } from "src/hooks/useIsMounted";
 import { useAccount } from "wagmi";
 import React, { useState, useEffect } from "react";
-import { Image } from "pages/api/materials/images";
+import { Image, UploadAudio } from "@prisma/client";
 
-const audios = [
+const defaultAudios = [
   {id: 1, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
   {id: 2, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
   {id: 3, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
 ];
 
-const defaultImages = [
-  { id: 1, replicateId: 'rdjp5iduprg7fljmjxtsi4k6xi', url: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/caf6d90a-0bf6-444f-b244-62663ca7a1ec/out-0.png', prompt: 'crows', jacketCID: 'aaa' }
-]
-
-type Props = {
-  images: Image[]
-};
-
-const Materials: NextPage<Props> = (props: Props) => {
+const Materials: NextPage = () => {
   const router = useRouter();
   const { address } = useAccount();
   const isMounted = useIsMounted();
-  const { images } = props
+  const [images, setImages] = useState<Image[]>([])
+  const [audios, setAudios] = useState<UploadAudio[]>([])
+
+  const getImages = async () => {
+    const res = await fetch("/api/materials/images", {
+      method: "GET",
+    });
+    const json = await res.json()
+    setImages(json.images)
+  }
+
+  const getUploadAudios = async () => {
+    const res = await fetch("/api/audios", {
+      method: "GET",
+    });
+    const json = await res.json()
+    setAudios(json.audios)
+  }
+
+  useEffect(() => {
+    getImages()
+    getUploadAudios()
+  }, []);
 
   return (
     <div className="container mx-auto py-10">
@@ -45,7 +59,7 @@ const Materials: NextPage<Props> = (props: Props) => {
                       Description
                     </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-4 py-4 text-left">
-                      AudioCID
+                      URL
                     </th>
                   </tr>
                 </thead>
@@ -62,7 +76,7 @@ const Materials: NextPage<Props> = (props: Props) => {
                       {audio.description}
                     </td>
                     <td className="text-sm text-gray-900 font-light px-4 py-4 whitespace-nowrap">
-                      {audio.audioCID}
+                      <p className="truncate">{audio.audioUrl}</p>
                     </td>
                   </tr>
                   ))}
@@ -70,6 +84,7 @@ const Materials: NextPage<Props> = (props: Props) => {
               </table>
               <div className="flex justify-end border-t pt-4">
                 <button
+                  onClick={() => router.push(`/mypage/audios/new`)}
                   type="submit"
                   className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
                 >
@@ -133,22 +148,5 @@ const Materials: NextPage<Props> = (props: Props) => {
     </div>
   );
 };
-
-Materials.getInitialProps = async (ctx) => {
-  try {
-    const host = ctx.req && ctx.req.headers && ctx.req.headers.host ? ctx.req.headers.host : 'localhost:3000'
-    const protocol = /^localhost/.test(host) ? 'http' : 'https' 
-    const res = await fetch(`${protocol}://${host}/api/materials/images`)
-        .then(data => data.json())
-    return {
-          images: res.images,
-    }
-  } catch (e) {
-      console.log(e)
-      return {
-          images: defaultImages,
-      }
-  }
-}
 
 export default Materials;
