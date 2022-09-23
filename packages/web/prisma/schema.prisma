@@ -15,6 +15,7 @@ model User {
   address String @unique
   nickname String?
   audioNFTs AudioNFT[]
+  balanceOfAudioNFT BalanceOfAudioNFT?
 }
 
 model UploadAudio {
@@ -48,6 +49,9 @@ model AudioNFT {
   creatorAddress String
   previewAudioCID String
   creator         User     @relation(fields: [creatorAddress], references: [address])
+  balanceOfAudioNFT BalanceOfAudioNFT?
+
+  @@unique([chainId, contractAddress, tokenId])
 }
 
 model AlterTemplate {
@@ -64,4 +68,17 @@ model Alter {
   description String
   creatorId Int
   arrangementData Json
+}
+
+model BalanceOfAudioNFT {
+  id Int @id @default(autoincrement())
+  userAddress String @unique
+  chainId Int
+  contractAddress String
+  tokenId Int
+  balance Int
+  user User @relation(fields: [userAddress], references: [address])
+  audioNFT AudioNFT @relation(fields: [chainId, contractAddress, tokenId], references: [chainId, contractAddress, tokenId])
+
+  @@unique([chainId, contractAddress, tokenId])
 }
