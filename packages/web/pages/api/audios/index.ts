@@ -76,6 +76,7 @@ export default async function handler(
         const encryptedAudioFile = new Web3File([encryptedFile], 'encryptedAudio', { type: '' })
         const encryptedAudioCID = await web3Storage?.put([encryptedAudioFile])
 
+        try {
         const split = new MediaSplit({ input: originalAudio.filepath, sections: ['[00:00 - 00:15] preview'], output: '/tmp' });
         const splitSections = await split.parse().catch((e) => console.error(e));
         const previewAudioFilename = splitSections && splitSections[0].name
@@ -107,6 +108,13 @@ export default async function handler(
 
         res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
         // res.status(200).end(JSON.stringify({ id: "0" }));
+        } catch (err) {
+          if (err instanceof Error) {
+            res.status(500).end(err.message);
+          } else {
+            res.status(500).end("Internal Server Error");
+          }
+        }
         return;
       });
 
