@@ -7,6 +7,7 @@ import { getOriginalAudioSignedUrl, putOriginalAudio } from "src/lib/s3";
 import Lit from "src/lib/Lit";
 import { UploadAudio } from "@prisma/client";
 import { Web3Storage, File as Web3File } from 'web3.storage'
+import MediaSplit from 'media-split'
 
 
 const WEB3_STORAGE_KEY = process.env.WEB3_STORAGE_KEY
@@ -20,8 +21,8 @@ export const config = {
   },
 };
 
-export async function getUploadAudios(limit: number = 100): Promise<UploadAudio[]> {
-  const audios = await prisma.uploadAudio.findMany()
+export async function getUploadAudios(creatorAddress: string, limit: number = 100): Promise<UploadAudio[]> {
+  const audios = await prisma.uploadAudio.findMany( { where: { creatorAddress }, take: limit } )
   return audios
 }
 
@@ -31,19 +32,18 @@ export default async function handler(
 ) {
   const token = await getToken({ req: req });
   const address = token?.sub ?? null;
+  if (!address) {
+    return res.status(401).end("401 Unauthorized");
+  }
 
   switch (req.method) {
     case "GET":
-      const audios = await getUploadAudios()
+      const audios = await getUploadAudios(address)
       res.status(200).json({
         audios: audios
       })
       break;
     case "POST":
-      if (!address) {
-        return res.status(401).end("401 Unauthorized");
-      }
-
       const form = new IncomingForm({ keepExtensions: true });
 
       form.parse(req, async (err, fields, files) => {
@@ -54,40 +54,57 @@ export default async function handler(
         const title = fields.title as string;
         const description = fields.description as string | undefined;
         const originalAudio = files.originalAudio as File;
+        const audioFilename = fields.audioFilename as string | undefined;
 
-        const audioBuf = fs.readFileSync(originalAudio.filepath);
+        const originalAudioBuf = fs.readFileSync(originalAudio.filepath);
 
-        const { url, key } = await putOriginalAudio({
-          file: audioBuf,
-          creatorAddress: "address",
-          filenameWithExtention: originalAudio.newFilename,
+        const split = new MediaSplit({ input: originalAudio.filepath, sections: ['[00:00 - 00:15] preview'] });
+        const splitSections = await split.parse()
+        const previewAudioFilename = splitSections[0].name
+        const previewAudioBuf = fs.readFileSync(previewAudioFilename)
+
+        const originalAudioS3 = await putOriginalAudio({
+          file: originalAudioBuf,
+          creatorAddress: address,
+          filenameWithExtention: audioFilename || originalAudio.newFilename,
           contentType: originalAudio.mimetype,
         });
-        const sinedUrl = await getOriginalAudioSignedUrl({ key });
+        const originalAudioSignedUrl = await getOriginalAudioSignedUrl({ key: originalAudioS3.key });
         const { encryptedFile, symmetricKey } = await Lit.encryptFile(
-          new Blob([audioBuf])
+          new Blob([originalAudioBuf])
         );
-        console.log(originalAudio.originalFilename)
 
-        const file = new Web3File([encryptedFile], 'tmp', { type: 'audio/*' })
+        const previewAudioS3 = await putOriginalAudio({
+          file: previewAudioBuf,
+          creatorAddress: address,
+          filenameWithExtention: previewAudioFilename,
+          contentType: originalAudio.mimetype,
+        })
+        const previewAudioSignedUrl = await getOriginalAudioSignedUrl({ key: previewAudioS3.key });
 
-        const encryptedAudioCID = await web3Storage?.put([file])
-        console.log(encryptedAudioCID);
+        const encryptedAudioFile = new Web3File([encryptedFile], 'encryptedAudio', { type: '' })
+        const encryptedAudioCID = await web3Storage?.put([encryptedAudioFile])
+
+        const previewAudioFile = new Web3File([previewAudioBuf], 'previewAudio', { type: 'audio/*' })
+        const previewAudioCID = await web3Storage?.put([previewAudioFile])
 
         const createUploadAudio = prisma.uploadAudio.create({
           data: {
             title: title,
             description: description,
-            audioUrl: url,
+            audioUrl: originalAudioSignedUrl,
+            previewUrl: previewAudioSignedUrl,
             audioSize: originalAudio.size,
             encryptedAudioCID: encryptedAudioCID,
             symmetricKey: new TextDecoder().decode(symmetricKey),
-            previewAudioCID: "TODO",
+            previewAudioCID: previewAudioCID,
+            creatorAddress: address,
           },
         });
         const [uploadAudio] = await prisma.$transaction([createUploadAudio]);
 
-        res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
+        // res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
+        res.status(200).end(JSON.stringify({ id: "0" }));
         return;
       });
 

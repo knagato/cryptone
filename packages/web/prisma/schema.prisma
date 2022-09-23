@@ -14,6 +14,7 @@ model User {
   id Int @id @default(autoincrement())
   address String @unique
   nickname String?
+  uploadAudios UploadAudio[]
   audioNFTs AudioNFT[]
 }
 
@@ -22,10 +23,13 @@ model UploadAudio {
   title String?
   description String?
   audioUrl String?
+  previewUrl String?
   audioSize Int?
   encryptedAudioCID String?
   symmetricKey String?
   previewAudioCID String?
+  creatorAddress String
+  creator User @relation(fields: [creatorAddress], references: [address])
 }
 
 model Image {
@@ -47,7 +51,7 @@ model AudioNFT {
   jacketImageCID String
   creatorAddress String
   previewAudioCID String
-  creator         User     @relation(fields: [creatorAddress], references: [address])
+  creator User @relation(fields: [creatorAddress], references: [address])
 }
 
 model AlterTemplate {

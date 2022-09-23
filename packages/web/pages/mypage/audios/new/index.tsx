@@ -40,6 +40,9 @@ const PostNewAudio: NextPage = () => {
     if (data.description) {
       formData.append("description", data.description);
     }
+    if (audioFile.name) {
+      formData.append("audioFilename", audioFile.name);
+    }
     formData.append(
       "originalAudio",
       new Blob([audioFile], { type: "application/octet-stream" })

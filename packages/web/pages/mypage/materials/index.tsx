@@ -6,12 +6,6 @@ import React, { useState, useEffect } from "react";
 import { Image, UploadAudio } from "@prisma/client";
 import Link from "next/link";
 
-const defaultAudios = [
-  {id: 1, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
-  {id: 2, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
-  {id: 3, title: "test1", description: "test1", isEnctypted: true, audioCID: "test1"},
-];
-
 const Materials: NextPage = () => {
   const router = useRouter();
   const { address } = useAccount();
@@ -60,7 +54,7 @@ const Materials: NextPage = () => {
                       Description
                     </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-4 py-4 text-left">
-                      EncryptedAudioCID
+                      EncryptedAudioCID / PreviewAudioCID
                     </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-4 py-4 text-left">
                       Link
@@ -80,10 +74,12 @@ const Materials: NextPage = () => {
                       {audio.description}
                     </td>
                     <td className="text-sm text-gray-900 font-light px-4 py-4 whitespace-nowrap">
-                      {audio.encryptedAudioCID}
+                      <p>{audio.encryptedAudioCID}</p>
+                      <p>{audio.previewAudioCID}</p>
                     </td>
                     <td className="text-sm text-gray-900 font-light px-4 py-4 whitespace-nowrap">
-                      <Link href={audio.audioUrl || ''}><a>URL</a></Link>
+                      { audio.audioUrl && <p><Link href={audio.audioUrl || ''}><a>original</a></Link></p> }
+                      { audio.previewUrl && <p><Link href={audio.previewUrl || ''}><a>preview</a></Link></p> }
                     </td>
                   </tr>
                   ))}
