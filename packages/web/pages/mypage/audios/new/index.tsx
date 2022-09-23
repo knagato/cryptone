@@ -2,7 +2,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import Lit from "src/lib/Lit";
 import * as yup from "yup";
 
 const schema = yup.object({}).shape({
@@ -40,8 +39,6 @@ const PostNewAudio: NextPage = () => {
     const jacketFile = data.jacket.item(0);
 
     if (!audioFile || !jacketFile) return;
-
-    const { encryptedFile, symmetricKey } = await Lit.encryptFile(audioFile);
 
     const formData = new FormData();
     formData.append("title", data.name);

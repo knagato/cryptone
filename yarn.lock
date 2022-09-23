@@ -1516,33 +1516,6 @@
     "@json-rpc-tools/types" "^1.7.6"
     "@pedrouid/environment" "^1.0.1"
 
-"@lit-protocol/sdk-browser@^1.1.218":
-  version "1.1.218"
-  resolved "https://registry.yarnpkg.com/@lit-protocol/sdk-browser/-/sdk-browser-1.1.218.tgz#eec6698855a154d0fcc3fed37f5442ac003758a9"
-  integrity sha512-WfxDli30rBMJ9/nwQJYkHXeN4PgQouno0IXr8RlmQQvpPh6d+vLkn30EAmCP55dRcOeNN/f3iHvKN7n73WXECQ==
-  dependencies:
-    "@ethersproject/bytes" "^5.5.0"
-    "@ethersproject/contracts" "^5.2.0"
-    "@ethersproject/hash" "^5.4.0"
-    "@ethersproject/providers" "^5.2.0"
-    "@ethersproject/strings" "^5.5.0"
-    "@ethersproject/units" "^5.4.0"
-    "@ethersproject/wallet" "^5.2.0"
-    "@walletconnect/ethereum-provider" "^1.7.8"
-    buffer "^6.0.3"
-    bufferutil "^4.0.6"
-    cross-blob "^3.0.1"
-    jszip "^3.6.0"
-    lit-connect-modal "^0.1.8"
-    lit-siwe "^1.1.8"
-    node-fetch "^3.2.3"
-    pako "^2.0.4"
-    tslib "^2.3.1"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.1"
-    uint8arrays "^3.0.0"
-    utf-8-validate "^5.0.8"
-
 "@lit-protocol/sdk-nodejs@^1.1.226":
   version "1.1.226"
   resolved "https://registry.yarnpkg.com/@lit-protocol/sdk-nodejs/-/sdk-nodejs-1.1.226.tgz#89b6b69221297143cf316ad65944b19bb8f9c9f6"
