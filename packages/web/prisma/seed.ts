@@ -22,7 +22,7 @@ const images: Prisma.ImageCreateInput[] = [
     replicateId: 'rdjp5iduprg7fljmjxtsi4k6xi',
     imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/caf6d90a-0bf6-444f-b244-62663ca7a1ec/out-0.png',
     prompt: 'crows',
-    jacketCID: 'aaa'
+    jacketCID: 'bafybeigcvm2jw6a2xwpl7g2syrbqrhogwz7ek3ick3a5i52ordk4cbot3a'
   },
   { replicateId: 'z32ygtk7xnemjpulylfglramaa',
     imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/d3db96b0-4314-491c-bcdb-1528bea0ba30/out-0.png',
