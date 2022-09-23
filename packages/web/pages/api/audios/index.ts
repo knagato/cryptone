@@ -32,18 +32,21 @@ export default async function handler(
 ) {
   const token = await getToken({ req: req });
   const address = token?.sub ?? null;
-  if (!address) {
-    return res.status(401).end("401 Unauthorized");
-  }
 
   switch (req.method) {
     case "GET":
+      if (!address) {
+        return res.status(200).json({audios: []});
+      }
       const audios = await getUploadAudios(address)
       res.status(200).json({
         audios: audios
       })
       break;
     case "POST":
+      if (!address) {
+        return res.status(401).end("401 Unauthorized");
+      }
       const form = new IncomingForm({ keepExtensions: true });
 
       form.parse(req, async (err, fields, files) => {
