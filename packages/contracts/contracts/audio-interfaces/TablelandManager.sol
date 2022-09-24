@@ -34,7 +34,7 @@ abstract contract TablelandManager {
                 "salesPrice text, generation int, ",
                 "name text, description text, encryptedAudioCID text, ",
                 "encryptedSymmetricKey text, previewAudioCID text, jacketCID text,",
-                "image text, external_url);"
+                "image text, external_url text);"
             )
         );
 
@@ -53,7 +53,7 @@ abstract contract TablelandManager {
                 _baseURIString,
                 "select+json_object%28%27name%27%2C+name%2C+%27description%27%2C+description%2C+%27image%27%2C+image%2C+%27animation_url%27%2C+animation_url%2C+%27chain%27%2C+chain%2C+%27contractAddress%27%2C+contractAddress%2C+%27tokenId%27%2C+tokenId%2C+%27salesPrice%27%2C+salesPrice%2C+%27generation%27%2C+generation%2C+%27encryptedAudioCID%27%2C+encryptedAudioCID%2C+%27encryptedSymmetricKey%27%2C+encryptedSymmetricKey%2C+%27previewAudioCID%27%2C+previewAudioCID%2C+%27jacketCID%27%2C+jacketCID%29+from+",
                 _metadataTable,
-                "+where+tokenId%3D"
+                "+where+tokenId%3D{id}"
             );
     }
 

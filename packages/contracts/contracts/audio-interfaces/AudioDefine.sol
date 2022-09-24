@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-library AudioLib {
-    enum NFTType {
+abstract contract AudioDefine {
+    enum WorkType {
         Audio,
         Inherit
     }
@@ -26,15 +26,15 @@ library AudioLib {
     }
 
     struct RefStruct {
-        NFTType nftType;
+        WorkType workType;
         address creatorAddress;
         uint256 workId;
         bool exists;
     }
 
-    error InitParamsInvalid();
-    error ProfileNFTNotFound();
-    error UnknownNFTType();
+    // error InitParamsInvalid();
+    // error ProfileNFTNotFound();
+    error UnknownWorkType();
     error ProfileIdInvalid();
     error NotTokenOwner();
     error MintWorkIdInvalid();
@@ -42,4 +42,25 @@ library AudioLib {
     error MintBatchLengthInvalid();
     error FirstHalfNotInitialized();
     error ThisHalfAlreadyInitialized();
+
+    event AudioCreated(
+        uint256 tokenId,
+        address owner,
+        uint256 workId,
+        uint256 generation
+    );
+
+    event AudioMinted(
+        uint256 tokenId,
+        uint256 amount,
+        uint256 salesPrice
+    );
+
+    event AudioBatchMinted(
+        uint256[] tokenIds,
+        uint256[] amounts,
+        uint256[] salesPrices
+    );
+
+    event ProfileContractChanged(address newContract);
 }
