@@ -40,17 +40,13 @@ const PostNewAudio: NextPage = () => {
     if (data.description) {
       formData.append("description", data.description);
     }
+    if (audioFile.name) {
+      formData.append("audioFilename", audioFile.name);
+    }
     formData.append(
       "originalAudio",
       new Blob([audioFile], { type: "application/octet-stream" })
     );
-
-    const response = await fetch("/api/ipfs", {
-      method: "POST",
-      headers: {},
-      body: formData,
-    });
-    console.log(response.body);
 
     const res = await fetch("/api/audios", {
       method: "POST",
@@ -58,7 +54,7 @@ const PostNewAudio: NextPage = () => {
     });
 
     const { id } = await res.json();
-    router.push(`/mypage/audios/${id}`);
+    router.push(`/mypage/materials`);
   });
 
   return (

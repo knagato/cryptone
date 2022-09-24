@@ -8,15 +8,15 @@ import { addSeconds, parseISO } from "date-fns";
 import { randomUUID } from "crypto";
 
 const BUCKET = process.env.AWS_S3_BUCKET ?? "cryptone";
-const REGION = process.env.AWS_REGION ?? "ap-northeast-1";
+const REGION = process.env.AWS_S3_REGION ?? "ap-northeast-1";
 
 const BASE_URL = `https://${BUCKET}.s3.${REGION}.amazonaws.com`;
 
 const client = new S3Client({
   region: REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_KEY as string,
+    accessKeyId: process.env.AWS_S3_ACCESS_ID as string,
+    secretAccessKey: process.env.AWS_S3_SECRET_KEY as string,
   },
 });
 

@@ -19,16 +19,25 @@ const users: Prisma.UserCreateInput[] = [
 
 const images: Prisma.ImageCreateInput[] = [
   {
-    replicateId: 'rdjp5iduprg7fljmjxtsi4k6xi',
     imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/caf6d90a-0bf6-444f-b244-62663ca7a1ec/out-0.png',
     prompt: 'crows',
     jacketCID: 'bafybeigcvm2jw6a2xwpl7g2syrbqrhogwz7ek3ick3a5i52ordk4cbot3a'
   },
-  { replicateId: 'z32ygtk7xnemjpulylfglramaa',
+  {
     imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/d3db96b0-4314-491c-bcdb-1528bea0ba30/out-0.png',
     prompt: 'electric sheep, neon, synthwave',
-    jacketCID: 'aaa'
-  }
+    jacketCID: 'bafybeig5sggcwlupsugcitdtikxbv5gvoxwhvj5z3qo7jnwz54v7rnqv4y'
+  },
+  {
+    imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/093a4a46-9149-4f45-aa24-203572b068e5/out-0.png',
+    prompt: 'sky, cloud',
+    jacketCID: 'bafybeidaucvr5wjlujtdgaq2n4cygkmmdozfkx33nopxt7p52oki5273im'
+  },
+  {
+    imageUrl: 'https://replicate.com/api/models/stability-ai/stable-diffusion/files/1f2440c0-ce84-4e4a-94d4-f431ff45138d/out-0.png',
+    prompt: 'summer beach',
+    jacketCID: 'bafybeicgszgrshjxyclpqjt6u4h345tqd7qdfmmgcbpklfgrs2r4drr46u'
+  },
 ]
 
 async function main() {
