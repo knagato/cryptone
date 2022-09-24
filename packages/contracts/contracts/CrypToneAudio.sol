@@ -144,19 +144,6 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
         emit AudioMinted(tokenId, amount, salesPrice);
     }
 
-    function mint(
-        uint256 tokenId,
-        uint256 amount,
-        uint256 salesPrice
-    ) public {
-        if (_refByTokenId[tokenId].creatorAddress != msg.sender) {
-            revert NotTokenOwner();
-        }
-        super._updateTableOnMint(tokenId, salesPrice);
-        _mint(msg.sender, tokenId, amount, "");
-        emit AudioMinted(tokenId, amount, salesPrice);
-    }
-
     function mintOnlyOwner(
         address creatorAddress,
         WorkType workType,
@@ -165,21 +152,6 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
         uint256 salesPrice
     ) public onlyOwner {
         uint256 tokenId = _beforeMint(creatorAddress, workType, workId, amount);
-        super._updateTableOnMint(tokenId, salesPrice);
-        _mint(creatorAddress, tokenId, amount, "");
-        // setApprovalForAll( , true); // approve to market
-        emit AudioMinted(tokenId, amount, salesPrice);
-    }
-
-    function mintOnlyOwner(
-        address creatorAddress,
-        uint256 tokenId,
-        uint256 amount,
-        uint256 salesPrice
-    ) public onlyOwner {
-        if (_refByTokenId[tokenId].creatorAddress != creatorAddress) {
-            revert NotTokenOwner();
-        }
         super._updateTableOnMint(tokenId, salesPrice);
         _mint(creatorAddress, tokenId, amount, "");
         // setApprovalForAll( , true); // approve to market
@@ -206,22 +178,6 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
             workIds,
             amounts
         );
-        super._updateTableOnMintBatch(tokenIds, salesPrices);
-        _mintBatch(msg.sender, tokenIds, amounts, "");
-        emit AudioBatchMinted(tokenIds, amounts, salesPrices);
-    }
-
-    function mintBatch(
-        uint256[] calldata tokenIds,
-        uint256[] calldata amounts,
-        uint256[] calldata salesPrices
-    ) public {
-        if (
-            tokenIds.length != amounts.length ||
-            amounts.length != salesPrices.length
-        ) {
-            revert MintBatchLengthInvalid();
-        }
         super._updateTableOnMintBatch(tokenIds, salesPrices);
         _mintBatch(msg.sender, tokenIds, amounts, "");
         emit AudioBatchMinted(tokenIds, amounts, salesPrices);
