@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import "../../node_modules/@openzeppelin/contracts/utils/Strings.sol";
-import "../../node_modules/@tableland/evm/contracts/ITablelandTables.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@tableland/evm/contracts/ITablelandTables.sol";
 
 abstract contract TablelandManager {
     // Tableland

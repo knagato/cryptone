@@ -3,13 +3,13 @@
 pragma solidity ^0.8.16;
 
 import "./IERC721Time.sol";
-import "../../../../node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "../../../../node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "../../../../node_modules/@openzeppelin/contracts/utils/Address.sol";
-import "../../../../node_modules/@openzeppelin/contracts/utils/Context.sol";
-import "../../../../node_modules/@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
-import "../../../../node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
