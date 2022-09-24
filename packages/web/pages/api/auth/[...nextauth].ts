@@ -3,6 +3,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
+import { prisma } from "src/lib/prisma";
 
 const isLocalhostDomain = (domain: string) => {
   if (domain.startsWith("127.0.0.1")) return true;
@@ -55,6 +56,10 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           }
 
           await siwe.validate(credentials?.signature || "");
+          await prisma.user.upsert({
+            where: { address: siwe.address },
+            create: { address: siwe.address },
+            update: {} });
           return {
             id: siwe.address,
           };
