@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { FC, Fragment } from "react";
+import { useHowler } from "src/hooks/useHowler";
 import { useStore } from "./store";
-import { useSound } from "./useSound";
 
 type Props = {};
 
@@ -11,7 +11,7 @@ export const JacketDetailModal: FC<Props> = ({}) => {
   const open = useStore((state) => state.jacketDetailModalOpen);
   const actions = useStore((state) => state.actions);
 
-  const [play, { stop }] = useSound(
+  const [play, { stop }] = useHowler(
     selectedJacket ? displayedJacket[selectedJacket]?.audioSrc : undefined
   );
 

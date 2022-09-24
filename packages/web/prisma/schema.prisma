@@ -24,8 +24,8 @@ model UploadAudio {
   id Int @id @default(autoincrement())
   title String?
   description String?
-  audioUrl String?
-  previewUrl String?
+  audioUrl String
+  previewUrl String
   audioSize Int?
   encryptedAudioCID String?
   symmetricKey Bytes?
@@ -54,6 +54,7 @@ model AudioNFT {
   jacketImageCID String
   creatorAddress String
   previewAudioCID String
+  decryptedAudioUrl String
   creator         User     @relation(fields: [creatorAddress], references: [address])
   balanceOfAudioNFT BalanceOfAudioNFT?
 

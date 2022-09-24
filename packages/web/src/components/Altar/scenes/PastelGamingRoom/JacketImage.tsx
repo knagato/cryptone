@@ -2,7 +2,6 @@ import { useTexture } from "@react-three/drei";
 import { FC } from "react";
 import { RepeatWrapping, sRGBEncoding } from "three";
 import { JacketKey, useStore } from "../../store";
-import { useSound } from "../../useSound";
 import { JACKET_INFO } from "./constants";
 
 type Props = {

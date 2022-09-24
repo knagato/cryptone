@@ -53,14 +53,19 @@ export const getOriginalAudioSignedUrl = async ({ key }: { key: string }) => {
 };
 
 export const renewOriginalAudioSignedUrl = async ({ url }: { url: string }) => {
-  const { pathname, searchParams } = new URL(url);
-  const creationDate = parseISO(searchParams.get("X-Amz-Date") as string);
-  const expiresInSec = Number(searchParams.get("X-Amz-Expires"));
-  const expiryDate = addSeconds(creationDate, expiresInSec);
-  const isExpired = expiryDate < new Date();
+  try {
+    const { pathname, searchParams } = new URL(url);
+    const creationDate = parseISO(searchParams.get("X-Amz-Date") as string);
+    const expiresInSec = Number(searchParams.get("X-Amz-Expires"));
+    const expiryDate = addSeconds(creationDate, expiresInSec);
+    const isExpired = expiryDate < new Date();
 
-  if (isExpired) {
-    return await getOriginalAudioSignedUrl({ key: pathname });
+    if (isExpired) {
+      return await getOriginalAudioSignedUrl({ key: pathname });
+    }
+    return url;
+  } catch (error) {
+    console.error(error);
+    return url;
   }
-  return url;
 };
