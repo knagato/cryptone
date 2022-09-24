@@ -34,7 +34,7 @@ abstract contract TablelandManager {
                 "salesPrice text, generation int, ",
                 "name text, description text, encryptedAudioCID text, ",
                 "encryptedSymmetricKey text, previewAudioCID text, jacketCID text,",
-                "image text, external_url text);"
+                "image text, animation_url text);"
             )
         );
 

@@ -13,11 +13,6 @@ async function main() {
     await profile.deployed();
 
     console.log(`CrypTone with 1 ETH and unlock timestamp ${unlockTime} deployed to ${profile.address}`);
-
-    const CrypToneAudio = await ethers.getContractFactory("AudioLib");
-    const audio = await CrypToneAudio.deploy();
-
-    await audio.deployed();
 }
 
 // We recommend this pattern to be able to use async/await everywhere

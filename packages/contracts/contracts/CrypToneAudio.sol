@@ -22,6 +22,9 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
     // reference
     mapping(uint256 => RefStruct) internal _refByTokenId;
 
+    // children
+    mapping(uint256 => uint256[]) internal _childrenByTokenId;
+
     constructor(address tableRegistry, string memory chainName)
         ERC1155("")
         TablelandManager(tableRegistry, chainName)
@@ -305,6 +308,14 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
         return _refByTokenId[tokenId];
     }
 
+    function getChildren(uint256 tokenId)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return _childrenByTokenId[tokenId];
+    }
+
     /// ****************************
     /// *****PRIVATE FUNCTIONS*****
     /// ****************************
@@ -343,6 +354,8 @@ contract CrypToneAudio is ERC1155, Ownable, TablelandManager, AudioDefine {
         ][parentRef.workId].generation + 1;
         _inheritByWorkIdByCreator[creatorAddress][newWorkId]
             .generation = generation;
+
+        _childrenByTokenId[parentTokenId].push(totalWorkCount);
 
         _totalInheritCountByCreator[creatorAddress]++;
 
