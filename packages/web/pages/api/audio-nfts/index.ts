@@ -40,7 +40,7 @@ export default async function handler(
         previewAudioUrl = uploadAudio.previewUrl;
         if (address === audioNFT.creatorAddress) {
           const { pathname } = new URL(uploadAudio.audioUrl);
-          // originalAudioUrl = await getOriginalAudioSignedUrl({ key: pathname });
+          originalAudioUrl = await getOriginalAudioSignedUrl({ key: pathname });
         }
         ret.push({ ...audioNFT, originalAudioUrl, previewAudioUrl });
       }
