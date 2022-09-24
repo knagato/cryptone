@@ -7,7 +7,7 @@ import "../../node_modules/@tableland/evm/contracts/ITablelandTables.sol";
 abstract contract TablelandManager {
     // Tableland
     string private _baseURIString =
-        "https://testnet.tableland.network/query?s=";
+        "https://testnet.tableland.network/query?unwrap=true&extract=true&s=";
     ITablelandTables private _tableland;
     string private _metadataTable;
     uint256 private _metadataTableId;
