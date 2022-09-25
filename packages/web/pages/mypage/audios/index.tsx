@@ -1,24 +1,12 @@
 // Ref. https://tailwindui.com/components/ecommerce/components/product-lists
-import { AudioNFT } from "@prisma/client";
 import type { NextPage } from "next";
 import { FC } from "react";
+import { useAudioNFTs } from "src/api/hooks";
+import { AudioNFT } from "src/api/interface";
 import { useHowler } from "src/hooks/useHowler";
-import useSWR from "swr";
-
-const fetcher = (path: string) =>
-  fetch(`${path}`, {
-    method: "GET",
-  }).then((res) => res.json());
-
-type ExtendAudioNFT = AudioNFT & {
-  originalAudioUrl: string | null;
-  previewAudioUrl: string;
-};
 
 const Home: NextPage = () => {
-  const { data } = useSWR<{
-    data: ExtendAudioNFT[];
-  }>(["/api/audio-nfts"], fetcher);
+  const { data } = useAudioNFTs();
 
   return (
     <div className="container mx-auto py-16">
@@ -36,7 +24,7 @@ const Home: NextPage = () => {
 };
 
 type Props = {
-  audioNFT: ExtendAudioNFT;
+  audioNFT: AudioNFT;
 };
 
 const AudioNFT: FC<Props> = ({ audioNFT }) => {

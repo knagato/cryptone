@@ -1,19 +1,10 @@
-import { AltarTemplate } from "@prisma/client";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import useSWR from "swr";
-
-const fetcher = (path: string) =>
-  fetch(`${path}`, {
-    method: "GET",
-  }).then((res) => res.json());
+import { useAltarTemplates } from "src/api/hooks";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const { data } = useSWR<{ data: AltarTemplate[] }>(
-    ["/api/altar-templates"],
-    fetcher
-  );
+  const { data } = useAltarTemplates();
 
   const selectAltar = async (templateId: number) => {
     const res = await fetch("/api/altars", {

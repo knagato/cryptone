@@ -1,21 +1,12 @@
-import { Altar, AltarTemplate } from "@prisma/client";
 import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import useSWR from "swr";
+import { useAltars } from "src/api/hooks";
 import { useAccount } from "wagmi";
-
-const fetcher = (path: string, address: string) =>
-  fetch(`${path}?address=${address}`, {
-    method: "GET",
-  }).then((res) => res.json());
 
 const Home: NextPage = () => {
   const { address } = useAccount();
-  const { data } = useSWR<{ data: (Altar & { template: AltarTemplate })[] }>(
-    () => (address ? ["/api/altars", address] : null),
-    fetcher
-  );
+  const { data } = useAltars(address);
 
   return (
     <div className="container mx-auto py-16">

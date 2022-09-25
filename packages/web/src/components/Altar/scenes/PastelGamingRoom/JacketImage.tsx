@@ -12,11 +12,13 @@ export const JacketImage: FC<Props> = ({ jacketKey }) => {
   const jacket = JACKET_INFO[jacketKey];
 
   const actions = useStore((state) => state.actions);
-  const displayedJacket = useStore((state) => state.displayedJacket);
+  const altar = useStore((state) => state.altar);
 
-  const textureUrl =
-    displayedJacket[jacketKey]?.thumbnailSrc ??
-    "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/default_jacket.png";
+  const displayedJacket = altar?.arrangementData[jacketKey];
+
+  const textureUrl = displayedJacket?.jacketImageCID
+    ? `https://ipfs.io/ipfs/${displayedJacket.jacketImageCID}`
+    : "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/default_jacket.png";
 
   const texture = useTexture(textureUrl, (t) => {
     if (Array.isArray(t)) return;
@@ -29,11 +31,11 @@ export const JacketImage: FC<Props> = ({ jacketKey }) => {
   return (
     <group
       position={jacket.position}
-      rotation={[-Math.PI / 2, 0, 0]}
+      rotation={[-Math.PI / 2, Math.PI, 0]}
       scale={100}
       onClick={() => {
-        if (displayedJacket[jacketKey]) {
-          actions.openJacketDetailModal();
+        if (displayedJacket) {
+          actions.openJacketDetailModal(jacketKey);
           return;
         }
         actions?.openSelectJacketModal(jacketKey);

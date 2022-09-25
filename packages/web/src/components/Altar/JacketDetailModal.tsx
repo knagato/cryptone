@@ -5,14 +5,16 @@ import { useStore } from "./store";
 
 type Props = {};
 
-export const JacketDetailModal: FC<Props> = ({}) => {
+export const JacketDetailModal: FC<Props> = () => {
   const selectedJacket = useStore((state) => state.selectedJacket);
-  const displayedJacket = useStore((state) => state.displayedJacket);
+  const altar = useStore((state) => state.altar);
   const open = useStore((state) => state.jacketDetailModalOpen);
   const actions = useStore((state) => state.actions);
 
   const [play, { stop }] = useHowler(
-    selectedJacket ? displayedJacket[selectedJacket]?.audioSrc : undefined
+    selectedJacket
+      ? altar?.arrangementData?.[selectedJacket]?.previewAudioUrl
+      : undefined
   );
 
   return (

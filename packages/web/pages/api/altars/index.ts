@@ -48,7 +48,7 @@ export default async function handler(
               address: address,
             },
           },
-          arrangementData: "",
+          arrangementData: {},
         },
       });
 

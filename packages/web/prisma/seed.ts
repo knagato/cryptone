@@ -106,7 +106,14 @@ const altars: Prisma.AltarCreateInput[] = [
         address: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
       },
     },
-    arrangementData: {},
+    arrangementData: {
+      "1": {
+        id: 1,
+        title: "Jaket1",
+        jacketImageCID: "",
+        previewAudioUrl: "",
+      },
+    },
   },
 ];
 

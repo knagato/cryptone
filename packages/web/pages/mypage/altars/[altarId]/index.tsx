@@ -1,21 +1,32 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { NextPage } from "next";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { Loader } from "src/components/Altar/Loader";
-import { Room } from "src/components/Altar";
+import { Room, useStore } from "src/components/Altar";
 import { SelectJacketModal } from "src/components/Altar/SelectJacketModal";
 import { JacketDetailModal } from "src/components/Altar/JacketDetailModal";
 import { Notification } from "src/components/Notification";
-
-const altar = {
-  id: "altar1",
-};
+import { useRouter } from "next/router";
+import { useAltar } from "src/api/hooks";
 
 const Home: NextPage = () => {
   const [open, setOpen] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
+
+  const router = useRouter();
+  const { altarId } = router.query;
+  const actions = useStore((state) => state.actions);
+
+  const { data } = useAltar(
+    typeof altarId === "string" ? parseInt(altarId) : undefined
+  );
+
+  useEffect(() => {
+    if (!data?.data) return;
+    actions.init(data.data);
+  }, [data]);
 
   return (
     <div className="container mx-auto py-16">
@@ -25,7 +36,7 @@ const Home: NextPage = () => {
         </h2>
         <button
           onClick={() => {
-            copyToClipboard(`${window.location.host}/altars/${altar.id}`);
+            copyToClipboard(`${window.location.host}/altars/${altarId}`);
             setOpen(true);
           }}
           className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -48,7 +59,7 @@ const Home: NextPage = () => {
           }}
         >
           <ambientLight />
-          <pointLight position={[10, 10, 10]} />
+          <pointLight intensity={0.3} position={[10, 10, 10]} />
           <color attach="background" args={["gray"]} />
           <OrbitControls
             makeDefault

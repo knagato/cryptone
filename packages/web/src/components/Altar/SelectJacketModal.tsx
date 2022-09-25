@@ -1,48 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { FC, Fragment } from "react";
+import { useAudioNFTs } from "src/api/hooks";
+import { useSWRConfig } from "swr";
 import { useStore } from "./store";
-import { Jacket } from "./types";
-
-const audios: Jacket[] = [
-  {
-    id: "m1",
-    title: "Music 1",
-    thumbnailSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster1_baseColor.jpeg",
-    audioSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
-  },
-  {
-    id: "m2",
-    title: "Music 2",
-    thumbnailSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster2_baseColor.jpeg",
-    audioSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
-  },
-  {
-    id: "m3",
-    title: "Music 3",
-    thumbnailSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster3_baseColor.jpeg",
-    audioSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
-  },
-  {
-    id: "m4",
-    title: "Music 4",
-    thumbnailSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/pastel_gaming_isometric_room/textures/Poster4_baseColor.jpeg",
-    audioSrc:
-      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
-  },
-];
 
 type Props = {};
 
 export const SelectJacketModal: FC<Props> = ({}) => {
   const actions = useStore((state) => state.actions);
   const open = useStore((state) => state.selectJacketModalOpen);
+  const { mutate } = useSWRConfig();
+
+  const { data } = useAudioNFTs();
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -83,16 +52,41 @@ export const SelectJacketModal: FC<Props> = ({}) => {
                     Select music jacket images
                   </Dialog.Title>
                   <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                    {audios.map((audio) => (
+                    {data?.data.map((audio) => (
                       <div key={audio.id}>
                         <button
-                          onClick={() => {
-                            actions.selectJacket(audio);
+                          onClick={async () => {
+                            actions.selectJacket(audio, async (newAltar) => {
+                              mutate(
+                                `/api/altars/${newAltar.id}`,
+                                async () => {
+                                  const res = await fetch(
+                                    `/api/altars/${newAltar.id}`,
+                                    {
+                                      method: "PUT",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                      body: JSON.stringify({
+                                        arrangementData:
+                                          newAltar.arrangementData,
+                                      }),
+                                    }
+                                  );
+                                  const json = await res.json();
+                                  return { data: json };
+                                },
+                                { revalidate: false }
+                              );
+                            });
                           }}
                           className="group"
                         >
                           <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
-                            <img alt={audio.title} src={audio.thumbnailSrc} />
+                            <img
+                              alt={audio.title}
+                              src={`https://ipfs.io/ipfs/${audio.jacketImageCID}`}
+                            />
                           </div>
                           <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
                             <h3>{audio.title}</h3>
