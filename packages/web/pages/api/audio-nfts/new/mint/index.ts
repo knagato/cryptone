@@ -9,7 +9,7 @@ const wallet = CONTRACT_OWNER_SECRET
     ? new Wallet(CONTRACT_OWNER_SECRET, provider)
     : null;
 
-const audioAbi = require('./audio.abi.json');
+const audioAbi = require('src/abi/audio.abi.json');
 
 export default async function handler(
     req: NextApiRequest,
