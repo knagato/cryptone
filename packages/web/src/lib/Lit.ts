@@ -73,9 +73,8 @@ class Lit {
     return { encryptedFile, symmetricKey };
   }
 
-  async saveEncriptionKey(symmetricKey: string) {
-    // TODO: mint original audio token to smart contract
-    const conditionTokenId = 0;
+  async saveEncriptionKey(symmetricKey: Buffer, conditionTokenId: number) {
+
     this.setConditionTokenId(conditionTokenId);
 
     const authSig = await lit.checkAndSignAuthMessage({ chain });

@@ -3,8 +3,15 @@ import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { NextPage } from 'next';
 import { Image, UploadAudio } from '@prisma/client';
-import { bool } from 'yup';
-import { useIsMounted } from 'src/hooks/useIsMounted';
+import {
+  useContractEvent,
+  useContractWrite,
+  usePrepareContractWrite,
+  usePrepareSendTransaction,
+  useWaitForTransaction,
+} from 'wagmi';
+import audioABI from 'src/abi/audio.abi.json';
+import { useRouter } from 'next/router';
 
 // const audios = [
 //   {
@@ -117,11 +124,101 @@ function classNames(...classes: string[]) {
 }
 
 const PostNewAudioNFT: NextPage = () => {
+  const AUDIO_CONTRACT_ADDRESS = '0xad5e5FfDB352769854D7E55E3d793F3237F46104';
+
   const [audios, setAudios] = useState<UploadAudio[]>([]);
   const [images, setImages] = useState<Image[]>([]);
-
   const [audioSelected, setAudioSelected] = useState<UploadAudio>(audios[0]);
   const [imageSelected, setImageSelected] = useState<Image>(images[0]);
+
+  // const [tokenId, setTokenId] = useState<number>(-1);
+  // const [generation, setGeneration] = useState<number>(-1);
+
+  //////////////////////////////////
+  const {
+    config: audioConfig,
+    error: audioPrepareError,
+    isError: isAudioPrepareError,
+  } = usePrepareContractWrite({
+    addressOrName: AUDIO_CONTRACT_ADDRESS,
+    contractInterface: audioABI,
+    functionName: 'postNewAudio',
+  });
+  const {
+    data: audioData,
+    error: audioError,
+    isError: isAudioError,
+    write: audioWrite,
+  } = useContractWrite(audioConfig);
+  const { isLoading: isAudioLoading, isSuccess: isAudioSuccess } =
+    useWaitForTransaction({
+      hash: audioData?.hash,
+    });
+  ///////////////////////////
+  // const {
+  //   config: firstHalfConfig,
+  //   error: firstHalfPrepareError,
+  //   isError: isFirstHalfPrepareError,
+  // } = usePrepareContractWrite({
+  //   addressOrName: AUDIO_CONTRACT_ADDRESS,
+  //   contractInterface: audioABI,
+  //   functionName: 'initMetadataFirstHalf',
+  //   args: [tokenId, generation, audioSelected.title, audioSelected.description],
+  // });
+  // const {
+  //   data: firstHalfData,
+  //   error: firstHalfError,
+  //   isError: isFirstHalfError,
+  //   write: firstHalfWrite,
+  // } = useContractWrite(firstHalfConfig);
+  // const { isLoading: isFirstHalfLoading, isSuccess: isFirstHalfSuccess } =
+  //   useWaitForTransaction({
+  //     hash: firstHalfData?.hash,
+  //   });
+  // /////////////////////////////
+  // const {
+  //   config: secondHalfConfig,
+  //   error: secondHalfPrepareError,
+  //   isError: isSecondHalfPrepareError,
+  // } = usePrepareContractWrite({
+  //   addressOrName: AUDIO_CONTRACT_ADDRESS,
+  //   contractInterface: audioABI,
+  //   functionName: 'initMetadataFirstHalf',
+  //   args: [tokenId, audioSelected.encryptedAudioCID]
+  // });
+  // const {
+  //   data: secondHalfData,
+  //   error: secondHalfError,
+  //   isError: isSecondHalfError,
+  //   write: secondHalfWrite,
+  // } = useContractWrite(secondHalfConfig);
+  // const { isLoading: isSecondHalfLoading, isSuccess: isSecondHalfSuccess } =
+  //   useWaitForTransaction({
+  //     hash: secondHalfData?.hash,
+  //   });
+  ////////////////////////////////////
+
+  useContractEvent({
+    addressOrName: AUDIO_CONTRACT_ADDRESS,
+    contractInterface: audioABI,
+    eventName: 'AudioCreated',
+    listener: (event) => {
+      console.log(event);
+      // setTokenId(event.tokenId);
+      // setGeneration(event.generation);
+      onCreateAudioNFTSucceded(event.tokenId, event.generation);
+    },
+  });
+
+  // const {inheritConfig} = usePrepareContractWrite({
+  //   addressOrName: "0xad5e5FfDB352769854D7E55E3d793F3237F46104",
+  //   contractInterface: audioABI,
+  //   functionName: 'postNewInherit',
+  //   args: [audioSelected.],
+  //   enabled:
+  // })
+
+  const router = useRouter();
 
   const getUploadAudios = async () => {
     const res = await fetch('/api/audios', {
@@ -140,22 +237,46 @@ const PostNewAudioNFT: NextPage = () => {
   };
 
   useEffect(() => {
-    console.log('hoge');
     getUploadAudios();
     getImages();
   }, []);
 
   useEffect(() => {
-    console.log('FUGA');
     setAudioSelected(audios[0]);
     setImageSelected(images[0]);
   }, [audios, images]);
 
-  const handleSubmit = () => {
-    // post data
-    console.log(audioSelected.id);
-    console.log(imageSelected.id);
+  const onCreateAudioNFTSucceded = (tokenId: number, generation: number) => {
+    // TODO:implement inherit write
+    // if (!write) {
+    //   return;
+    // }
+    // write();
+    // // post data
+    // console.log(audioSelected.id);
+    // console.log(imageSelected.id);
+    fetch('/api/audio-nfts/new', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tokenId: tokenId,
+        generation: generation,
+        audioId: audioSelected.id,
+        imageId: imageSelected.id,
+      }),
+    }).then(async (res) => {
+      const json = await res.json();
+      router.push({
+        pathname: `/mypage/audio-nfts/${json.tokenId}/onsale`,
+        query: { tokenId: tokenId },
+      });
+      // router.push(`/mypage/audio-nfts/${json.tokenId}/new/mint`, Option: {tokenId: tokenId});
+    });
   };
+
+  // const initMetadataFirstHalf = async () => {};
 
   return (
     <>
@@ -397,13 +518,16 @@ const PostNewAudioNFT: NextPage = () => {
                   disabled={false}
                   type="submit"
                   className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
-                  onClick={handleSubmit}
+                  onClick={() => (audioWrite ? audioWrite() : {})}
                 >
-                  Create
+                  {isAudioLoading ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </div>
           </div>
+          {(isAudioPrepareError || isAudioError) && (
+            <div>Error: {(audioPrepareError || audioError)?.message}</div>
+          )}
         </>
       ) : (
         <>
