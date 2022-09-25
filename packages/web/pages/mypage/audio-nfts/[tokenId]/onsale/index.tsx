@@ -17,7 +17,7 @@ const PutOnSale: NextPage = () => {
   const AUDIO_CONTRACT_ADDRESS = '0xad5e5FfDB352769854D7E55E3d793F3237F46104';
   const router = useRouter();
   const [amount, setAmount] = useState('100');
-  const [salesPrice, setSalesPrice] = useState<string>('10000');
+  const [salesPrice, setSalesPrice] = useState<string>('0.01');
   const [workType, setWorkType] = useState(0);
   const [workId, setWorkId] = useState(0);
 
@@ -33,7 +33,7 @@ const PutOnSale: NextPage = () => {
       workType,
       workId,
       Number.parseInt(amount),
-      Number.parseInt(salesPrice),
+      Number.parseInt(salesPrice) * 100000,
     ],
   });
 
@@ -119,8 +119,10 @@ const PutOnSale: NextPage = () => {
             onChange={(e) => setSalesPrice(e.target.value)}
             value={salesPrice}
             type="number"
-            id="salesPriceRef"
+            step="0.01"
+            className="w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
           />
+          <span className="ml-3 text-sm font-medium text-gray-700 ">MATIC</span>
         </div>
       </div>
 
