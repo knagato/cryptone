@@ -24,7 +24,7 @@ export interface ExposedData {
 
 export type ReturnedValue = [PlayFunction, ExposedData];
 
-export const useSound = <T = any>(
+export const useHowler = <T = any>(
   src?: string | string[],
   {
     id,

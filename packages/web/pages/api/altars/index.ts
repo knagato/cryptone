@@ -1,5 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "src/lib/prisma";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,24 +11,48 @@ export default async function handler(
 
   switch (req.method) {
     case "GET":
-      if (!address) {
-        return res.status(401);
+      const { address: _address } = req.query;
+      if (typeof _address !== "string") {
+        res.status(400).end("Bad Request.");
+        return;
       }
-      console.log(address);
+      const altars = await prisma.altar.findMany({
+        where: {
+          creator: {
+            address: _address,
+          },
+        },
+        include: { template: true, creator: true },
+      });
 
-      // ...ceate altar
-
-      res.status(200).end("This is altar");
+      res.status(200).end(JSON.stringify({ data: altars }));
       break;
     case "POST":
       if (!address) {
-        return res.status(401);
+        res.status(401).end("Not Authorized");
+        return;
       }
-      console.log(address);
+      const { title, description, templateId } = req.body;
 
-      // ...ceate altar
+      const altar = await prisma.altar.create({
+        data: {
+          template: {
+            connect: {
+              id: templateId,
+            },
+          },
+          title,
+          description,
+          creator: {
+            connect: {
+              address: address,
+            },
+          },
+          arrangementData: {},
+        },
+      });
 
-      res.status(200).end("Altar created!!");
+      res.status(200).end(JSON.stringify({ id: altar.id }));
       break;
     default:
       res.setHeader("Allow", ["GET", "POST"]);

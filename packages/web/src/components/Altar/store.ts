@@ -1,38 +1,36 @@
 import produce from "immer";
+import { Altar, AudioNFT } from "src/api/interface";
 import create from "zustand";
-import { Jacket } from "./types";
 
 export type JacketKey = "1" | "2" | "3" | "4";
 
 type AltarState = {
+  altar?: Altar;
   selectedJacket?: JacketKey;
-  displayedJacket: Record<JacketKey, Jacket | undefined>;
   selectJacketModalOpen: boolean;
   jacketDetailModalOpen: boolean;
   actions: {
-    init: () => void;
+    init: (altar: Altar) => void;
     openSelectJacketModal: (key?: JacketKey) => void;
     closeSelectJacketModal: () => void;
-    openJacketDetailModal: () => void;
+    openJacketDetailModal: (key: JacketKey) => void;
     closeJacketDetailModal: () => void;
-    selectJacket: (src: Jacket) => void;
+    selectJacket: (
+      src: AudioNFT,
+      onUpdate: (altar: Altar) => Promise<void>
+    ) => void;
   };
 };
 
 const useStore = create<AltarState>()((set, get) => {
   return {
+    altar: undefined,
     openJacketModal: false,
-    displayedJacket: {
-      "1": undefined,
-      "2": undefined,
-      "3": undefined,
-      "4": undefined,
-    },
     selectJacketModalOpen: false,
     jacketDetailModalOpen: false,
     actions: {
-      init: () => {
-        //
+      init: (altar) => {
+        set({ altar });
       },
       openSelectJacketModal: (key) => {
         if (key) {
@@ -48,23 +46,29 @@ const useStore = create<AltarState>()((set, get) => {
       closeSelectJacketModal: () => {
         set({ selectJacketModalOpen: false });
       },
-      openJacketDetailModal: () => {
-        set({ jacketDetailModalOpen: true });
+      openJacketDetailModal: (key) => {
+        set({ jacketDetailModalOpen: true, selectedJacket: key });
       },
       closeJacketDetailModal: () => {
-        set({ jacketDetailModalOpen: false });
+        set({ jacketDetailModalOpen: false, selectedJacket: undefined });
       },
-      selectJacket: (src) => {
-        const { displayedJacket, selectedJacket } = get();
-        if (selectedJacket === undefined) return;
+      selectJacket: (audioNFT, onUpdate) => {
+        const { altar, selectedJacket } = get();
+        if (!selectedJacket || !altar) return;
 
-        const newJacket = produce(displayedJacket, (draft) => {
-          draft[selectedJacket] = src;
+        const newAltar = produce(altar, (draft) => {
+          draft.arrangementData[selectedJacket] = {
+            id: audioNFT.id,
+            title: audioNFT.title,
+            jacketImageCID: audioNFT.jacketImageCID,
+            previewAudioUrl: audioNFT.previewAudioUrl,
+          };
         });
         set({
-          displayedJacket: newJacket,
+          altar: newAltar,
           selectJacketModalOpen: false,
         });
+        onUpdate(newAltar);
       },
     },
   };

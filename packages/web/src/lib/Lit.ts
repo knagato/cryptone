@@ -1,6 +1,5 @@
 // this is any type.
 import lit from "@lit-protocol/sdk-nodejs";
-import { access } from "fs";
 import { SAMPLE_CONTRACT_ADDRESS } from "src/utils/constants";
 
 const client = new lit.LitNodeClient();
@@ -73,10 +72,8 @@ class Lit {
     return { encryptedFile, symmetricKey };
   }
 
-  async saveEncriptionKey(symmetricKey: string) {
-    // TODO: mint original audio token to smart contract
-    const conditionTokenId = 0;
-    this.setConditionTokenId(conditionTokenId);
+  async saveEncriptionKey(symmetricKey: string, tokenId: number) {
+    this.setConditionTokenId(tokenId);
 
     const authSig = await lit.checkAndSignAuthMessage({ chain });
 
@@ -97,7 +94,7 @@ class Lit {
   async decryptFile(
     encryptedFile: Blob,
     encryptedSymmetricKey: string,
-    conditionTokenId: Number
+    conditionTokenId: number
   ): Promise<Blob> {
     if (!this.litNodeClient) {
       await this.connect();

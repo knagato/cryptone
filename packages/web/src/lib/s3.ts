@@ -43,6 +43,30 @@ export const putOriginalAudio = async ({
   return { url: `${BASE_URL}/${key}`, key: key };
 };
 
+export const putPreviewAudio = async ({
+  file,
+  creatorAddress,
+  filenameWithExtention,
+  contentType,
+}: {
+  file: Buffer;
+  creatorAddress: string;
+  filenameWithExtention: string;
+  contentType?: string | null;
+}) => {
+  const key = `users/${creatorAddress}/preview-audios/${randomUUID()}-${filenameWithExtention}`;
+  const command = new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: key,
+    ContentType: contentType ?? undefined,
+    Body: file,
+    ACL: "public-read",
+  });
+  await client.send(command);
+
+  return { url: `${BASE_URL}/${key}`, key: key };
+};
+
 export const getOriginalAudioSignedUrl = async ({ key }: { key: string }) => {
   const command = new GetObjectCommand({
     Bucket: BUCKET,
@@ -53,14 +77,19 @@ export const getOriginalAudioSignedUrl = async ({ key }: { key: string }) => {
 };
 
 export const renewOriginalAudioSignedUrl = async ({ url }: { url: string }) => {
-  const { pathname, searchParams } = new URL(url);
-  const creationDate = parseISO(searchParams.get("X-Amz-Date") as string);
-  const expiresInSec = Number(searchParams.get("X-Amz-Expires"));
-  const expiryDate = addSeconds(creationDate, expiresInSec);
-  const isExpired = expiryDate < new Date();
+  try {
+    const { pathname, searchParams } = new URL(url);
+    const creationDate = parseISO(searchParams.get("X-Amz-Date") as string);
+    const expiresInSec = Number(searchParams.get("X-Amz-Expires"));
+    const expiryDate = addSeconds(creationDate, expiresInSec);
+    const isExpired = expiryDate < new Date();
 
-  if (isExpired) {
-    return await getOriginalAudioSignedUrl({ key: pathname });
+    if (isExpired) {
+      return await getOriginalAudioSignedUrl({ key: pathname });
+    }
+    return url;
+  } catch (error) {
+    console.error(error);
+    return url;
   }
-  return url;
 };
