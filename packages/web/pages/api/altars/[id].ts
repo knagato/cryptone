@@ -35,7 +35,6 @@ export default async function handler(
         return;
       }
       const { arrangementData } = req.body;
-      console.log(arrangementData)
 
       const updateAltar = await prisma.altar.update({
         where: { id: altar.id },
