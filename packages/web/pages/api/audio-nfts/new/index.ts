@@ -28,7 +28,7 @@ export default async function handler(
     res: NextApiResponse
 ) {
     switch (req.method) {
-        case 'GET':
+        case 'POST':
             if (!wallet || !process.env.AUDIO_CONTRACT_ADDRESS) {
                 return res.status(500).send('Internal Server Error');
             }
@@ -61,6 +61,7 @@ export default async function handler(
             if (!audioData.symmetricKey) {
                 return res.status(500).send('Internal Server Error');
             }
+
             const litResult = await Lit.saveEncriptionKey(audioData.symmetricKey, tokenId);
 
             const tx1 = await audioContract.initMetadataFirstHalfOnlyOwner(
@@ -86,7 +87,7 @@ export default async function handler(
             })
             break;
         default:
-            res.setHeader('Allow', ['GET'])
+            res.setHeader('Allow', ['POST'])
             res.status(405).end(`Method ${req.method} Not Allowed`)
     }
 }

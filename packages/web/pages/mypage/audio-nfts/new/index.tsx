@@ -125,7 +125,6 @@ function classNames(...classes: string[]) {
 
 const PostNewAudioNFT: NextPage = () => {
   const AUDIO_CONTRACT_ADDRESS = '0xad5e5FfDB352769854D7E55E3d793F3237F46104';
-
   const [audios, setAudios] = useState<UploadAudio[]>([]);
   const [images, setImages] = useState<Image[]>([]);
   const [audioSelected, setAudioSelected] = useState<UploadAudio>(audios[0]);
@@ -140,7 +139,7 @@ const PostNewAudioNFT: NextPage = () => {
     error: audioPrepareError,
     isError: isAudioPrepareError,
   } = usePrepareContractWrite({
-    addressOrName: AUDIO_CONTRACT_ADDRESS,
+    addressOrName: AUDIO_CONTRACT_ADDRESS!,
     contractInterface: audioABI,
     functionName: 'postNewAudio',
   });
@@ -199,14 +198,17 @@ const PostNewAudioNFT: NextPage = () => {
   ////////////////////////////////////
 
   useContractEvent({
-    addressOrName: AUDIO_CONTRACT_ADDRESS,
+    addressOrName: AUDIO_CONTRACT_ADDRESS!,
     contractInterface: audioABI,
     eventName: 'AudioCreated',
     listener: (event) => {
       console.log(event);
       // setTokenId(event.tokenId);
       // setGeneration(event.generation);
-      onCreateAudioNFTSucceded(event.tokenId, event.generation);
+      onCreateAudioNFTSucceded(
+        Number.parseInt(event[0]),
+        Number.parseInt(event[3])
+      );
     },
   });
 

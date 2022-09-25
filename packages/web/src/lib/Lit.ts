@@ -74,6 +74,9 @@ class Lit {
   }
 
   async saveEncriptionKey(symmetricKey: Buffer, conditionTokenId: number) {
+    if (!this.litNodeClient) {
+      await this.connect();
+    }
 
     this.setConditionTokenId(conditionTokenId);
 
