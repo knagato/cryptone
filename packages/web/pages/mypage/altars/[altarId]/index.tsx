@@ -26,7 +26,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (!data?.data) return;
     actions.init(data.data);
-  }, [data]);
+  }, [actions, data]);
 
   return (
     <div className="container mx-auto py-16">

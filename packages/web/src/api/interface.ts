@@ -2,6 +2,7 @@ import {
   Altar as PrismaAltar,
   AltarTemplate as PrismaAltarTemplate,
   AudioNFT as PrismaAudioNFT,
+  User as PrismaUser,
 } from "@prisma/client";
 
 export type AudioNFT = PrismaAudioNFT & {
@@ -12,6 +13,7 @@ export type AudioNFT = PrismaAudioNFT & {
 type JacketKey = "1" | "2" | "3" | "4";
 export type Altar = PrismaAltar & {
   template: PrismaAltarTemplate;
+  creator: PrismaUser;
   arrangementData: Record<
     JacketKey,
     {

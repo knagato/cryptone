@@ -53,16 +53,70 @@ const audioNFTs: Prisma.AudioNFTCreateInput[] = [
     chainId: 80001,
     contractAddress: "0x01",
     tokenId: 1,
-    title: "audio1",
+    title: "Black crow",
     encryptedAudioCID: "",
     encryptedSymmetricKey: "",
-    jacketImageCID: "QmPbxeGcXhYQQNgsC6a36dDyYUcHgMLnGKnF8pVFmGsvqi",
+    jacketImageCID: "QmVSD4LKEJsmSnZoLwbCnvkXcmCp4kZFxU5K8cE8chy7iP",
     creator: {
       connect: {
         address: "0x01",
       },
     },
-    previewAudioCID: "previewaudiocid",
+    previewAudioCID: "blackcrowcid",
+    balanceOfAudioNFT: {
+      create: {
+        user: {
+          connect: {
+            address: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+          },
+        },
+        balance: 1,
+      },
+    },
+    decryptedAudioUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+  },
+  {
+    chainId: 80001,
+    contractAddress: "0x01",
+    tokenId: 2,
+    title: "White crow",
+    encryptedAudioCID: "",
+    encryptedSymmetricKey: "",
+    jacketImageCID: "QmXTMywVX3GhkJETjfhn2kr53u58DgHbEQ4ANpon31Jqwn",
+    creator: {
+      connect: {
+        address: "0x01",
+      },
+    },
+    previewAudioCID: "whitecrowcid",
+    balanceOfAudioNFT: {
+      create: {
+        user: {
+          connect: {
+            address: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+          },
+        },
+        balance: 1,
+      },
+    },
+    decryptedAudioUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+  },
+  {
+    chainId: 80001,
+    contractAddress: "0x01",
+    tokenId: 3,
+    title: "Hokusai crow",
+    encryptedAudioCID: "",
+    encryptedSymmetricKey: "",
+    jacketImageCID: "QmUyQYhs9e81ERR7w1dMhjEDh6aQM5a6H1EKmCwo4jh4dW",
+    creator: {
+      connect: {
+        address: "0x01",
+      },
+    },
+    previewAudioCID: "hokusaicrowcid",
     balanceOfAudioNFT: {
       create: {
         user: {
@@ -80,13 +134,31 @@ const audioNFTs: Prisma.AudioNFTCreateInput[] = [
 
 const uploadAudios: Prisma.UploadAudioCreateInput[] = [
   {
-    title: "Audio title",
+    title: "Black crow audio",
     description: "Audio description",
     audioUrl:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
     previewUrl:
       "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
-    previewAudioCID: "previewaudiocid",
+    previewAudioCID: "blackcrowcid",
+  },
+  {
+    title: "White crow audio",
+    description: "Audio description",
+    audioUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+    previewUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+    previewAudioCID: "whitecrowcid",
+  },
+  {
+    title: "Hokusai crow audio",
+    description: "Audio description",
+    audioUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+    previewUrl:
+      "https://nszknao-sandbox.s3.ap-northeast-1.amazonaws.com/cat-life.mp3",
+    previewAudioCID: "hokusaicrowcid",
   },
 ];
 

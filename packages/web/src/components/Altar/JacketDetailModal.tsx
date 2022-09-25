@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { FC, Fragment } from "react";
 import { useHowler } from "src/hooks/useHowler";
+import { useAccount } from "wagmi";
 import { useStore } from "./store";
 
 type Props = {};
@@ -10,12 +11,15 @@ export const JacketDetailModal: FC<Props> = () => {
   const altar = useStore((state) => state.altar);
   const open = useStore((state) => state.jacketDetailModalOpen);
   const actions = useStore((state) => state.actions);
+  const { address } = useAccount();
 
-  const [play, { stop }] = useHowler(
-    selectedJacket
-      ? altar?.arrangementData?.[selectedJacket]?.previewAudioUrl
-      : undefined
-  );
+  const jacket = selectedJacket
+    ? altar?.arrangementData?.[selectedJacket]
+    : undefined;
+
+  const [play, { stop }] = useHowler(jacket?.previewAudioUrl);
+
+  const isOwner = address === altar?.creator.address;
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -53,16 +57,22 @@ export const JacketDetailModal: FC<Props> = () => {
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Music jacket
+                    {altar?.title}
                   </Dialog.Title>
-                  <div className="mt-6">
-                    <button
-                      onClick={() => actions.openSelectJacketModal()}
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                    >
-                      Change jacket
-                    </button>
-                    <div className="mt-4 flex space-x-2">
+                  <div className="mt-6 space-y-4">
+                    <img
+                      src={`https://ipfs.io/ipfs/${jacket?.jacketImageCID}`}
+                      className="w-full"
+                    />
+                    {isOwner && (
+                      <button
+                        onClick={() => actions.openSelectJacketModal()}
+                        className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                      >
+                        Change jacket
+                      </button>
+                    )}
+                    <div className="flex space-x-2">
                       <button
                         onClick={() => play()}
                         className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50"
@@ -76,6 +86,11 @@ export const JacketDetailModal: FC<Props> = () => {
                         stop
                       </button>
                     </div>
+                    <button
+                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                    >
+                      Make offer at OpenSea
+                    </button>
                   </div>
                 </div>
               </Dialog.Panel>

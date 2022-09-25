@@ -43,7 +43,7 @@ export const SelectJacketModal: FC<Props> = ({}) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl sm:p-6">
                 <div className="mt-3 text-center sm:mt-5">
                   <Dialog.Title
                     as="h3"
@@ -53,46 +53,44 @@ export const SelectJacketModal: FC<Props> = ({}) => {
                   </Dialog.Title>
                   <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
                     {data?.data.map((audio) => (
-                      <div key={audio.id}>
-                        <button
-                          onClick={async () => {
-                            actions.selectJacket(audio, async (newAltar) => {
-                              mutate(
-                                `/api/altars/${newAltar.id}`,
-                                async () => {
-                                  const res = await fetch(
-                                    `/api/altars/${newAltar.id}`,
-                                    {
-                                      method: "PUT",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                      },
-                                      body: JSON.stringify({
-                                        arrangementData:
-                                          newAltar.arrangementData,
-                                      }),
-                                    }
-                                  );
-                                  const json = await res.json();
-                                  return { data: json };
-                                },
-                                { revalidate: false }
-                              );
-                            });
-                          }}
-                          className="group"
-                        >
-                          <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
-                            <img
-                              alt={audio.title}
-                              src={`https://ipfs.io/ipfs/${audio.jacketImageCID}`}
-                            />
-                          </div>
-                          <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                            <h3>{audio.title}</h3>
-                          </div>
-                        </button>
-                      </div>
+                      <button
+                        key={audio.id}
+                        onClick={async () => {
+                          actions.selectJacket(audio, async (newAltar) => {
+                            mutate(
+                              `/api/altars/${newAltar.id}`,
+                              async () => {
+                                const res = await fetch(
+                                  `/api/altars/${newAltar.id}`,
+                                  {
+                                    method: "PUT",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                      arrangementData: newAltar.arrangementData,
+                                    }),
+                                  }
+                                );
+                                const json = await res.json();
+                                return { data: json };
+                              },
+                              { revalidate: false }
+                            );
+                          });
+                        }}
+                        className="group w-full"
+                      >
+                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg relative">
+                          <img
+                            alt={audio.title}
+                            src={`https://ipfs.io/ipfs/${audio.jacketImageCID}`}
+                          />
+                        </div>
+                        <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
+                          <h3>{audio.title}</h3>
+                        </div>
+                      </button>
                     ))}
                   </div>
                 </div>

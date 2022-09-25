@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect } from "react";
 import { useAltar } from "src/api/hooks";
 import { useStore } from "src/components/Altar";
+import { JacketDetailModal } from "src/components/Altar/JacketDetailModal";
 import { Loader } from "src/components/Altar/Loader";
 import { Room } from "src/components/Altar/Room";
 
@@ -20,7 +21,7 @@ const Altar: NextPage = () => {
   useEffect(() => {
     if (!data?.data) return;
     actions.init(data.data);
-  }, [data]);
+  }, [actions, data]);
 
   return (
     <div className="container mx-auto py-16">
@@ -53,6 +54,7 @@ const Altar: NextPage = () => {
           </Suspense>
         </Canvas>
       </div>
+      <JacketDetailModal />
     </div>
   );
 };

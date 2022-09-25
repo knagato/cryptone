@@ -22,7 +22,7 @@ export default async function handler(
             address: _address,
           },
         },
-        include: { template: true },
+        include: { template: true, creator: true },
       });
 
       res.status(200).end(JSON.stringify({ data: altars }));

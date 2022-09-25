@@ -16,7 +16,7 @@ model User {
   nickname String?
   uploadAudios UploadAudio[]
   audioNFTs AudioNFT[]
-  balanceOfAudioNFT BalanceOfAudioNFT?
+  balanceOfAudioNFT BalanceOfAudioNFT[]
   generateImages Image[]
   altars Altar[]
 }
@@ -83,7 +83,7 @@ model Altar {
 
 model BalanceOfAudioNFT {
   id Int @id @default(autoincrement())
-  userAddress String @unique
+  userAddress String
   chainId Int
   contractAddress String
   tokenId Int

@@ -31,7 +31,7 @@ export const JacketImage: FC<Props> = ({ jacketKey }) => {
   return (
     <group
       position={jacket.position}
-      rotation={[-Math.PI / 2, Math.PI, 0]}
+      rotation={[Math.PI / 2, -Math.PI, 0]}
       scale={100}
       onClick={() => {
         if (displayedJacket) {
