@@ -1,6 +1,6 @@
 // this is any type.
 import lit from "@lit-protocol/sdk-nodejs";
-import { SAMPLE_CONTRACT_ADDRESS } from "src/utils/constants";
+import { access } from "fs";
 
 const client = new lit.LitNodeClient();
 const chain = "mumbai";
@@ -39,7 +39,7 @@ class Lit {
     // ];
     [
       {
-        contractAddress: SAMPLE_CONTRACT_ADDRESS,
+        contractAddress: process.env.AUDIO_CONTRACT_ADDRESS,
         standardContractType: "ERC1155",
         chain,
         method: "balanceOf",
@@ -52,7 +52,6 @@ class Lit {
     ];
 
   private setConditionTokenId(tokenId: Number) {
-    // TODO: modify this function to match conditions structure
     this.accessControlConditions[0].parameters[1] = tokenId.toString();
   }
 
@@ -72,14 +71,18 @@ class Lit {
     return { encryptedFile, symmetricKey };
   }
 
-  async saveEncriptionKey(symmetricKey: string, tokenId: number) {
-    this.setConditionTokenId(tokenId);
+  async saveEncriptionKey(symmetricKey: Buffer, conditionTokenId: number) {
+    if (!this.litNodeClient) {
+      await this.connect();
+    }
+
+    this.setConditionTokenId(conditionTokenId);
 
     const authSig = await lit.checkAndSignAuthMessage({ chain });
 
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
       accessControlConditions: this.accessControlConditions,
-      symmetricKey: symmetricKey,
+      symmetricKey: new Uint8Array(symmetricKey),
       authSig: authSig,
       chain: chain,
     });
@@ -116,89 +119,6 @@ class Lit {
     return decryptedFile;
   }
 
-  /*
-  // using encryptFileAndZipWithMetadata
-  async encryptFileAndZip(file: Blob | File): Promise<Blob> {
-    if (!this.litNodeClient) {
-      await this.connect();
-    }
-    const authSig = await lit.checkAndSignAuthMessage({ chain });
-    const { zipBlob } = await lit.encryptFileAndZipWithMetadata({
-      authSig: authSig,
-      accessControlConditions: accessControlConditions,
-      chain: chain,
-      file: file,
-      litNodeClient: this.litNodeClient,
-    });
-    return zipBlob;
-  }
-
-  async decryptZipFile(file: Blob): Promise<DecryptWithUnzipResult> {
-    if (!this.litNodeClient) {
-      await this.connect();
-    }
-    const authSig = await lit.checkAndSignAuthMessage({ chain });
-    const { decryptedFile, metadata } = await lit.decryptZipFileWithMetadata({
-      authSig: authSig,
-      file: file,
-      litNodeClient: this.litNodeClient,
-    });
-    return {
-      decryptedFile,
-      metadata,
-    };
-  }
-  */
-
-  /*
-  async encryptString(message: string): Promise<EncryptStringResult> {
-    if (!this.litNodeClient) {
-      await this.connect();
-    }
-
-    const authSig = await lit.checkAndSignAuthMessage({ chain });
-    const { encryptedString, symmetricKey } = await lit.encryptString(message);
-
-    const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
-      accessControlConditions,
-      symmetricKey,
-      authSig,
-      chain,
-    });
-
-    return {
-      encryptedString: encryptedString,
-      encryptedSymmetricKey: lit.uint8arrayToString(
-        encryptedSymmetricKey,
-        "base16"
-      ),
-    };
-  }
-
-  async decryptString(
-    encryptedString: string,
-    encryptedSymmetricKey: string
-  ): Promise<string> {
-    if (!this.litNodeClient) {
-      await this.connect();
-    }
-
-    const authSig = await lit.checkAndSignAuthMessage({ chain });
-    const symmetricKey = await this.litNodeClient.getEncryptionKey({
-      accessControlConditions,
-      toDecrypt: encryptedSymmetricKey,
-      chain,
-      authSig,
-    });
-
-    const decryptedString = await lit.decryptString(
-      encryptedString,
-      symmetricKey
-    );
-
-    return decryptedString;
-  }
-  */
 }
 
 export default new Lit();
