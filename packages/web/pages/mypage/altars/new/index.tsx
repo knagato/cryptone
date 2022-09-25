@@ -1,26 +1,32 @@
+import { AltarTemplate } from "@prisma/client";
 import type { NextPage } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 
-const altars = [
-  {
-    id: "altar1",
-    thumbnail: "/altar-pastel.png",
-    title: "Modern",
-  },
-  {
-    id: "altar2",
-    thumbnail: "/altar-pastel.png",
-    title: "Fancy",
-  },
-];
+const fetcher = (path: string) =>
+  fetch(`${path}`, {
+    method: "GET",
+  }).then((res) => res.json());
 
 const Home: NextPage = () => {
   const router = useRouter();
+  const { data } = useSWR<{ data: AltarTemplate[] }>(
+    ["/api/altar-templates"],
+    fetcher
+  );
 
-  const selectAltar = async (id: string) => {
-    // const altar = await createAlatar(id);
-    router.push(`/mypage/altars/${id}`);
+  const selectAltar = async (templateId: number) => {
+    const res = await fetch("/api/altars", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "My awesome altar",
+        description: "This is my awesome altar",
+        templateId,
+      }),
+    });
+    const json = await res.json();
+    router.push(`/mypage/altars/${json.id}`);
   };
 
   return (
@@ -37,21 +43,21 @@ const Home: NextPage = () => {
         </h2>
 
         <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-          {altars.map((altar) => (
+          {data?.data.map((template) => (
             <button
-              key={altar.id}
-              onClick={() => selectAltar(altar.id)}
+              key={template.id}
+              onClick={() => selectAltar(template.id)}
               className="group"
             >
               <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg sm:aspect-w-2 sm:aspect-h-3">
                 <img
-                  src={altar.thumbnail}
+                  src={template.thumbnailUrl}
                   alt="Person using a pen to cross a task off a productivity paper card."
                   className="h-full w-full object-cover object-center group-hover:opacity-75"
                 />
               </div>
               <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
-                <h3>{altar.title}</h3>
+                <h3>{template.name}</h3>
               </div>
             </button>
           ))}

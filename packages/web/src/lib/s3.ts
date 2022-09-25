@@ -43,6 +43,30 @@ export const putOriginalAudio = async ({
   return { url: `${BASE_URL}/${key}`, key: key };
 };
 
+export const putPreviewAudio = async ({
+  file,
+  creatorAddress,
+  filenameWithExtention,
+  contentType,
+}: {
+  file: Buffer;
+  creatorAddress: string;
+  filenameWithExtention: string;
+  contentType?: string | null;
+}) => {
+  const key = `users/${creatorAddress}/preview-audios/${randomUUID()}-${filenameWithExtention}`;
+  const command = new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: key,
+    ContentType: contentType ?? undefined,
+    Body: file,
+    ACL: "public-read",
+  });
+  await client.send(command);
+
+  return { url: `${BASE_URL}/${key}`, key: key };
+};
+
 export const getOriginalAudioSignedUrl = async ({ key }: { key: string }) => {
   const command = new GetObjectCommand({
     Bucket: BUCKET,

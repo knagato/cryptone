@@ -90,6 +90,26 @@ const uploadAudios: Prisma.UploadAudioCreateInput[] = [
   },
 ];
 
+const altars: Prisma.AltarCreateInput[] = [
+  {
+    template: {
+      create: {
+        name: "PastelGamingRoom",
+        thumbnailUrl: "/altar-pastel.png",
+        roomUrl: "",
+      },
+    },
+    title: "My awesome altar",
+    description: "This is My awesome altar",
+    creator: {
+      connect: {
+        address: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+      },
+    },
+    arrangementData: {},
+  },
+];
+
 async function main() {
   console.log(`Start truncating ...`);
 
@@ -124,6 +144,12 @@ async function main() {
   for (const uploadAudio of uploadAudios) {
     await prisma.uploadAudio.create({
       data: uploadAudio,
+    });
+  }
+
+  for (const altar of altars) {
+    await prisma.altar.create({
+      data: altar,
     });
   }
 

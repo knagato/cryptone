@@ -18,6 +18,7 @@ model User {
   audioNFTs AudioNFT[]
   balanceOfAudioNFT BalanceOfAudioNFT?
   generateImages Image[]
+  altars Altar[]
 }
 
 model UploadAudio {
@@ -61,20 +62,23 @@ model AudioNFT {
   @@unique([chainId, contractAddress, tokenId])
 }
 
-model AlterTemplate {
+model AltarTemplate {
   id Int @id @default(autoincrement())
   name String
   thumbnailUrl String
   roomUrl String
+  altars Altar[]
 }
 
-model Alter {
+model Altar {
   id Int @id @default(autoincrement())
   templateId Int
   title String
   description String
   creatorId Int
   arrangementData Json
+  creator User @relation(fields: [creatorId], references: [id])
+  template AltarTemplate @relation(fields: [templateId], references: [id])
 }
 
 model BalanceOfAudioNFT {

@@ -1,29 +1,22 @@
+import { Altar, AltarTemplate } from "@prisma/client";
 import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import useSWR from "swr";
+import { useAccount } from "wagmi";
 
-const user = {
-  id: "user1",
-  altars: [
-    {
-      id: "altar-pastel",
-      thumbnail: "/altar-pastel.png",
-      title: "Pastel",
-    },
-    {
-      id: "altar2",
-      thumbnail: "/altar-pastel.png",
-      title: "My awesome altar2",
-    },
-    {
-      id: "altar3",
-      thumbnail: "/altar-pastel.png",
-      title: "My awesome altar3",
-    },
-  ],
-};
+const fetcher = (path: string, address: string) =>
+  fetch(`${path}?address=${address}`, {
+    method: "GET",
+  }).then((res) => res.json());
 
 const Home: NextPage = () => {
+  const { address } = useAccount();
+  const { data } = useSWR<{ data: (Altar & { template: AltarTemplate })[] }>(
+    () => (address ? ["/api/altars", address] : null),
+    fetcher
+  );
+
   return (
     <div className="container mx-auto py-16">
       <div className="md:flex md:items-center md:justify-between">
@@ -43,13 +36,13 @@ const Home: NextPage = () => {
         </h2>
 
         <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-          {user.altars.map((altar) => (
+          {data?.data.map((altar) => (
             <Link key={altar.id} href={`/mypage/altars/${altar.id}`}>
               <a className="group">
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg sm:aspect-w-2 sm:aspect-h-3 relative">
                   <Image
                     alt={altar.title}
-                    src={altar.thumbnail}
+                    src={altar.template.thumbnailUrl}
                     layout="fill"
                     objectFit="cover"
                   />

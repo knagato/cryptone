@@ -473,6 +473,18 @@
     "@aws-sdk/types" "3.178.0"
     tslib "^2.3.1"
 
+"@aws-sdk/middleware-endpoint@^3.178.0":
+  version "3.178.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-endpoint/-/middleware-endpoint-3.178.0.tgz#00c36fbb8ace5b8457698cdc9b41ed935c5331bc"
+  integrity sha512-U0FiwZyK9R+c8bxuXWoKf24Hyf/b17Qm2utHHPRJQ9IqWf3+i86BMCSqMPQmi70DVqNK4VlboSos+19n2S4szQ==
+  dependencies:
+    "@aws-sdk/protocol-http" "3.178.0"
+    "@aws-sdk/signature-v4" "3.178.0"
+    "@aws-sdk/types" "3.178.0"
+    "@aws-sdk/util-config-provider" "3.170.0"
+    "@aws-sdk/util-middleware" "3.178.0"
+    tslib "^2.3.1"
+
 "@aws-sdk/middleware-expect-continue@3.178.0":
   version "3.178.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-expect-continue/-/middleware-expect-continue-3.178.0.tgz#7e6f927badb4f909b3edf9d298be405563c5fd0b"

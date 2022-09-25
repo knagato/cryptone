@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { getToken } from "next-auth/jwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "src/lib/prisma";
-import { putOriginalAudio } from "src/lib/s3";
+import { putOriginalAudio, putPreviewAudio } from "src/lib/s3";
 import Lit from "src/lib/Lit";
 import { UploadAudio } from "@prisma/client";
 import { Web3Storage, File as Web3File } from 'web3.storage'
@@ -80,7 +80,7 @@ export default async function handler(
         const splitSections = await split.parse();
         const previewAudioFilename = splitSections[0].name
         const previewAudioBuf = fs.readFileSync('/tmp/preview.mp3')
-        const previewAudioS3 = await putOriginalAudio({
+        const previewAudioS3 = await putPreviewAudio({
           file: previewAudioBuf,
           creatorAddress: address,
           filenameWithExtention: previewAudioFilename,
@@ -107,6 +107,7 @@ export default async function handler(
         res.status(200).end(JSON.stringify({ id: uploadAudio.id }));
         // res.status(200).end(JSON.stringify({ id: "0" }));
         } catch (err) {
+          console.error(err);
           if (err instanceof Error) {
             res.status(500).end(err.message);
           } else {
