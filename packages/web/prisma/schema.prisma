@@ -16,15 +16,17 @@ model User {
   nickname String?
   uploadAudios UploadAudio[]
   audioNFTs AudioNFT[]
+  balanceOfAudioNFT BalanceOfAudioNFT[]
   generateImages Image[]
+  altars Altar[]
 }
 
 model UploadAudio {
   id Int @id @default(autoincrement())
   title String?
   description String?
-  audioUrl String?
-  previewUrl String?
+  audioUrl String
+  previewUrl String
   audioSize Int?
   encryptedAudioCID String?
   symmetricKey Bytes?
@@ -53,21 +55,41 @@ model AudioNFT {
   jacketImageCID String
   creatorAddress String
   previewAudioCID String
-  creator User @relation(fields: [creatorAddress], references: [address])
+  decryptedAudioUrl String
+  creator         User     @relation(fields: [creatorAddress], references: [address])
+  balanceOfAudioNFT BalanceOfAudioNFT?
+
+  @@unique([chainId, contractAddress, tokenId])
 }
 
-model AlterTemplate {
+model AltarTemplate {
   id Int @id @default(autoincrement())
   name String
   thumbnailUrl String
   roomUrl String
+  altars Altar[]
 }
 
-model Alter {
+model Altar {
   id Int @id @default(autoincrement())
   templateId Int
   title String
   description String
   creatorId Int
   arrangementData Json
+  creator User @relation(fields: [creatorId], references: [id])
+  template AltarTemplate @relation(fields: [templateId], references: [id])
+}
+
+model BalanceOfAudioNFT {
+  id Int @id @default(autoincrement())
+  userAddress String
+  chainId Int
+  contractAddress String
+  tokenId Int
+  balance Int
+  user User @relation(fields: [userAddress], references: [address])
+  audioNFT AudioNFT @relation(fields: [chainId, contractAddress, tokenId], references: [chainId, contractAddress, tokenId])
+
+  @@unique([chainId, contractAddress, tokenId])
 }

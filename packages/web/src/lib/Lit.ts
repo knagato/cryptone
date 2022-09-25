@@ -97,7 +97,7 @@ class Lit {
   async decryptFile(
     encryptedFile: Blob,
     encryptedSymmetricKey: string,
-    conditionTokenId: Number
+    conditionTokenId: number
   ): Promise<Blob> {
     if (!this.litNodeClient) {
       await this.connect();

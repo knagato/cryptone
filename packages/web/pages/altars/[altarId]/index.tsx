@@ -1,11 +1,28 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { NextPage } from "next";
-import React, { Suspense } from "react";
+import { useRouter } from "next/router";
+import React, { Suspense, useEffect } from "react";
+import { useAltar } from "src/api/hooks";
+import { useStore } from "src/components/Altar";
+import { JacketDetailModal } from "src/components/Altar/JacketDetailModal";
 import { Loader } from "src/components/Altar/Loader";
 import { Room } from "src/components/Altar/Room";
 
 const Altar: NextPage = () => {
+  const router = useRouter();
+  const { altarId } = router.query;
+  const actions = useStore((state) => state.actions);
+
+  const { data } = useAltar(
+    typeof altarId === "string" ? parseInt(altarId) : undefined
+  );
+
+  useEffect(() => {
+    if (!data?.data) return;
+    actions.init(data.data);
+  }, [actions, data]);
+
   return (
     <div className="container mx-auto py-16">
       <div className="md:flex md:items-center md:justify-between">
@@ -23,7 +40,7 @@ const Altar: NextPage = () => {
           }}
         >
           <ambientLight />
-          <pointLight position={[10, 10, 10]} />
+          <pointLight intensity={0.3} position={[10, 10, 10]} />
           <color attach="background" args={["gray"]} />
           <OrbitControls
             makeDefault
@@ -37,6 +54,7 @@ const Altar: NextPage = () => {
           </Suspense>
         </Canvas>
       </div>
+      <JacketDetailModal />
     </div>
   );
 };
