@@ -13,112 +13,6 @@ import {
 import audioABI from 'src/abi/audio.abi.json';
 import { useRouter } from 'next/router';
 
-// const audios = [
-//   {
-//     id: 1,
-//     title: 'Wade Cooper',
-//     description: 'ike',
-//     audioUrl: null,
-//     previewUrl: null,
-//     audioSize: null,
-//     encryptedAudioCID: null,
-//     symmetricKey: null,
-//     previewAudioCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 2,
-//     title: 'Arlene Mccoy',
-//     description: 'southern workd',
-//     audioUrl: null,
-//     previewUrl: null,
-//     audioSize: null,
-//     encryptedAudioCID: null,
-//     symmetricKey: null,
-//     previewAudioCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 3,
-//     title: 'Devon Webb',
-//     description: 'clock chance',
-//     audioUrl: null,
-//     previewUrl: null,
-//     audioSize: null,
-//     encryptedAudioCID: null,
-//     symmetricKey: null,
-//     previewAudioCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 4,
-//     title: 'Tom Cook',
-//     description: 'jokingum',
-//     audioUrl: null,
-//     previewUrl: null,
-//     audioSize: null,
-//     encryptedAudioCID: null,
-//     symmetricKey: null,
-//     previewAudioCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 5,
-//     title: 'Tanya Fox',
-//     description: 'splay power',
-//     audioUrl: null,
-//     previewUrl: null,
-//     audioSize: null,
-//     encryptedAudioCID: null,
-//     symmetricKey: null,
-//     previewAudioCID: null,
-//     creatorAddress: null,
-//   },
-// ];
-
-// const images = [
-//   {
-//     id: 1,
-//     prompt: 'dolphin',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-//     jacketCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 2,
-//     prompt: 'bbb',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-//     jacketCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 3,
-//     prompt: 'ccc',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-//     jacketCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 4,
-//     prompt: 'ddd',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-//     jacketCID: null,
-//     creatorAddress: null,
-//   },
-//   {
-//     id: 5,
-//     prompt: 'eee',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-//     jacketCID: null,
-//     creatorAddress: null,
-//   },
-// ];
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
@@ -130,72 +24,27 @@ const PostNewAudioNFT: NextPage = () => {
   const [audioSelected, setAudioSelected] = useState<UploadAudio>(audios[0]);
   const [imageSelected, setImageSelected] = useState<Image>(images[0]);
 
-  // const [tokenId, setTokenId] = useState<number>(-1);
-  // const [generation, setGeneration] = useState<number>(-1);
-
-  //////////////////////////////////
   const {
     config: audioConfig,
     error: audioPrepareError,
     isError: isAudioPrepareError,
   } = usePrepareContractWrite({
-    addressOrName: AUDIO_CONTRACT_ADDRESS!,
+    addressOrName: AUDIO_CONTRACT_ADDRESS,
     contractInterface: audioABI,
     functionName: 'postNewAudio',
   });
+
   const {
     data: audioData,
     error: audioError,
     isError: isAudioError,
     write: audioWrite,
   } = useContractWrite(audioConfig);
+
   const { isLoading: isAudioLoading, isSuccess: isAudioSuccess } =
     useWaitForTransaction({
       hash: audioData?.hash,
     });
-  ///////////////////////////
-  // const {
-  //   config: firstHalfConfig,
-  //   error: firstHalfPrepareError,
-  //   isError: isFirstHalfPrepareError,
-  // } = usePrepareContractWrite({
-  //   addressOrName: AUDIO_CONTRACT_ADDRESS,
-  //   contractInterface: audioABI,
-  //   functionName: 'initMetadataFirstHalf',
-  //   args: [tokenId, generation, audioSelected.title, audioSelected.description],
-  // });
-  // const {
-  //   data: firstHalfData,
-  //   error: firstHalfError,
-  //   isError: isFirstHalfError,
-  //   write: firstHalfWrite,
-  // } = useContractWrite(firstHalfConfig);
-  // const { isLoading: isFirstHalfLoading, isSuccess: isFirstHalfSuccess } =
-  //   useWaitForTransaction({
-  //     hash: firstHalfData?.hash,
-  //   });
-  // /////////////////////////////
-  // const {
-  //   config: secondHalfConfig,
-  //   error: secondHalfPrepareError,
-  //   isError: isSecondHalfPrepareError,
-  // } = usePrepareContractWrite({
-  //   addressOrName: AUDIO_CONTRACT_ADDRESS,
-  //   contractInterface: audioABI,
-  //   functionName: 'initMetadataFirstHalf',
-  //   args: [tokenId, audioSelected.encryptedAudioCID]
-  // });
-  // const {
-  //   data: secondHalfData,
-  //   error: secondHalfError,
-  //   isError: isSecondHalfError,
-  //   write: secondHalfWrite,
-  // } = useContractWrite(secondHalfConfig);
-  // const { isLoading: isSecondHalfLoading, isSuccess: isSecondHalfSuccess } =
-  //   useWaitForTransaction({
-  //     hash: secondHalfData?.hash,
-  //   });
-  ////////////////////////////////////
 
   useContractEvent({
     addressOrName: AUDIO_CONTRACT_ADDRESS!,
@@ -211,14 +60,6 @@ const PostNewAudioNFT: NextPage = () => {
       );
     },
   });
-
-  // const {inheritConfig} = usePrepareContractWrite({
-  //   addressOrName: "0xad5e5FfDB352769854D7E55E3d793F3237F46104",
-  //   contractInterface: audioABI,
-  //   functionName: 'postNewInherit',
-  //   args: [audioSelected.],
-  //   enabled:
-  // })
 
   const router = useRouter();
 
@@ -269,12 +110,10 @@ const PostNewAudioNFT: NextPage = () => {
         imageId: imageSelected.id,
       }),
     }).then(async (res) => {
-      const json = await res.json();
-      router.push({
-        pathname: `/mypage/audio-nfts/${json.tokenId}/onsale`,
-        query: { tokenId: tokenId },
+      res.json().then((data) => {
+        console.log(data);
+        router.push(`/mypage/audio-nfts/${data.tokenId}/onsale`);
       });
-      // router.push(`/mypage/audio-nfts/${json.tokenId}/new/mint`, Option: {tokenId: tokenId});
     });
   };
 
@@ -300,11 +139,6 @@ const PostNewAudioNFT: NextPage = () => {
                         {/* <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"> */}
                         <Listbox.Button className="w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                           <span className="flex items-center">
-                            {/* <img
-                        src={audioSelected.original_image}
-                        alt=""
-                        className="h-16 w-16 flex-shrink-0 rounded-full"
-                    /> */}
                             <span className="ml-3 block truncate">
                               {audioSelected!.title}
                             </span>
